@@ -9,7 +9,7 @@ const authSer = require('./../services/auth.services')
  */
 function signin(req, res, next) {
     const body = req.body;
-    console.log('login body', req.body);
+    // console.log('login body', req.body);
 
     User.findOne({ email: body.email }).exec((err, user) => {
         if (err) {

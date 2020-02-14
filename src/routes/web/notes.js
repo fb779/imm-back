@@ -18,7 +18,7 @@ router.get('/add', (req, res, next) => {
 });
 
 router.post('/new-note', (req, res, next) => {
-    console.log(req.body);
+    // console.log(req.body);
     const { title, description } = req.body;
 
     note = new Note({ title, description });

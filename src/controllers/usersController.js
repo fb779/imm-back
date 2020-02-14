@@ -83,7 +83,7 @@ function getUsers(req, res, next) {
 
 function saveUser(req, res, next) {
     var body = req.body;
-    console.log('save new user', req.body);
+    // console.log('save new user', req.body);
 
     var newUser = new User({
         first_name: body.first_name,
