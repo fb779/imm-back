@@ -16,4 +16,9 @@ router.get('/:id', [auth.isAuth], userCtrl.getUser);
 router.post('/', [auth.isAuth], userCtrl.saveUser);
 router.put('/:id', [auth.isAuth], userCtrl.updateUser);
 
+// router.get('/', userCtrl.getUsers);
+// router.get('/:id', userCtrl.getUser);
+// router.post('/', userCtrl.saveUser);
+// router.put('/:id', userCtrl.updateUser);
+
 module.exports = router;

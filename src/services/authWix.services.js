@@ -2,8 +2,8 @@ const seed = require('../config/config').seed;
 const jwt = require('jsonwebtoken');
 const moment = require('moment');
 
-// metodo encargado de crear un token para las peticiones
-function createToken(user) {
+// metodo encargado de crear un token para las peticiones de wix
+function createWixToken(user) {
     user.password = ':)';
     user.img = ':)';
 
@@ -13,20 +13,10 @@ function createToken(user) {
         sub: user._id,
         user,
         iat: dt.unix(),
-        exp: dt.add(2, 'days').unix()
+        exp: dt.add(20, 'minutes').unix()
     }
 
     return jwt.sign(payload, seed);
-
-    // jwt.sign(payload, seed, function(err, token) {
-    //     if (err) {
-    //         console.log('error al crear el token', err);
-    //     }
-    //     console.log('creando el token', token);
-    //     return token;
-    // });
-
-    // return token;
 }
 
 // metodo encargado de validar (verificacion de firma y fecha) y decodificar el token
@@ -56,25 +46,8 @@ function decodeToken(token) {
     return decode;
 }
 
-// metodo encargado de crear un token para las peticiones de wix
-// function createWixToken(user) {
-//     user.password = ':)';
-//     user.img = ':)';
-
-//     let dt = moment();
-
-//     const payload = {
-//         sub: user._id,
-//         user,
-//         iat: dt.unix(),
-//         exp: dt.add(2, 'days').unix()
-//     }
-
-//     return jwt.sign(payload, seed);
-// }
 
 module.exports = {
-    createToken,
+    createWixToken,
     decodeToken,
-    // createWixToken,
 }

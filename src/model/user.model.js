@@ -22,7 +22,7 @@ const UserSchema = new Schema({
     // google: { type: Boolean, default: false },
 }, { timestamps: true, collection: 'users' });
 
-UserSchema.plugin(uniqueValidator, { message: '{PATH} isnt unique' });
+UserSchema.plugin(uniqueValidator, { message: '{PATH} is not unique' });
 
 /**
  * Hook to before to save user to encrypt password

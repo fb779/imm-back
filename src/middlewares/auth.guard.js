@@ -2,16 +2,16 @@ const authSer = require('./../services/auth.services');
 
 // funcion de verificacion de token valido para autenticar la peticion
 function isAuth(req, res, next) {
-    if (!req.headers.authorization) {
+    const token = extractToken(req);
+
+    if (!token) {
         return res.status(403).send({
             data: {
                 ok: false,
-                message: 'You dont have authorization'
+                message: 'You don\'t have authorization'
             }
         });
     }
-
-    const token = req.headers.authorization.split(' ')[1];
 
     authSer.decodeToken(token)
         .then((response) => {
@@ -26,6 +26,21 @@ function isAuth(req, res, next) {
                 }
             });
         });
+}
+
+function extractToken(req) {
+    let token = '';
+    // console.log('headers', req.headers);
+    // console.log('query', req.query);
+    if (req.headers.authorization) {
+        // console.log('authorization');
+        token = req.headers.authorization.split(" ")[1];
+    } else if (req.query.token) {
+        // console.log('query');
+        token = req.query.token;
+    }
+
+    return token;
 }
 
 module.exports = {
