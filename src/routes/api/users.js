@@ -11,10 +11,11 @@ const auth = require('./../../middlewares/auth.guard')
 /************************************************
  *  get users
  ************************************************/
-router.get('/', [auth.isAuth], userCtrl.getUsers);
-router.get('/:id', [auth.isAuth], userCtrl.getUser);
-router.post('/', [auth.isAuth], userCtrl.saveUser);
 router.put('/:id', [auth.isAuth], userCtrl.updateUser);
+router.post('/', [auth.isAuth], userCtrl.saveUser);
+router.get('/consultans', [auth.isAuth], userCtrl.getConsultans);
+router.get('/:id', [auth.isAuth], userCtrl.getUser);
+router.get('/', [auth.isAuth], userCtrl.getUsers);
 
 // router.get('/', userCtrl.getUsers);
 // router.get('/:id', userCtrl.getUser);

@@ -179,10 +179,35 @@ function deleteUser(req, res, next) {
 }
 
 
+function getConsultans(req, res, next) {
+
+    User.find({ active: true, role: { $eq: "USER_ROLE" } }, '_id first_name last_name email').exec((err, consultans) => {
+        if (err) {
+            return res.status(500).json({
+                data: {
+                    ok: false,
+                    message: 'Problemas al cargar los consultores'
+                }
+            });
+        }
+
+
+        return res.status(200).json({
+            data: {
+                ok: true,
+                message: 'llegamos por los consultores',
+                consultans
+            }
+        });
+    });
+
+}
+
 module.exports = {
     getUser,
     getUsers,
     saveUser,
     updateUser,
     deleteUser,
+    getConsultans
 }
