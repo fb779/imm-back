@@ -5,7 +5,7 @@ const router = express.Router();
 /************************************************
  *  Importaciones
  ************************************************/
-const loginCtrl = require('./../../controllers/loginController');
+const loginCtrl = require('./../../controllers/login.controller');
 
 /************************************************
  *  Login de Usuario

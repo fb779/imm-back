@@ -5,7 +5,7 @@ function isAuth(req, res, next) {
     const token = extractToken(req);
 
     if (!token) {
-        return res.status(403).send({
+        return res.status(401).send({
             data: {
                 ok: false,
                 message: 'You don\'t have authorization'

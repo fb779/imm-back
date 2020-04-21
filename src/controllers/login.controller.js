@@ -1,8 +1,8 @@
 /************************************************
  *  Importaciones
  ************************************************/
-const User = require('./../model/user.model');
-const authSer = require('./../services/auth.services')
+const User = require('../model/user.model');
+const authSer = require('../services/auth.services')
 
 /**
  * Function to login user in app
@@ -11,7 +11,7 @@ function signin(req, res, next) {
     const body = req.body;
     // console.log('login body', req.body);
 
-    User.findOne({ email: body.email }).exec((err, user) => {
+    User.findOne({ email: body.email, active: true }).exec((err, user) => {
         if (err) {
             return res.status(500).json({
                 data: {
@@ -30,7 +30,7 @@ function signin(req, res, next) {
                     errors: [
                         'The credentials are incorrect, email or password has error'
                     ],
-                    // msa: 'email',
+                    msa: 'email',
                 }
             });
         }
@@ -44,7 +44,7 @@ function signin(req, res, next) {
                     errors: [
                         'The credentials are incorrect, email or password has error'
                     ],
-                    // msa: 'password',
+                    msa: 'password',
                 },
             });
         }

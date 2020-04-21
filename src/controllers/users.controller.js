@@ -1,8 +1,18 @@
 /************************************************
  *  Importaciones
  ************************************************/
+
+/**
+ * getUser
+ * getListUsers
+ * createUser
+ * editUser
+ * deleteUser
+ * getUsersConsultans
+ * getUsersClients
+ */
 const User = require('../model/user.model');
-const campos = '_id first_name last_name email img role active createdAt updatedAt';
+const campos = '_id first_name last_name email img role active client createdAt updatedAt';
 
 /**
  * Busca un usuario por su identificador
@@ -12,7 +22,7 @@ function getUser(req, res, next) {
     var id = req.params.id;
 
     User.findById(id, campos)
-        // .populate({ path: 'usuario', select: 'nombre email img' })
+        .populate({ path: 'client' })
         .exec((err, user) => {
             if (err) {
                 return res.status(500).json({
@@ -50,7 +60,8 @@ function getUser(req, res, next) {
  * Listado general de usuarios existentes
  * es posible habilitar paginacion con las configuraciones respectivas
  */
-function getUsers(req, res, next) {
+// function getListUsers(req, res, next) {}
+function getListUsers(req, res, next) {
     var offset = req.query.offset || 0;
     offset = Number(offset);
     var limit = req.query.limit || 20;
@@ -81,7 +92,8 @@ function getUsers(req, res, next) {
         });
 }
 
-function saveUser(req, res, next) {
+// function createUser (req, res, next){}
+function createUser(req, res, next) {
     var body = req.body;
     // console.log('save new user', req.body);
 
@@ -95,6 +107,10 @@ function saveUser(req, res, next) {
     // valida si la data trae el rol o lo crea por defecto
     if (req.body.role) {
         newUser.role = req.body.role;
+    }
+
+    if (req.body.client) {
+        newUser.client = req.body.client;
     }
 
     newUser.save((err, user) => {
@@ -136,7 +152,7 @@ function updateUser(req, res, next) {
             return res.status(400).json({
                 data: {
                     ok: false,
-                    mensaje: 'Error, el usuario ' + id + ' no existe',
+                    mensaje: 'Error, The user Id ' + id + ' doesn\'t exist',
                     errors: { messages: 'NO existe un usuario con ese ID' }
                 }
             });
@@ -149,6 +165,12 @@ function updateUser(req, res, next) {
 
         if (body.password) {
             userEdit.password = body.password;
+        }
+
+        if (body.client) {
+            userEdit.client = body.client;
+        } else {
+            userEdit.client = null;
         }
 
         userEdit.save((err, usSave) => {
@@ -178,10 +200,10 @@ function deleteUser(req, res, next) {
 
 }
 
+// function getListConsultans(req, res, next){}
+function getConsultants(req, res, next) {
 
-function getConsultans(req, res, next) {
-
-    User.find({ active: true, role: { $eq: "USER_ROLE" } }, '_id first_name last_name email').exec((err, consultans) => {
+    User.find({ active: true, role: { $eq: "USER_ROLE" } }, '_id first_name last_name email').exec((err, consultants) => {
         if (err) {
             return res.status(500).json({
                 data: {
@@ -191,23 +213,22 @@ function getConsultans(req, res, next) {
             });
         }
 
-
         return res.status(200).json({
             data: {
                 ok: true,
-                message: 'llegamos por los consultores',
-                consultans
+                consultants
             }
         });
     });
-
 }
+
+// function getListClients(req, res, next){}
 
 module.exports = {
     getUser,
-    getUsers,
-    saveUser,
+    getListUsers,
+    createUser,
     updateUser,
     deleteUser,
-    getConsultans
+    getConsultants
 }

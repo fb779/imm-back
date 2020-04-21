@@ -2,7 +2,7 @@
  *  imports
  ********************************************************/
 const express = require('express');
-// const path = require('path');
+const path = require('path');
 // const session = require('express-session');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -63,6 +63,6 @@ app.use(require('./routes/routes'));
 /********************************************************
  * Static Files
  ********************************************************/
-// app.use(express.static(path.join(__dirname, 'public')));
+// app.use('/documents', express.static(path.join(__dirname, 'public')));
 
 module.exports = app;

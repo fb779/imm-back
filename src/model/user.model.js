@@ -1,25 +1,19 @@
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const seed = require('../config/config').seed;
+const { rolesValidos } = require('./../config/config')
 
 const Schema = mongoose.Schema;
 
-const rolesValidos = {
-    values: ['ADMIN_ROLE', 'USER_ROLE', 'CLIENT_ROLE'],
-    message: '{VALUE} no es un role permitido'
-};
-
 const UserSchema = new Schema({
+    email: { type: String, unique: true, required: [true, 'El correo es necesario'], lowercase: true },
     first_name: { type: String, required: [true, 'El Nombre es necesario'], },
     last_name: { type: String, required: [true, 'El Apellido es necesario'], },
-    email: { type: String, unique: true, required: [true, 'El correo es necesario'], lowercase: true },
     password: { type: String, required: [true, 'La contraseña es necesario'] },
     img: { type: String, required: false, default: '' },
-    role: { type: String, default: 'CLIENT_ROLE', enum: rolesValidos, uppercase: true },
     active: { type: Boolean, default: false },
-    // google: { type: Boolean, default: false },
+    role: { type: String, default: 'CLIENT_ROLE', enum: rolesValidos, uppercase: true },
+    client: { type: Schema.Types.ObjectId, ref: 'Client', default: null, required: false },
 }, { timestamps: true, collection: 'users' });
 
 UserSchema.plugin(uniqueValidator, { message: '{PATH} is not unique' });
@@ -41,7 +35,7 @@ UserSchema.pre('save', async function(next) {
 /**
  * Hook to after save user to replace the password
  */
-UserSchema.post('save', async function(next) {
+UserSchema.post('save', function(next) {
     const user = this;
     user.password = ':)';
 
