@@ -41,15 +41,45 @@ function createFamilyMember(process, client) {
     })
 }
 
-// function editFamilyMember() {
-//     return new Promise(async(resolve, reject) => {
-//         try {
+function editFamilyMember(editClient) {
+    return new Promise(async(resolve, reject) => {
+        try {
+            const client = await await Client.findById(editClient._id).select('-email -createdAt -updatedAt -active -__v');
 
-//         } catch (error) {
 
-//         }
-//     })
-// }
+
+            if (!client) {
+                return reject({
+                    ok: false,
+                    message: `Client doesn't exist`,
+                    error: {}
+                });
+            }
+
+            if (editClient.first_name) { client.first_name = editClient.first_name; }
+            if (editClient.last_name) { client.last_name = editClient.last_name; }
+            if (editClient.title) { client.title = editClient.title; }
+            if (editClient.sex) { client.sex = editClient.sex; }
+            // if (editClient.birthday) { client.birthday = editClient.birthday; }
+            if (editClient.age) { client.age = editClient.age; }
+            if (editClient.country_citizenship) { client.country_citizenship = editClient.country_citizenship; }
+            client.other_citizenship = editClient.other_citizenship;
+            if (editClient.country_residence) { client.country_residence = editClient.country_residence; }
+            if (editClient.status_residence) { client.status_residence = editClient.status_residence; }
+            if (editClient.status_residence_other) { client.status_residence_other = editClient.status_residence_other; }
+
+            await client.save();
+
+            resolve(client);
+        } catch (error) {
+            reject({
+                status: 500,
+                message: 'Error al editar familiar',
+                errors: error
+            })
+        }
+    })
+}
 
 function deleteFamilyMember(id_process, id_client) {
     return new Promise(async(resolve, reject) => {
@@ -80,6 +110,6 @@ function deleteFamilyMember(id_process, id_client) {
 module.exports = {
     getFamilyByProcess,
     createFamilyMember,
-    // editFamilyMember,
+    editFamilyMember,
     deleteFamilyMember,
 }

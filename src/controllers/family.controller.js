@@ -21,9 +21,10 @@ async function getFamilyByProcess(req, res, next) {
 }
 
 async function createFamilyMember(req, res, next) {
+    const id_process = req.params.id_process;
+    const body = req.body;
+
     try {
-        const id_process = req.params.id_process;
-        const body = req.body;
         // const relationship = req.body.relationship;
 
         // delete body.relationship;
@@ -48,8 +49,16 @@ async function createFamilyMember(req, res, next) {
 }
 
 async function editFamilyMember(req, res, next) {
+    const id_process = req.params.id_process;
+    const body = req.body;
     try {
+        const familyMember = await FamilyService.editFamilyMember(body);
 
+        res.status(200).json({
+            ok: true,
+            message: 'Miembro de la familia editado',
+            familyMember
+        });
     } catch (error) {
         return res.status(error.status).json({
             ok: false,
