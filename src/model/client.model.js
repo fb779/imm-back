@@ -49,7 +49,7 @@ const ClientSchema = new Schema({
     // email: { type: String, unique: true, required: [true, 'The email is required'], lowercase: true },
     telephone: { type: String, required: [false, 'The phone number is required'] },
     birthday: { type: Date, min, max, required: [false, 'The birthday is required'] },
-    age: { type: Number },
+    age: { type: Number, default: null },
     country_citizenship: { type: String, required: false },
     other_citizenship: { type: String, required: false },
     country_residence: { type: String, required: false },
@@ -85,6 +85,3 @@ ClientSchema.pre('save', async function(next) {
 });
 
 module.exports = mongoose.model('Client', ClientSchema);
-
-369832
-238963

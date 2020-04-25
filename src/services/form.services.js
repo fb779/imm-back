@@ -54,17 +54,19 @@ function editForm(process, oldForm) {
             if (oldForm.destiny) { form.destiny = oldForm.destiny; }
             if (oldForm.marital_status) { form.marital_status = oldForm.marital_status; }
 
-            if (oldForm.number_children) {
-                form.number_children = oldForm.number_children;
-            } else {
-                form.number_children = '';
-            }
+            form.number_accompanying = oldForm.number_accompanying;
 
-            if (oldForm.spouse_accompanying) {
-                form.spouse_accompanying = oldForm.spouse_accompanying;
-            } else {
-                form.spouse_accompanying = '';
-            }
+            // if (oldForm.number_children) {
+            //     form.number_children = oldForm.number_children;
+            // } else {
+            //     form.number_children = '';
+            // }
+
+            // if (oldForm.spouse_accompanying) {
+            //     form.spouse_accompanying = oldForm.spouse_accompanying;
+            // } else {
+            //     form.spouse_accompanying = '';
+            // }
 
             if (oldForm.purpose_visit) { form.purpose_visit = oldForm.purpose_visit; }
             if (oldForm.letter_invitation) { form.letter_invitation = oldForm.letter_invitation; }

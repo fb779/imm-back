@@ -16,21 +16,11 @@ const statusVisa = {
 const FormVisitorSchema = new Schema({
     process: { type: Schema.Types.ObjectId, ref: 'Process', unique: true, required: [true, 'The process is required'] },
     client: { type: Schema.Types.ObjectId, ref: 'Client', required: [true, 'The user is required'] },
-    // title: { type: String, required: true },
-    // sex: { type: String, required: true },
-    // first_name: { type: String, required: true, uppercase: true },
-    // last_name: { type: String, required: true, uppercase: true },
-    // email: { type: String, required: [true, 'The email is required'], lowercase: true },
-    // telephone: { type: String, required: true },
-    // country_citizenship: { type: String, required: true },
-    // other_citizenship: { type: String, required: true },
-    // country_residence: { type: String, required: true },
-    // status_residence: { type: String, required: true },
-    // age: { type: String, required: true },
     destiny: { type: String, required: true },
     marital_status: { type: String, required: true },
-    number_children: { type: Number, default: 0, required: false },
-    spouse_accompanying: { type: String, default: '', required: false },
+    number_accompanying: { type: Number, default: 0, required: false },
+    // number_children: { type: Number, default: null, required: false },
+    // spouse_accompanying: { type: String, default: '', required: false },
     purpose_visit: { type: String, required: true },
     letter_invitation: { type: String, required: true },
     stay_canada: { type: String, required: true },
@@ -42,5 +32,18 @@ const FormVisitorSchema = new Schema({
 }, { timestamps: true, collection: 'form' });
 
 FormVisitorSchema.plugin(uniqueValidator, { message: '{PATH} is not unique' });
+
+/**
+ * Hook to before to save user to encrypt password
+ */
+// FormVisitorSchema.pre('save', async function(next) {
+//     const form = this;
+
+//     if (form.isModified('number_accompanying') || !form.number_accompanying) {
+//         form.number_accompanying = 0;
+//     }
+
+//     return next();
+// });
 
 module.exports = mongoose.model('FormVisitor', FormVisitorSchema);

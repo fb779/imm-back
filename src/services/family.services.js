@@ -1,5 +1,6 @@
 const Family = require('../model/family.model');
 const Client = require('../model/client.model');
+const ClientService = require('../services/client.services');
 
 function getFamilyByProcess(process) {
     return new Promise(async(resolve, reject) => {
@@ -19,10 +20,11 @@ function getFamilyByProcess(process) {
 
 function createFamilyMember(process, client) {
     return new Promise(async(resolve, reject) => {
-        const newClient = new Client(client);
         try {
             // console.log(process, client);
-            await newClient.save();
+            // const newClient = new Client(client);
+            // await newClient.save();
+            const newClient = await ClientService.createClient(client);
 
             const family = new Family({ client: newClient, process: process });
             await family.save();
@@ -45,8 +47,6 @@ function editFamilyMember(editClient) {
     return new Promise(async(resolve, reject) => {
         try {
             const client = await await Client.findById(editClient._id).select('-email -createdAt -updatedAt -active -__v');
-
-
 
             if (!client) {
                 return reject({
