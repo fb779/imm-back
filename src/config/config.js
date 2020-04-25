@@ -38,6 +38,4 @@ module.exports = {
     titles,
     sexs,
     relationships,
-
-
 };

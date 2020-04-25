@@ -18,11 +18,11 @@ const auth = require('./../../middlewares/auth.guard');
  *  CRUD basico para el recurso
  ************************************************/
 
-router.get('/', [], visaCategoryCtrl.getVisaCateories);
-router.get('/:id', [], visaCategoryCtrl.getVisaCateoryId);
-router.post('/', [], visaCategoryCtrl.createVisaCateory);
-router.put('/:id', [], visaCategoryCtrl.editVisaCateory);
-router.delete('/:id', [], visaCategoryCtrl.deleteVisaCateory);
+router.get('/', [auth.isAuth], visaCategoryCtrl.getVisaCateories);
+router.get('/:id', [auth.isAuth], visaCategoryCtrl.getVisaCateoryId);
+router.post('/', [auth.isAuth], visaCategoryCtrl.createVisaCateory);
+router.put('/:id', [auth.isAuth], visaCategoryCtrl.editVisaCateory);
+router.delete('/:id', [auth.isAuth], visaCategoryCtrl.deleteVisaCateory);
 
 
 
