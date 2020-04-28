@@ -41,7 +41,7 @@ function createProcess(newProcess) {
 
 
             const listProcess = await Process.find({ active: true, client: newProcess.client, visa_category: newProcess.visa_category });
-            // console.log(listProcess.length);
+
             if (listProcess.length > 0) {
                 return reject({
                     status: 400,
@@ -51,6 +51,7 @@ function createProcess(newProcess) {
             }
 
             const process = new Process(newProcess);
+            // console.log('verificacion al crear el proceso', process);
             await process.save();
 
             resolve(process);

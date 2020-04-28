@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { statusVisa, typeVisa } = require('./../config/config');
+const { statusVisa } = require('./../config/config');
 const uniqueValidator = require('mongoose-unique-validator');
 
 const Schema = mongoose.Schema;
@@ -20,7 +20,6 @@ const ProcessSchema = new Schema({
     code: { type: String, uppercase: true },
     status: { type: String, default: 'ACTIVE', enum: statusVisa, uppercase: true },
     active: { type: Boolean, default: true },
-    // type_visa: { type: String, enum: typeVisa, uppercase: true, required: [true, 'The type visa is required'] },
 }, { timestamps: true, collection: 'process' });
 
 /**
@@ -29,14 +28,16 @@ const ProcessSchema = new Schema({
 ProcessSchema.pre('save', async function(next) {
     const process = this;
 
-    if (process.isModified('birthday')) {
-        // var nacimiento = moment( birthday, "YYYY-MM-DD");
-        var nacimiento = moment(client.birthday);
-        var hoy = moment();
-        client.age = hoy.diff(nacimiento, "years");
+    if (this.isNew) {
+        const list_process = await Process.find({ visa_category: process.visa_category }).countDocuments();
+        process.code = `${process.visa_category.name}-${String(list_process + 1).padStart(10,'0')}`;
+
     }
+
 
     return next();
 });
 
-module.exports = mongoose.model('Process', ProcessSchema);
+const Process = mongoose.model('Process', ProcessSchema);
+
+module.exports = Process;

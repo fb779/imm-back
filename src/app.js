@@ -63,6 +63,6 @@ app.use(require('./routes/routes'));
 /********************************************************
  * Static Files
  ********************************************************/
-// app.use('/documents', express.static(path.join(__dirname, 'public')));
+// app.use('/api/v1/documents', express.static(path.join(__dirname, 'public', 'processes')));
 
 module.exports = app;
