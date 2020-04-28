@@ -38,7 +38,7 @@ router.post('/:id_process/:id_client', async(req, res, next) => {
             ok: false,
             mesaje: 'No selecciono nada',
             errors: {
-                message: 'Debe seleccionar una imagen'
+                message: 'Debe seleccionar un archivo'
             }
         });
     }
