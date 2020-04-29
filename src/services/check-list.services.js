@@ -8,23 +8,40 @@ function getListCheckList() {
             return resolve(list);
         } catch (error) {
             reject({
-                status: 400,
-                message: 'Error to create VisaCategory',
+                status: 500,
+                message: 'Error to create checklist',
                 errors: error
             });
         }
     })
 }
 
-// function getCheckListById(id) {
-//     return new Promise(async() => {
-//         try {
+function getCheckListByIds(ids) {
+    return new Promise(async(resolve, reject) => {
+        try {
 
-//         } catch (error) {
+            const list_ids = ids.split(',').filter(el => (el.trim()) ? true : false).map(el => el.trim());
 
-//         }
-//     })
-// }
+            const list_items = await CheckList.find({ _id: { $in: list_ids } }).select('_id name');
+
+            if (list_items.length !== list_ids.length) {
+                return reject({
+                    status: 404,
+                    message: 'Error to find all items checklist',
+                    errors: error
+                });
+            }
+
+            return resolve(list_items);
+        } catch (error) {
+            return reject({
+                status: 500,
+                message: 'Error to find items checklist',
+                errors: error
+            });
+        }
+    })
+}
 
 
 // crear nuevo VisaCategorye
@@ -97,7 +114,7 @@ function editCheckList(id, newCheckList) {
         } catch (error) {
             reject({
                 status: 400,
-                message: 'Error to edit Visa-Category',
+                message: 'Error to edit CheckList',
                 errors: error
             });
         }
@@ -113,7 +130,7 @@ function deleteCheckList(id) {
             if (!check) {
                 reject({
                     status: 400,
-                    message: 'Error, the VisaCategory doesn\'t delete',
+                    message: 'Error, the CheckList doesn\'t delete',
                     errors: error
                 })
             }
@@ -122,7 +139,7 @@ function deleteCheckList(id) {
         } catch (error) {
             reject({
                 status: 400,
-                message: 'Error, the VisaCategory doesn\'t deletel',
+                message: 'Error, the CheckList doesn\'t deletel',
                 errors: error
             });
         }
@@ -153,7 +170,7 @@ function disableCheckList(id) {
         } catch (error) {
             reject({
                 status: 400,
-                message: 'Error, the VisaCategory doesn\'t deletel',
+                message: 'Error, the CheckList doesn\'t deletel',
                 errors: error
             });
         }
@@ -184,7 +201,7 @@ function enableCheckList(id) {
         } catch (error) {
             reject({
                 status: 400,
-                message: 'Error, the VisaCategory doesn\'t deletel',
+                message: 'Error, the CheckList doesn\'t deletel',
                 errors: error
             });
         }
@@ -198,4 +215,5 @@ module.exports = {
     deleteCheckList,
     disableCheckList,
     enableCheckList,
+    getCheckListByIds
 }

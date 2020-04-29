@@ -1,6 +1,5 @@
 const VisaCategory = require('../model/visa-category.model');
 
-
 // obtener un tipo de visa por su nombre
 function getByName(name) {
     return new Promise(async(resolve, reject) => {

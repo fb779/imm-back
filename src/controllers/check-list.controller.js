@@ -26,6 +26,7 @@ async function getCheckList(req, res, next) {
         }
 
         const listCheckList = await CheckList.find(filter).select('-visa_categories -createdAt -updatedAt -__v'); //.populate({ path: 'visa_categories', match: { name: { $eq: "VISITOR" } } });
+
         // const listCheckList = await CheckList.find({}).select('-createdAt -updatedAt -__v'); //.populate({ path: 'visa_categories', match: { name: { $eq: "VISITOR" } } });
 
         // .populate({

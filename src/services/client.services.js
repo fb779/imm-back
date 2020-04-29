@@ -3,19 +3,21 @@ const Client = require('../model/client.model');
 function getById(id) {
     return new Promise(async(resolve, reject) => {
         try {
-            var client = await Client.findById(id);
+            const client = await Client.findById(id);
 
             if (!client) {
-                reject({
-                    status: 400,
-                    message: `The client doesn't find with the Email: ${email}`,
-                    errors: `Client doesn't find with the Email`
+                // throw (new Error('mi error personalizado en el cliente'));
+                return reject({
+                    status: 404,
+                    message: `The client doesn't find with this Id: ${id}`,
+                    errors: `Client doesn't find with this Id`
                 });
             }
 
-            resolve(client);
+            return resolve(client);
         } catch (error) {
-            reject({
+            console.log(error)
+            return reject({
                 status: 500,
                 message: 'Error, the client doesn\'t find',
                 errors: error
@@ -31,7 +33,7 @@ function getByEmail(email) {
 
             if (!client) {
                 reject({
-                    status: 400,
+                    status: 404,
                     message: `The client doesn't find with the Email: ${email}`,
                     errors: `Client doesn't find with the Email`
                 });
@@ -144,5 +146,6 @@ module.exports = {
     createClient,
     editClient,
     deleteClient,
+    getById,
     getByEmail,
 }
