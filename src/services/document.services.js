@@ -60,6 +60,22 @@ function deleteDocuments(documents) {
     });
 }
 
+function deleteDocumentsByClient(client) {
+    return new Promise(async(resolve, reject) => {
+        try {
+            const list_documents = await Document.deleteMany({ client: client._id });
+            return resolve(list_documents);
+
+        } catch (error) {
+            return reject({
+                status: 500,
+                message: 'Error to delete documents',
+                errors: error
+            });
+        }
+    });
+}
+
 /************************************************
  *  Export de metodos
  ************************************************/
@@ -68,4 +84,5 @@ module.exports = {
     getDocumentsByClientId,
     createDocumentsByClient,
     deleteDocuments,
+    deleteDocumentsByClient,
 }

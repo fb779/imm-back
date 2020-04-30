@@ -77,6 +77,10 @@ async function deleteFamilyMember(req, res, next) {
 
     try {
         const familyMember = await FamilyService.deleteFamilyMember(id_process, id_client);
+
+        //
+
+
         res.status(200).json({
             ok: true,
             message: 'se elimino el familiar',

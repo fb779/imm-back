@@ -1,6 +1,7 @@
 const Family = require('../model/family.model');
 const Client = require('../model/client.model');
 const ClientService = require('../services/client.services');
+const DocumentService = require('./document.services');
 
 function getFamilyByProcess(process) {
     return new Promise(async(resolve, reject) => {
@@ -94,7 +95,9 @@ function deleteFamilyMember(id_process, id_client) {
                 })
             }
 
-            await Client.findByIdAndRemove(id_client);
+            const client = await Client.findByIdAndRemove(id_client);
+
+            await DocumentService.deleteDocumentsByClient(client);
 
             return resolve(member);
         } catch (error) {
