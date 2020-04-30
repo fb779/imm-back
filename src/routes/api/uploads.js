@@ -71,7 +71,7 @@ async function loadFileServer(file, keyFile, process, client) {
     var extension = nombreCortado[nombreCortado.length - 1];
 
     // definicion del nombre del archivo
-    var nombreArchivo = `${ keyFile }.${ moment().unix() }.${ extension }`;
+    var nombreArchivo = `${ keyFile.replace(/\s/gi, '-') }.${ moment().unix() }.${ extension }`;
 
     // definicion de la rua de guardado
     var file_path = `${uploadDir}/${ process }/${ client }/${nombreArchivo}`;
