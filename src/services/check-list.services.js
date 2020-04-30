@@ -20,7 +20,7 @@ function getCheckListByIds(ids) {
     return new Promise(async(resolve, reject) => {
         try {
 
-            const list_ids = ids.split(',').filter(el => (el.trim()) ? true : false).map(el => el.trim());
+            const list_ids = [...new Set(ids.split(',').filter(el => (el.trim()) ? true : false).map(el => el.trim()))];
 
             const list_items = await CheckList.find({ _id: { $in: list_ids } }).select('_id name');
 

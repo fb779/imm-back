@@ -13,10 +13,11 @@ async function getFamilyByProcess(req, res, next) {
             list
         });
     } catch (error) {
-        return res.status(500).json({
-            ok: false,
-            message: 'catch, llegamos a los familiares'
-        });
+        errorHandler(error, res);
+        // return res.status(500).json({
+        //     ok: false,
+        //     message: 'catch, llegamos a los familiares'
+        // });
     }
 }
 
@@ -39,12 +40,12 @@ async function createFamilyMember(req, res, next) {
         });
 
     } catch (error) {
-        return res.status(error.status).json({
-            ok: false,
-            message: error.message,
-            errors: error.errors
-
-        });
+        errorHandler(error, res);
+        // return res.status(error.status).json({
+        //     ok: false,
+        //     message: error.message,
+        //     errors: error.errors
+        // });
     }
 }
 
@@ -60,12 +61,13 @@ async function editFamilyMember(req, res, next) {
             familyMember
         });
     } catch (error) {
-        return res.status(error.status).json({
-            ok: false,
-            message: error.message,
-            errors: error.errors
+        errorHandler(error, res);
+        // return res.status(error.status).json({
+        //     ok: false,
+        //     message: error.message,
+        //     errors: error.errors
 
-        });
+        // });
     }
 }
 
@@ -83,16 +85,37 @@ async function deleteFamilyMember(req, res, next) {
             familyMember
         })
     } catch (error) {
-        // console.log(error);
-        return res.status(error.status).json({
-            ok: false,
-            message: error.message,
-            errors: error.errors
+        errorHandler(error, res);
+        // return res.status(error.status).json({
+        //     ok: false,
+        //     message: error.message,
+        //     errors: error.errors
 
-        });
+        // });
     }
 }
 
+/************************************************
+ *  Metodo para el manejo de error
+ ************************************************/
+const errorHandler = (error, res) => {
+    if (error.hasOwnProperty('status')) {
+        return res.status(error.status).json({
+            ok: false,
+            message: error.message,
+            error: error.errors
+        })
+    }
+    return res.status(500).json({
+        ok: true,
+        message: 'error en el servicio de creacion del listado de documentos',
+        error
+    })
+}
+
+/************************************************
+ *  Export de metodos
+ ************************************************/
 module.exports = {
     getFamilyByProcess,
     createFamilyMember,

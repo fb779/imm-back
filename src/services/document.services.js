@@ -13,9 +13,9 @@ function getDocumentsByClientId(id_client) {
     return new Promise(async(resolve, reject) => {
         try {
 
-            const list_documents = await Document.find({ client: id_client });
+            const list_documents = await Document.find({ client: id_client }).select('-createdAt -updatedAt -__v');
+
             return resolve(list_documents);
-            // resolve(list_documents);
 
         } catch (error) {
             return reject({
@@ -45,9 +45,10 @@ function createDocumentsByClient(itemsChecklist) {
 function deleteDocuments(documents) {
     return new Promise(async(resolve, reject) => {
         try {
-            const filter = documents.map(el => el.checklist.toString());
+            // const filter = documents.map(el => el.checklist.toString());
+            const filter = documents.map(el => el._id);
             // const list_documents = await Document.deleteMany({ checklist: { $in: documents } });
-            const list_documents = await Document.deleteMany({ checklist: { $in: filter } });
+            const list_documents = await Document.deleteMany({ _id: { $in: filter } });
             return resolve(list_documents);
         } catch (error) {
             return reject({

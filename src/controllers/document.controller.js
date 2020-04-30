@@ -17,10 +17,10 @@ async function getDocumentsByCliente(req, res, next) {
 
         res.status(200).json({
             ok: true,
-            client,
             list: documents
         })
     } catch (error) {
+        errorHandler(error, res);
 
     }
 }
@@ -41,15 +41,13 @@ async function saveDocumentsByCliente(req, res, next) {
 
         const checkList = await (await CheckListService.getCheckListByIds(body)).map(({ _id, name }) => ({ checklist: _id, client: client._id, name, }));
 
-        const client_documents = await DocumentServices.getDocumentsByClientId(client._id)
+        const documents = await DocumentServices.getDocumentsByClientId(client._id)
 
-        let documents = [];
-
-        const create = newDocuments(checkList, client_documents);
-        const remove = removeDocuments(client_documents, checkList);
+        const create = newDocuments(checkList, documents);
+        const remove = removeDocuments(documents, checkList);
 
         if (create.length > 0) {
-            documents = await DocumentServices.createDocumentsByClient(create);
+            await DocumentServices.createDocumentsByClient(create);
         }
 
         if (remove.length > 0) {
@@ -58,32 +56,14 @@ async function saveDocumentsByCliente(req, res, next) {
 
         return res.status(200).json({
             ok: true,
-            message: 'hola desde la creacion del listado de documentos',
-            client_documents,
+            message: 'This checklist is updated',
+            documents,
             create,
-            remove
-            // checkList,
-            // documents,
-            // client,
-            // body
-        })
+            remove,
+        });
     } catch (error) {
         errorHandler(error, res);
     }
-    // } catch (error) {
-    //     if (error.hasOwnProperty('status')) {
-    //         return res.status(error.status).json({
-    //             ok: false,
-    //             message: error.message,
-    //             error: error.errors
-    //         })
-    //     }
-    //     return res.status(500).json({
-    //         ok: true,
-    //         message: 'error en el servicio de creacion del listado de documentos',
-    //         error
-    //     })
-    // }
 }
 
 
