@@ -170,5 +170,4 @@ GitHub.sublime-settings
 
 # End of https://www.gitignore.io/api/git,node,dotenv,sublimetext,visualstudiocode
 
-# folder to upload documents, forms and guies to process
 public/

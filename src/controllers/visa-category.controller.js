@@ -6,15 +6,17 @@ const VisaCategoryService = require('../services/visa-category.services');
 const moment = require('moment');
 
 async function getVisaCateories(req, res, next) {
+    try {
+        const listVisaCategories = await VisaCategory.find();
 
-    const listVisaCategories = await VisaCategory.find();
-
-    res.status(200).json({
-        ok: true,
-        message: 'getVisaCateories',
-        list: listVisaCategories
-
-    });
+        res.status(200).json({
+            ok: true,
+            message: 'getVisaCateories',
+            list: listVisaCategories
+        });
+    } catch (error) {
+        errorHandler(error, res);
+    }
 }
 
 async function getVisaCateoryId(req, res, next) {
@@ -39,12 +41,13 @@ async function getVisaCateoryId(req, res, next) {
 
         });
     } catch (error) {
-        res.status(500).json({
-            ok: false,
-            message: 'getVisaCateoryId',
-            error
-
-        });
+        errorHandler(error, res);
+        // errorHandler(error);
+        // // res.status(500).json({
+        // //     ok: false,
+        // //     message: 'getVisaCateoryId',
+        // //     error
+        // });
     }
 
 }
@@ -62,12 +65,12 @@ async function createVisaCateory(req, res, next) {
 
         });
     } catch (error) {
-        res.status(error.status).json({
-            ok: false,
-            message: error.message,
-            errors: error.errors
-
-        });
+        errorHandler(error, res);
+        // res.status(error.status).json({
+        //     ok: false,
+        //     message: error.message,
+        //     errors: error.errors
+        // });
     }
 }
 
@@ -85,11 +88,12 @@ async function editVisaCateory(req, res, next) {
 
         });
     } catch (error) {
-        res.status(error.status).json({
-            ok: false,
-            message: error.message,
-            errors: error.errors
-        });
+        errorHandler(error, res);
+        // res.status(error.status).json({
+        //     ok: false,
+        //     message: error.message,
+        //     errors: error.errors
+        // });
     }
 }
 
@@ -105,16 +109,37 @@ async function deleteVisaCateory(req, res, next) {
             visa
         });
     } catch (error) {
-        res.status(error.status).json({
-            ok: false,
-            message: error.message,
-            errors: error.errors
-        });
+        errorHandler(error, res);
+        // res.status(error.status).json({
+        //     ok: false,
+        //     message: error.message,
+        //     errors: error.errors
+        // });
     }
 
 }
 
+/************************************************
+ *  Metodo para el manejo de error
+ ************************************************/
+const errorHandler = (error, res) => {
+    if (error.hasOwnProperty('status')) {
+        return res.status(error.status).json({
+            ok: false,
+            message: error.message,
+            error: error.errors
+        })
+    }
+    return res.status(500).json({
+        ok: true,
+        message: 'error en el servicio de creacion del listado de documentos',
+        error
+    })
+}
 
+/************************************************
+ *  Export de metodos
+ ************************************************/
 
 module.exports = {
     getVisaCateories,

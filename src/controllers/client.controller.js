@@ -9,12 +9,13 @@ const moment = require('moment');
 async function getClientes(req, res, next) {
     Client.find().exec((err, listClients) => {
         if (err) {
-            return res.status(500).json({
-                data: {
-                    ok: false,
-                    errors: err,
-                }
-            });
+            errorHandler(err, res);
+            // return res.status(500).json({
+            //     data: {
+            //         ok: false,
+            //         errors: err,
+            //     }
+            // });
         }
 
         return res.status(200).json({
@@ -33,7 +34,7 @@ async function getClienteId(req, res, next) {
         const client = await Client.findById(id);
 
         if (!client) {
-            return res.status(200).json({
+            return res.status(404).json({
                 data: {
                     ok: true,
                     messages: 'Client doesn\'t exist'
@@ -48,13 +49,14 @@ async function getClienteId(req, res, next) {
             }
         })
     } catch (error) {
-        return res.status(500).json({
-            data: {
-                ok: true,
-                messages: 'edit client to id',
-                errors: error
-            }
-        })
+        errorHandler(error, res);
+        // return res.status(500).json({
+        //     data: {
+        //         ok: true,
+        //         messages: 'edit client to id',
+        //         errors: error
+        //     }
+        // })
     }
 }
 
@@ -70,13 +72,14 @@ async function createCliente(req, res, next) {
             }
         });
     } catch (error) {
-        res.status(error.status).json({
-            data: {
-                ok: false,
-                messages: error.message,
-                errors: error.errors
-            }
-        })
+        errorHandler(error, res);
+        // res.status(error.status).json({
+        //     data: {
+        //         ok: false,
+        //         messages: error.message,
+        //         errors: error.errors
+        //     }
+        // });
     }
 }
 
@@ -95,13 +98,14 @@ async function editCliente(req, res, next) {
             }
         })
     } catch (error) {
-        res.status(error.status).json({
-            data: {
-                ok: false,
-                messages: error.message,
-                errors: error.errors
-            }
-        })
+        errorHandler(error, res);
+        // res.status(error.status).json({
+        //     data: {
+        //         ok: false,
+        //         messages: error.message,
+        //         errors: error.errors
+        //     }
+        // })
     }
 
 }
@@ -120,17 +124,38 @@ async function deleteCliente(req, res, next) {
             }
         })
     } catch (error) {
-        res.status(error.status).json({
-            data: {
-                ok: false,
-                messages: error.message,
-                errors: error.errors
-            }
-        })
+        errorHandler(error, res);
+        // res.status(error.status).json({
+        //     data: {
+        //         ok: false,
+        //         messages: error.message,
+        //         errors: error.errors
+        //     }
+        // })
     }
 }
 
+/************************************************
+ *  Metodo para el manejo de error
+ ************************************************/
+const errorHandler = (error, res) => {
+    if (error.hasOwnProperty('status')) {
+        return res.status(error.status).json({
+            ok: false,
+            message: error.message,
+            error: error.errors
+        })
+    }
+    return res.status(500).json({
+        ok: true,
+        message: 'Error services client',
+        error
+    })
+}
 
+/************************************************
+ *  Export de metodos
+ ************************************************/
 module.exports = {
     getClientes,
     getClienteId,

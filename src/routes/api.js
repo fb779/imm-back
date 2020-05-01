@@ -1,12 +1,12 @@
+/********************************************************
+ * Definicion
+ ********************************************************/
 const express = require('express');
-// const path = require('path');
-// const auth = require('./../middlewares/auth.guard');
-
 // Inicialización
 const router = express.Router();
 
 /********************************************************
- *  Rutas
+ *  Importes
  ********************************************************/
 
 // const api = require('./api/principal');
@@ -18,9 +18,13 @@ const client = require('./api/client');
 const visaCategory = require('./api/visa-category');
 const checkList = require('./api/check-list');
 const family = require('./api/family');
-const uploads = require('./api/uploads');
 const documents = require('./api/documents');
+const uploads = require('./api/uploads');
+const static_files = require('./api/static-files');
 
+/********************************************************
+ *  Rutas
+ ********************************************************/
 
 router.use('/api/v1/login', login);
 router.use('/api/v1/users', users);
@@ -30,9 +34,14 @@ router.use('/api/v1/consultant', consultant);
 router.use('/api/v1/visa-category', visaCategory);
 router.use('/api/v1/check-list', checkList);
 router.use('/api/v1/family', family);
+router.use('/api/v1/documents', documents);
+
+
+/********************************************************
+ * - Carga de archivos (Upload)
+ * - Archivos estaticos (Static Files)
+ ********************************************************/
 router.use('/api/v1/upload', uploads);
-router.use('/api/v1/', documents);
-
-
+router.use('/api/v1/', static_files);
 
 module.exports = router;

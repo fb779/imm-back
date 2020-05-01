@@ -42,12 +42,12 @@ async function getProcess(req, res, next) {
             list: ListProcess
         });
     } catch (error) {
-        res.status(500).json({
-            ok: false,
-            message: 'Error, Process',
-            error
-
-        });
+        errorHandler(error, res);
+        // res.status(500).json({
+        //     ok: false,
+        //     message: 'Error, Process',
+        //     error
+        // });
     }
 }
 
@@ -82,12 +82,13 @@ async function getProcessId(req, res, next) {
             process
         });
     } catch (error) {
-        res.status(500).json({
-            ok: false,
-            message: 'Error, Process',
-            error
+        errorHandler(error, res);
+        // res.status(500).json({
+        //     ok: false,
+        //     message: 'Error, Process',
+        //     error
 
-        });
+        // });
     }
 }
 
@@ -112,12 +113,12 @@ async function createProcess(req, res, next) {
             process,
         });
     } catch (error) {
-        res.status(error.status).json({
-            ok: false,
-            message: error.message,
-            errors: error.errors
-
-        });
+        errorHandler(error, res);
+        // res.status(error.status).json({
+        //     ok: false,
+        //     message: error.message,
+        //     errors: error.errors
+        // });
     }
 }
 
@@ -173,32 +174,32 @@ async function editProcess(req, res, next) {
             process,
         });
     } catch (error) {
-        res.status(error.status).json({
-            ok: false,
-            message: error.message,
-            errors: error.errors
-        });
+        errorHandler(error, res);
+        // res.status(error.status).json({
+        //     ok: false,
+        //     message: error.message,
+        //     errors: error.errors
+        // });
     }
 }
 
 // async function deleteProcess(req, res, next) {
 //     try {
 //         const id = req.params.id;
-
 //         // const checkList = await CheckListService.deleteCheckList(id);
 //         // const checkList = await CheckListService.disableCheckList(id);
 //         // const checkList = await CheckListService.enableCheckList(id);
-
 //         res.status(200).json({
 //             ok: true,
 //             // check: checkList
 //         });
 //     } catch (error) {
-//         res.status(error.status).json({
-//             ok: false,
-//             message: error.message,
-//             errors: error.errors
-//         });
+//         errorHandler(error, res);
+//         // res.status(error.status).json({
+//         //     ok: false,
+//         //     message: error.message,
+//         //     errors: error.errors
+//         // });
 //     }
 // }
 
@@ -225,11 +226,12 @@ async function getProcessIdClient(req, res, next) {
             client: process.client
         })
     } catch (error) {
-        res.status(error.status).json({
-            ok: false,
-            message: error.message,
-            errors: error.errors
-        });
+        errorHandler(error, res);
+        // res.status(error.status).json({
+        //     ok: false,
+        //     message: error.message,
+        //     errors: error.errors
+        // });
     }
 }
 
@@ -257,11 +259,12 @@ async function createFormProcess(req, res, next) {
             form
         })
     } catch (error) {
-        res.status(error.status).json({
-            ok: false,
-            message: error.message,
-            errors: error.errors
-        });
+        errorHandler(error, res);
+        // res.status(error.status).json({
+        //     ok: false,
+        //     message: error.message,
+        //     errors: error.errors
+        // });
     }
 }
 
@@ -298,11 +301,12 @@ async function getProcessIdForm(req, res, next) {
             form
         })
     } catch (error) {
-        return res.status(error.status).json({
-            ok: false,
-            message: error.message,
-            errors: error.errors
-        });
+        errorHandler(error, res);
+        // return res.status(error.status).json({
+        //     ok: false,
+        //     message: error.message,
+        //     errors: error.errors
+        // });
     }
 }
 
@@ -330,42 +334,41 @@ async function editProcessIdForm(req, res, next) {
             }
         });
     } catch (error) {
-        return res.status(error.status).json({
-            ok: false,
-            message: error.message,
-            errors: error.errors
-        });
+        errorHandler(error, res);
+        // return res.status(error.status).json({
+        //     ok: false,
+        //     message: error.message,
+        //     errors: error.errors
+        // });
         // return res.status(500).json({
         //     ok: false,
         //     message: 'error en la actualizacion de informacion del form',
         //     errors: error
         // });
     }
-
 }
 
-// async function putProcessIdConsultant(req, res, next) {
-//     try {
-//         const id = req.params.id;
+/************************************************
+ *  Metodo para el manejo de error
+ ************************************************/
+const errorHandler = (error, res) => {
+    if (error.hasOwnProperty('status')) {
+        return res.status(error.status).json({
+            ok: false,
+            message: error.message,
+            error: error.errors
+        })
+    }
+    return res.status(500).json({
+        ok: true,
+        message: 'error en el servicio de creacion del listado de documentos',
+        error
+    })
+}
 
-//         const process = await Process.findOne({ _id: id }).populate([{ path: 'client' }, { path: 'visa_category' }]);
-
-//         const form = await FormServices.getFormByProcess(process);
-
-//         res.status(200).json({
-//             ok: true,
-//             message: `Estamos en la carga del formulario asociado`,
-//             // process,
-//             form
-//         })
-//     } catch (error) {
-//         res.status(error.status).json({
-//             ok: false,
-//             message: error.message,
-//             errors: error.errors
-//         });
-//     }
-// }
+/************************************************
+ *  Export de metodos
+ ************************************************/
 
 module.exports = {
     getProcess,
@@ -378,431 +381,3 @@ module.exports = {
     editProcessIdForm,
     getProcessIdForm,
 }
-
-
-
-
-/**
- * Para revisar y ver que sirve despues de crear los nuevos servicios
- */
-
-// // metodo cargar todos los procesos del usuario
-// function getProcesses(req, res, next) {
-//     var user = req.user || 'no hay usuario';
-
-//     Process.find({ user: user._id }, '_id type_visa active status')
-//         //.populate({ path: 'user', select: '_id first_name last_name email' })
-//         .exec((err, processes) => {
-//             if (err) {
-//                 return res.status(500).json({
-//                     data: {
-//                         ok: false,
-//                         message: 'Fallo al cargar el proceso',
-//                         err
-//                     }
-//                 });
-//             }
-
-//             return res.status(200).json({
-//                 data: {
-//                     ok: true,
-//                     message: 'llegamos a los proceso',
-//                     // user,
-//                     processes
-//                 }
-//             });
-
-//         });
-// }
-
-// // metodo para cargar un proceso por ID de usuario
-// function getProcessId(req, res, next) {
-//     var id = req.params.id || 'no llego';
-//     var user = req.user || 'no hay usuario';
-
-//     Process.findOne({ _id: id, user: user._id }, '_id type_visa active status')
-//         //.populate({ path: 'user', select: '_id first_name last_name email' })
-//         .exec((err, process) => {
-//             if (err) {
-//                 return res.status(500).json({
-//                     data: {
-//                         ok: false,
-//                         message: 'Fallo al cargar el proceso',
-//                         err
-//                     }
-//                 });
-//             }
-
-//             if (!process) {
-//                 return res.status(401).json({
-//                     data: {
-//                         ok: false,
-//                         message: 'No puede acceder a ese proceso'
-//                     }
-//                 });
-//             }
-
-
-//             return res.status(200).json({
-//                 data: {
-//                     ok: true,
-//                     message: 'llegamos al proceso',
-//                     // id,
-//                     process
-//                 }
-//             });
-
-//         });
-// }
-
-// // metodo para cargar un proceso por Id de proceso
-// function getFormProcess(req, res, next) {
-//     var id = req.params.id;
-//     var user = req.user;
-
-//     FormVisitor.findOne({ process: id }).exec((err, form) => {
-//         if (err) {
-//             return res.status(500).json({
-//                 data: {
-//                     ok: false,
-//                     message: 'Error al cargar el formulario por el proceso',
-//                     errors: err
-//                 }
-//             });
-//         }
-
-//         return res.status(200).json({
-//             data: {
-//                 ok: true,
-//                 message: 'Cargando el fomrulario por el proceso',
-//                 form
-//             }
-//         });
-//     });
-
-// }
-
-// // metodo apra cargar los proceso para asignar
-// function getProcessToAssignan(req, res, next) {
-
-//     // Process.find({ active: true, status: 'FORM' })
-//     Process.find({ active: true, status: 'FORM', consultan: { $eq: null } })
-//         // .populate({ path: 'client', select: '_id first_name last_name email' })
-//         .populate({ path: 'user', select: '_id first_name last_name email' })
-//         // .populate({ path: 'consultan' })
-//         .exec((err, processes) => {
-//             if (err) {
-//                 return res.status(500).json({
-//                     data: {
-//                         ok: false,
-//                         message: 'Problemas la carga de procesos',
-//                         errors: err
-//                     }
-//                 });
-//             }
-
-//             return res.status(200).json({
-//                 data: {
-//                     ok: true,
-//                     message: 'procesos cargados con exito',
-//                     processes
-//                 }
-//             });
-//         });
-// }
-
-// // metodo para asignar un proceso a un consultor
-// function setAssignConsultan(req, res, next) {
-//     var body = req.body;
-//     var user = req.user;
-
-//     Process.findById(body._id).exec((err, process) => {
-//         if (err) {
-//             return res.status(500).json({
-//                 data: {
-//                     ok: true,
-//                     message: 'error al cargar proceso',
-//                     errors: err
-//                 }
-//             });
-//         }
-
-//         if (!process) {
-//             return res.status(400).json({
-//                 data: {
-//                     ok: true,
-//                     message: 'no existe el proceso'
-//                 }
-//             });
-//         }
-
-//         if (process.status !== 'FORM' || process.hasOwnProperty('consultan')) {
-//             return res.status(401).json({
-//                 data: {
-//                     ok: true,
-//                     message: 'El proceso ya fue asignado'
-//                 }
-//             });
-//         }
-
-//         process.consultan = body.consultan;
-
-//         process.save((err, saveProcess) => {
-//             if (err) {
-//                 return res.status(500).json({
-//                     data: {
-//                         ok: true,
-//                         message: 'error al actualizar el proceso',
-//                         errors: err
-//                     }
-//                 });
-//             }
-
-//             return res.status(200).json({
-//                 data: {
-//                     ok: true,
-//                     message: 'llegamos aqui',
-//                     process: saveProcess
-//                 }
-//             });
-
-//         });
-//     });
-
-
-// }
-
-// // metodo para consultar los procesos asignados a un consultor
-// function getProcessesAssigned(req, res, next) {
-//     const user = req.user;
-//     const id = user._id;
-
-//     Process.find({ active: true, status: 'FORM', consultan: id }).exec((err, processes) => {
-//         if (err) {
-//             return res.status(500).json({
-//                 data: {
-//                     ok: false,
-//                     message: 'Error al cargar los procesos',
-//                     errors: err
-//                 }
-//             });
-//         }
-
-//         return res.status(200).json({
-//             data: {
-//                 ok: true,
-//                 message: 'Llegamos a los procesos asignados',
-//                 processes
-//             }
-//         })
-//     });
-
-
-
-// }
-
-// // Metodo que guarda un formulario VISITOR
-// function saveForm(req, res, next) {
-//     var body = req.body;
-//     var user = req.user;
-
-//     body.user = user._id;
-
-//     frmVisitor = new FormVisitor(body);
-
-//     Process.findById(body.process).exec((err, process) => {
-//         if (err) {
-//             return res.status(500).json({
-//                 data: {
-//                     ok: false,
-//                     message: 'Problemas con encontrar el proceso asociado',
-//                     errors: err
-//                 }
-//             });
-//         }
-
-//         if (!process) {
-//             return res.status(400).json({
-//                 data: {
-//                     ok: false,
-//                     message: 'No se encuentra el proceso asociado con ese ID',
-//                 }
-//             });
-//         }
-
-//         process.status = 'FORM';
-
-//         process.save((err, saveProcess) => {
-//             if (err) {
-//                 return res.status(500).json({
-//                     data: {
-//                         ok: false,
-//                         message: 'No se puede actualizar el proceso',
-//                         errors: err
-//                     }
-//                 });
-//             }
-
-//             frmVisitor.save((err, saveForm) => {
-//                 if (err) {
-//                     return res.status(500).json({
-//                         data: {
-//                             ok: false,
-//                             message: 'No se puede guardar el formulario',
-//                             errors: err
-//                         }
-//                     });
-//                 }
-
-//                 return res.status(200).json({
-//                     data: {
-//                         ok: true,
-//                         form: saveForm,
-//                         user,
-//                     }
-//                 });
-//             });
-
-//         });
-//     });
-// }
-
-// // metodo para la creacion de una solicitud y el proceso respectivo
-// // se crea el proceso con el usuario asociado
-// function createProcess(req, res, next) {
-//     var body = req.body;
-
-//     User.findOne({ email: body.email }, campos).exec((err, userDB) => {
-//         // manejo de error de la peticion
-//         if (err) {
-//             return res.status(500).json({
-//                 data: {
-//                     ok: false,
-//                     mensaje: 'Error al buscar usuario',
-//                     errors: err
-//                 }
-//             });
-//         }
-
-//         if (userDB) {
-
-//             Process.find({ user: userDB._id, type_visa: body.visa, active: true }).exec((err, processBD) => {
-//                 if (err) {
-//                     return res.status(500).json({
-//                         data: {
-//                             ok: false,
-//                             mensaje: 'Error al buscar proceso',
-//                             errors: err
-//                         }
-//                     });
-//                 }
-
-//                 console.log(processBD);
-//                 if (processBD.length > 0) {
-//                     return res.status(200).json({
-//                         data: {
-//                             ok: false,
-//                             mensaje: 'El usuario tiene uno o mas proceso activo'
-//                         }
-//                     });
-//                 }
-
-//                 // crear proceso pagado
-//                 saveProcess(userDB, body.visa)
-//                     .then((response) => {
-//                         res.status(response.status).json({ data: response.data })
-//                     })
-//                     .catch((response) => {
-//                         res.status(response.status).json({ data: response.data });
-//                     });
-//             });
-
-
-//         } else {
-//             // el usuario no existe y debe ser creado
-
-//             var nUser = new User();
-
-//             nUser.first_name = body.first_name;
-//             nUser.last_name = body.last_name;
-//             nUser.email = body.email;
-//             nUser.password = body.password;
-
-//             nUser.save((err, userSave) => {
-
-//                 if (err) {
-//                     return res.status(500).json({
-//                         ok: false,
-//                         mensaje: 'Error al guardar usuario',
-//                         errors: err
-//                     });
-//                 }
-
-//                 saveProcess(userSave, body.visa)
-//                     .then((response) => {
-//                         res.status(response.status).json({ data: response.data })
-//                     })
-//                     .catch((response) => {
-//                         res.status(response.status).json({ data: response.data });
-//                     });
-
-//             });
-//         }
-
-//     });
-// }
-
-// // metodo para crear un proceso con su usuario asociado
-// function saveProcess(user, visa) {
-//     const process = new Promise((resolve, reject) => {
-//         try {
-
-//             var process = new Process({
-//                 user: user._id,
-//                 type_visa: visa
-//             });
-
-//             process.save((err, saveProcess) => {
-//                 if (err) {
-//                     reject({
-//                         status: 500,
-//                         data: {
-//                             ok: false,
-//                             mensaje: 'Error al crear el proceso',
-//                             errors: err
-//                         }
-//                     });
-//                 }
-
-//                 resolve({
-//                     status: 200,
-//                     data: {
-//                         ok: true,
-//                         user: user,
-//                         process: saveProcess
-//                     }
-//                 });
-//             });
-
-//         } catch (error) {
-//             reject({
-//                 status: 500,
-//                 message: 'Error al crear el proceso',
-//                 errors: error
-//             });
-//         }
-//     });
-
-//     return process;
-// }
-
-// module.exports = {
-//     createProcess,
-//     saveForm,
-//     getProcesses,
-//     getProcessId,
-//     getFormProcess,
-//     getProcessToAssignan,
-//     setAssignConsultan,
-//     getProcessesAssigned,
-// }

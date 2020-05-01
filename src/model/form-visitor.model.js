@@ -3,16 +3,6 @@ const uniqueValidator = require('mongoose-unique-validator');
 
 const Schema = mongoose.Schema;
 
-const typeVisa = {
-    values: ['TURIST', 'VISITOR'],
-    message: '{VALUE} is not valid'
-};
-
-const statusVisa = {
-    values: ['ACTIVE', 'PROCESS', 'CLOSE'],
-    message: '{VALUE} no es un estado permitido'
-};
-
 const FormVisitorSchema = new Schema({
     process: { type: Schema.Types.ObjectId, ref: 'Process', unique: true, required: [true, 'The process is required'] },
     client: { type: Schema.Types.ObjectId, ref: 'Client', required: [true, 'The user is required'] },

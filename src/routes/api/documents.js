@@ -1,16 +1,25 @@
+/************************************************
+ *  Definicion
+ ************************************************/
 const express = require('express');
-const path = require('path');
-const auth = require('./../../middlewares/auth.guard');
-
 // Inicialización
 const router = express.Router();
 
-/********************************************************
- * Static Files
- ********************************************************/
+/************************************************
+ *  Imports
+ ************************************************/
+const documentCtrl = require('./../../controllers/document.controller');
+const auth = require('./../../middlewares/auth.guard');
 
-router.use('/documents', [auth.isAuth], express.static(path.join(__dirname, '..', '..', 'public', 'processes')));
 
-// app.use('/documents', express.static(path.join(__dirname, 'public')));
+/************************************************
+ *  Router
+ ************************************************/
+
+router.get('/:id_client', [auth.isAuth], documentCtrl.getDocumentsByCliente);
+router.post('/:id_client', [auth.isAuth], documentCtrl.saveDocumentsByCliente);
+// router.post('/', [], documentCtrl.createCliente);
+// router.put('/:id', [], documentCtrl.editCliente);
+// router.delete('/:id', [], documentCtrl.deleteCliente);
 
 module.exports = router;

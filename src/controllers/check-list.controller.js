@@ -26,6 +26,7 @@ async function getCheckList(req, res, next) {
         }
 
         const listCheckList = await CheckList.find(filter).select('-visa_categories -createdAt -updatedAt -__v'); //.populate({ path: 'visa_categories', match: { name: { $eq: "VISITOR" } } });
+
         // const listCheckList = await CheckList.find({}).select('-createdAt -updatedAt -__v'); //.populate({ path: 'visa_categories', match: { name: { $eq: "VISITOR" } } });
 
         // .populate({
@@ -40,12 +41,13 @@ async function getCheckList(req, res, next) {
             list: listCheckList
         });
     } catch (error) {
-        console.log('verificando error en listado de checklist', error);
-        res.status(500).json({
-            ok: false,
-            message: 'get check list visa categories by name',
-            error
-        });
+        errorHandler(error, res);
+        // console.log('verificando error en listado de checklist', error);
+        // res.status(500).json({
+        //     ok: false,
+        //     message: 'get check list visa categories by name',
+        //     error
+        // });
     }
 }
 
@@ -69,12 +71,13 @@ async function getCheckListId(req, res, next) {
             check: checkList
         });
     } catch (error) {
-        res.status(500).json({
-            ok: false,
-            message: 'getVisaCateoryId',
-            error
+        errorHandler(error, res);
+        // res.status(500).json({
+        //     ok: false,
+        //     message: 'getVisaCateoryId',
+        //     error
 
-        });
+        // });
     }
 }
 
@@ -108,13 +111,14 @@ async function createCheckListMasive(req, res, next) {
             body
         });
     } catch (error) {
-        console.log(error);
-        res.status(error.status).json({
-            ok: false,
-            message: error.message,
-            errors: error.errors
+        errorHandler(error, res);
+        // console.log(error);
+        // res.status(error.status).json({
+        //     ok: false,
+        //     message: error.message,
+        //     errors: error.errors
 
-        });
+        // });
     }
 }
 
@@ -131,13 +135,14 @@ async function createCheckList(req, res, next) {
             check: checkList,
         });
     } catch (error) {
-        console.log(error);
-        res.status(error.status).json({
-            ok: false,
-            message: error.message,
-            errors: error.errors
+        errorHandler(error, res);
+        // console.log(error);
+        // res.status(error.status).json({
+        //     ok: false,
+        //     message: error.message,
+        //     errors: error.errors
 
-        });
+        // });
     }
 }
 
@@ -152,17 +157,18 @@ async function editCheckList(req, res, next) {
 
         const checkList = await CheckListService.editCheckList(id, body);
 
-        res.status(200).json({
+        return res.status(200).json({
             ok: true,
             check: checkList
 
         });
     } catch (error) {
-        res.status(error.status).json({
-            ok: false,
-            message: error.message,
-            errors: error.errors
-        });
+        errorHandler(error, res);
+        // res.status(error.status).json({
+        //     ok: false,
+        //     message: error.message,
+        //     errors: error.errors
+        // });
     }
 }
 
@@ -174,19 +180,41 @@ async function deleteCheckList(req, res, next) {
         const checkList = await CheckListService.disableCheckList(id);
         // const checkList = await CheckListService.enableCheckList(id);
 
-        res.status(200).json({
+        return res.status(200).json({
             ok: true,
             check: checkList
         });
     } catch (error) {
-        res.status(error.status).json({
-            ok: false,
-            message: error.message,
-            errors: error.errors
-        });
+        errorHandler(error, res);
+        // res.status(error.status).json({
+        //     ok: false,
+        //     message: error.message,
+        //     errors: error.errors
+        // });
     }
 }
 
+/************************************************
+ *  Metodo para el manejo de error
+ ************************************************/
+const errorHandler = (error, res) => {
+    if (error.hasOwnProperty('status')) {
+        return res.status(error.status).json({
+            ok: false,
+            message: error.message,
+            error: error.errors
+        })
+    }
+    return res.status(500).json({
+        ok: true,
+        message: 'Error services family',
+        error
+    })
+}
+
+/************************************************
+ *  Export de metodos
+ ************************************************/
 
 module.exports = {
     getCheckList,

@@ -196,9 +196,9 @@ function updateUser(req, res, next) {
     });
 }
 
-function deleteUser(req, res, next) {
+// function deleteUser(req, res, next) {
 
-}
+// }
 
 // function getListConsultans(req, res, next){}
 function getConsultants(req, res, next) {
@@ -229,6 +229,6 @@ module.exports = {
     getListUsers,
     createUser,
     updateUser,
-    deleteUser,
+    // deleteUser,
     getConsultants
 }
