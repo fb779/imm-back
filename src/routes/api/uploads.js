@@ -32,7 +32,7 @@ router.use(fileUpload({
  * Definicion de rutas
  ************************************************/
 
-router.post('/forms-guides/:id_process', [], UpController.uploadFormsGuides);
+router.post('/forms-guides/:id_process', [auth.isAuth], UpController.uploadFormsGuides);
 // router.post('/documents/:id_process/:id_document', [], UpController.uploadDocuments);
 
 module.exports = router;

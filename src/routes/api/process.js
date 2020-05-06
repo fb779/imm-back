@@ -32,7 +32,7 @@ router.get('/', [auth.isAuth], processCtrl.getProcess);
 router.post('/:id/form', [auth.isAuth], processCtrl.createFormProcess);
 router.post('/', [auth.isAuth], processCtrl.createProcess);
 router.put('/:id/form', [auth.isAuth], processCtrl.editProcessIdForm);
-router.put('/:id', [], processCtrl.editProcess);
+router.put('/:id', [auth.isAuth], processCtrl.editProcess);
 // router.delete('/:id', [], processCtrl.deleteProcess);
 
 
