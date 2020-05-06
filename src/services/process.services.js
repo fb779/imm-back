@@ -17,15 +17,24 @@ function getProcesses() {
     });
 }
 
-function getProcessId(process) {
+function getProcessId(id_process) {
+
     return new Promise(async(resolve, reject) => {
         try {
-            const process = await Process.findOne({ _id: process });
+            const process = await Process.findById(id_process);
 
-            resolve(process);
+            if (!process) {
+                return reject({
+                    status: 404,
+                    message: `The Process isn't found`,
+                    errors: `The process doesn't find with this Id: ${id_process}`,
+                });
+            }
+
+            return resolve(process);
 
         } catch (error) {
-            reject({
+            return reject({
                 status: 400,
                 message: 'Error to find the Process',
                 errors: error

@@ -19,6 +19,7 @@ const visaCategory = require('./api/visa-category');
 const checkList = require('./api/check-list');
 const family = require('./api/family');
 const documents = require('./api/documents');
+const forms_guides = require('./api/forms-guides');
 const uploads = require('./api/uploads');
 const static_files = require('./api/static-files');
 
@@ -35,6 +36,7 @@ router.use('/api/v1/visa-category', visaCategory);
 router.use('/api/v1/check-list', checkList);
 router.use('/api/v1/family', family);
 router.use('/api/v1/documents', documents);
+router.use('/api/v1/forms-guides', forms_guides);
 
 
 /********************************************************

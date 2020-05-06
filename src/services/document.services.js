@@ -9,6 +9,32 @@ const Document = require('../model/document.model');
  *  Deficnicion de metodos
  ************************************************/
 
+function getDocumentById(id_document) {
+    return new Promise(async(resolve, reject) => {
+        try {
+
+            const document = await Document.findById(id_document);
+
+            if (!document) {
+                return reject({
+                    status: 404,
+                    message: `The Document isn't found`,
+                    errors: `The Document doesn't find with this Id: ${id_document}`,
+                });
+            }
+
+            return resolve(document);
+
+        } catch (error) {
+            return reject({
+                status: 500,
+                message: 'Error to find list documents by client',
+                errors: error
+            });
+        }
+    });
+}
+
 function getDocumentsByClientId(id_client) {
     return new Promise(async(resolve, reject) => {
         try {
@@ -41,6 +67,28 @@ function createDocumentsByClient(itemsChecklist) {
         }
     });
 }
+
+// function editDocument(id_document, new_document) {
+//     return new Promise(async(resolve, reject) => {
+//         try {
+//             const document = Document.findById(id_document);
+
+//             document.name = new_document.name;
+//             document.description = new_document.description;
+//             document.type = new_document.type;
+
+//             await document.save();
+
+//             return resolve(document);
+//         } catch (error) {
+//             return reject({
+//                 status: 500,
+//                 message: 'Error to edit document',
+//                 errors: error
+//             });
+//         }
+//     });
+// }
 
 function deleteDocuments(documents) {
     return new Promise(async(resolve, reject) => {
@@ -81,8 +129,10 @@ function deleteDocumentsByClient(client) {
  ************************************************/
 
 module.exports = {
+    getDocumentById,
     getDocumentsByClientId,
     createDocumentsByClient,
+    // editDocument,
     deleteDocuments,
     deleteDocumentsByClient,
 }

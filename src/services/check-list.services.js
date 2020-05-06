@@ -16,6 +16,31 @@ function getListCheckList() {
     })
 }
 
+function getCheckListById(id_checklist) {
+    return new Promise(async(resolve, reject) => {
+        try {
+
+            const checklist = await CheckList.findById(id_checklist).populate([{ path: 'client' }]);
+
+            if (!checklist) {
+                return reject({
+                    status: 404,
+                    message: `The CheckList isn't found`,
+                    errors: `The CheckList doesn't find with this Id: ${id_checklist}`,
+                });
+            }
+
+            return resolve(list_items);
+        } catch (error) {
+            return reject({
+                status: 500,
+                message: 'Error to find items checklist',
+                errors: error
+            });
+        }
+    })
+}
+
 function getCheckListByIds(ids) {
     return new Promise(async(resolve, reject) => {
         try {
@@ -215,5 +240,6 @@ module.exports = {
     deleteCheckList,
     disableCheckList,
     enableCheckList,
+    getCheckListById,
     getCheckListByIds
 }

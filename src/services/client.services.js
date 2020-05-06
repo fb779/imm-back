@@ -9,8 +9,8 @@ function getById(id) {
                 // throw (new Error('mi error personalizado en el cliente'));
                 return reject({
                     status: 404,
-                    message: `The client doesn't find with this Id: ${id}`,
-                    errors: `Client doesn't find with this Id`
+                    message: `Client isn't found`,
+                    errors: `The client doesn't find with this Id: ${id}`,
                 });
             }
 
