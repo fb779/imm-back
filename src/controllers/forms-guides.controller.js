@@ -15,6 +15,22 @@ const FormsGuidesService = require('../services/forms-guides.services');
 /************************************************
  *  Deficnicion de metodos
  ************************************************/
+async function getFormGuideById(req, res, netx) {
+    try {
+        const id_form_guide = req.params.id_form_guide;
+
+        const form_guide = await FormsGuidesService.getformGuideById(id_form_guide);
+
+        res.status(200).json({
+            ok: true,
+            data: form_guide
+        })
+    } catch (error) {
+        errorHandler(error, res);
+    }
+
+}
+
 async function getFormsGuidesByProcess(req, res, next) {
     try {
         const type = req.params.type;
@@ -31,6 +47,31 @@ async function getFormsGuidesByProcess(req, res, next) {
     }
 }
 
+async function getFormsGuidesByClient(req, res, net) {
+    try {
+        const user = req.user;
+        const id_client = req.params.id_client;
+        const type = req.query.type || null;
+
+
+        const client = await ClientService.getById(id_client);
+        const processes = await ProcessService.getProcessesByClient(client._id);
+
+        const list_processes = processes.map(el => el._id.toString());
+
+        // console.log('listado de procesos', list_processes);
+
+        const formsGuides = await FormsGuidesService.getformsGuidesByProcesses(list_processes, type);
+
+
+        return res.status(200).json({
+            ok: true,
+            list: formsGuides
+        })
+    } catch (error) {
+        errorHandler(error, res);
+    }
+}
 async function deleteFormGuideById(req, res, next) {
     try {
 
@@ -84,6 +125,8 @@ const errorHandler = (error, res) => {
  ************************************************/
 
 module.exports = {
+    getFormGuideById,
     getFormsGuidesByProcess,
+    getFormsGuidesByClient,
     deleteFormGuideById,
 }

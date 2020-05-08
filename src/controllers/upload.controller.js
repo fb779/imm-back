@@ -13,12 +13,8 @@ const FormsGuidesService = require('../services/forms-guides.services');
 
 async function uploadFormsGuides(req, res, next) {
     try {
-
-        // return res.status(200).json({ ok: true, message: 'llegamos a cargar un archivo' });
-
         var description = req.body.description || '';
         const type_document = req.body.type_document.toLowerCase() || null;
-        // const type_document = String(req.params.type_document).toLowerCase() || null;
         const id_process = req.params.id_process;
 
         if (!type_document || !Object.values(typeFilesUpload).includes(type_document)) {
@@ -29,12 +25,6 @@ async function uploadFormsGuides(req, res, next) {
         }
 
         const process = await ProcessService.getProcessId(id_process);
-
-        // const files_upload = Object.keys(req.files).filter((el, ix) => ix === 0).map((file) => loadSingleFilesServer(
-        //     req.files[file],
-        //     nameFile(req.files[file], type_document, process._id, null, file),
-        //     res
-        // ));
 
         const files_upload = req.files[Object.keys(req.files)[0]]
 
@@ -66,7 +56,6 @@ async function uploadDocuments(req, res, next) {
         const type_document = req.body.type_document.toLowerCase() || null;
         const id_process = req.params.id_process;
         const id_document = req.params.id_document;
-
 
         const process = await ProcessService.getProcessId(id_process);
         const document = await DocumentServices.getDocumentById(id_document);

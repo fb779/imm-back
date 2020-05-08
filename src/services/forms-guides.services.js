@@ -6,12 +6,67 @@ const FormsGuides = require('../model/forms-guides.mode');
 /************************************************
  *  Deficnicion de metodos
  ************************************************/
+function getformGuideById(id_form_guide) {
+    return new Promise(async(resolve, reject) => {
+        try {
+            const form_guide = await FormsGuides.findById(id_form_guide).select('-directory -createdAt -updatedAt -__v');
+
+            if (!form_guide) {
+                // throw ({
+                //     status: 404,
+                //     message: `Error, The Document isn't exist`,
+                //     error: {
+                //         message: `Error, The Document isn't exist with this Id: ${id_form_guide}`
+                //     }
+                // })
+
+                return reject({
+                    status: 404,
+                    message: `Error, The Document isn't exist`,
+                    errors: `Error, The Document isn't exist with this Id: ${id_form_guide}`
+                });
+            }
+
+            return resolve(form_guide);
+        } catch (error) {
+            return reject({
+                status: 500,
+                message: 'Error to find forms or guides',
+                errors: error
+            });
+        }
+    });
+}
+
 function getformsGuidesByProcess(id_process, type_document) {
     return new Promise(async(resolve, reject) => {
         try {
             const listItems = FormsGuides.find({ process: id_process, type: type_document }).select('-directory -createdAt -updatedAt -__v');
 
             return resolve(listItems);
+        } catch (error) {
+            return reject({
+                status: 500,
+                message: 'Error to find forms or guides',
+                errors: error
+            });
+        }
+    });
+}
+
+function getformsGuidesByProcesses(processes, type_document) {
+    return new Promise(async(resolve, reject) => {
+        try {
+            var filter = { process: { $in: processes } };
+
+            if (type_document) {
+                filter['type'] = type_document;
+            }
+
+            const listItems = await FormsGuides.find(filter).select('-directory -createdAt -updatedAt -__v');
+
+            return resolve(listItems);
+            // return resolve(true);
         } catch (error) {
             return reject({
                 status: 500,
@@ -90,7 +145,9 @@ function deleteFormGuide(id_form_guide) {
  ************************************************/
 
 module.exports = {
+    getformGuideById,
     getformsGuidesByProcess,
+    getformsGuidesByProcesses,
     createFormGudide,
     deleteFormGuide,
 }

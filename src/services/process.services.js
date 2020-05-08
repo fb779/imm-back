@@ -3,7 +3,10 @@ const Process = require('../model/proceso.model');
 function getProcesses() {
     return new Promise(async(resolve, reject) => {
         try {
-            const listProcesses = await Process.find().populate([{ path: 'client', select: '-active -createdAt -updatedAt -__v' }, { path: 'visa_category', select: '-createdAt -updatedAt -__v' }]);
+            const listProcesses = await Process.find().populate([
+                { path: 'client', select: '-active -createdAt -updatedAt -__v' },
+                { path: 'visa_category', select: '-createdAt -updatedAt -__v' }
+            ]);
 
             resolve(listProcesses);
 
@@ -37,6 +40,26 @@ function getProcessId(id_process) {
             return reject({
                 status: 400,
                 message: 'Error to find the Process',
+                errors: error
+            });
+        }
+    });
+}
+
+function getProcessesByClient(id_client) {
+    return new Promise(async(resolve, reject) => {
+        try {
+            const listProcesses = await Process.find({ client: id_client }).populate([
+                { path: 'client', select: '-active -createdAt -updatedAt -__v' },
+                { path: 'visa_category', select: '-createdAt -updatedAt -__v' }
+            ]);
+
+            resolve(listProcesses);
+
+        } catch (error) {
+            reject({
+                status: 400,
+                message: 'Error to create Process',
                 errors: error
             });
         }
@@ -181,6 +204,7 @@ function getListByClientVisaCategory(client, visa) {
 module.exports = {
     getProcesses,
     getProcessId,
+    getProcessesByClient,
     createProcess,
     editProcess,
     // deleteProcess,

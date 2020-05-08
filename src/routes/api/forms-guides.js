@@ -16,11 +16,9 @@ const auth = require('../../middlewares/auth.guard');
  *  Router
  ************************************************/
 
+router.get('/client/:id_client', [auth.isAuth], formsGuidesCtrl.getFormsGuidesByClient);
 router.get('/:id_process/:type', [auth.isAuth], formsGuidesCtrl.getFormsGuidesByProcess);
+router.get('/:id_form_guide', [auth.isAuth], formsGuidesCtrl.getFormGuideById);
 router.delete('/:id_form_guide', [auth.isAuth], formsGuidesCtrl.deleteFormGuideById);
-// router.post('/:id_client', [], formsGuidesCtrl.saveDocumentsByCliente);
-// router.post('/', [], formsGuidesCtrl.createCliente);
-// router.put('/:id', [], formsGuidesCtrl.editCliente);
-// router.delete('/:id', [], formsGuidesCtrl.deleteCliente);
 
 module.exports = router;
