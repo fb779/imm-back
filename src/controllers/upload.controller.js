@@ -53,18 +53,23 @@ async function uploadFormsGuides(req, res, next) {
 async function uploadDocuments(req, res, next) {
     try {
         var description = req.body.description || '';
-        const type_document = req.body.type_document.toLowerCase() || null;
-        const id_process = req.params.id_process;
+        // const type_document = req.body.type_document.toLowerCase() || null;
+        const id_process_query = req.query.process;
+        const id_process_params = req.body.process;
         const id_document = req.params.id_document;
 
-        const process = await ProcessService.getProcessId(id_process);
-        const document = await DocumentServices.getDocumentById(id_document);
-        const client = await ClientService.getById(document.client);
-        const id_client = client._id;
+        // // const process = await ProcessService.getProcessId(id_process);
+        // const document = await DocumentServices.getDocumentById(id_document);
+        // const client = await ClientService.getById(document.client);
+
+        // const id_client = client._id;
 
         return res.status(200).json({
             ok: true,
-            message: `Llegamos a cargar documentos`
+            message: `Llegamos a cargar documentos`,
+            id_document,
+            id_process_query,
+            id_process_params
         });
     } catch (error) {
         errorHandler(error, res);

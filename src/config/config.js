@@ -66,6 +66,11 @@ const typeFilesUpload = {
     documents: 'documents',
 };
 
+const typesDocument = {
+    client: 'client',
+    process: 'process',
+};
+
 /*******************************************
  * Exports de los datos
  *******************************************/
@@ -85,4 +90,5 @@ module.exports = {
     typeFiles,
     typeFilesUpload,
     typeExtensionFiles,
+    typesDocument
 };

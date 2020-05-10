@@ -33,6 +33,6 @@ router.use(fileUpload({
  ************************************************/
 
 router.post('/forms-guides/:id_process', [auth.isAuth], UpController.uploadFormsGuides);
-// router.post('/documents/:id_process/:id_document', [], UpController.uploadDocuments);
+router.post('/documents/:id_document', [], UpController.uploadDocuments);
 
 module.exports = router;

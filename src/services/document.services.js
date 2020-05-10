@@ -3,6 +3,7 @@
  ************************************************/
 const Document = require('../model/document.model');
 // const ClientService = require('./client.services');
+const { typesDocument } = require('../config/config');
 
 
 /************************************************
@@ -35,11 +36,61 @@ function getDocumentById(id_document) {
     });
 }
 
+function getDocuments(type, id) {
+    return new Promise(async(resolve, reject) => {
+        try {
+            var filter = {};
+
+            switch (type) {
+                case typesDocument.client:
+                case typesDocument.process:
+                    filter[type] = id;
+                    break;
+
+                default:
+                    reject({
+                        status: 400,
+                        message: `Error, the type isn't exist`,
+                        errors: {}
+                    });
+                    break;
+            }
+
+            const list_documents = await Document.find(filter).select('-createdAt -updatedAt -__v');
+
+            return resolve(list_documents);
+
+        } catch (error) {
+            return reject({
+                status: 500,
+                message: 'Error to find list documents by client',
+                errors: error
+            });
+        }
+    });
+}
+
 function getDocumentsByClientId(id_client) {
     return new Promise(async(resolve, reject) => {
         try {
-
             const list_documents = await Document.find({ client: id_client }).select('-createdAt -updatedAt -__v');
+
+            return resolve(list_documents);
+
+        } catch (error) {
+            return reject({
+                status: 500,
+                message: 'Error to find list documents by client',
+                errors: error
+            });
+        }
+    });
+}
+
+function getDocumentsByProcessClient(id_process, id_client) {
+    return new Promise(async(resolve, reject) => {
+        try {
+            const list_documents = await Document.find({ process: id_process, client: id_client }).select('-createdAt -updatedAt -__v');
 
             return resolve(list_documents);
 
@@ -68,7 +119,7 @@ function createDocumentsByClient(itemsChecklist) {
     });
 }
 
-// function editDocument(id_document, new_document) {
+// function uploadDocument(id_document, new_document) {
 //     return new Promise(async(resolve, reject) => {
 //         try {
 //             const document = Document.findById(id_document);
@@ -130,9 +181,11 @@ function deleteDocumentsByClient(client) {
 
 module.exports = {
     getDocumentById,
+    getDocuments,
     getDocumentsByClientId,
+    getDocumentsByProcessClient,
     createDocumentsByClient,
-    // editDocument,
+    // uploadDocument,
     deleteDocuments,
     deleteDocumentsByClient,
 }

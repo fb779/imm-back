@@ -2,12 +2,61 @@
  *  Importaciones
  ************************************************/
 const DocumentServices = require('../services/document.services');
+const ProcessService = require('../services/process.services');
 const ClientService = require('../services/client.services');
 const CheckListService = require('../services/check-list.services');
+const { typesDocument } = require('../config/config');
 
 /************************************************
  *  Deficnicion de metodos
  ************************************************/
+
+async function getDocuments(req, res, next) {
+    try {
+        const type = req.query.type || null;
+        const id = req.query.id || null;
+
+        if (!type) {
+            throw ({
+                status: 400,
+                message: `Error en los parametros`,
+                errors: {}
+            });
+        }
+
+        // const documents = [];
+        const documents = await DocumentServices.getDocuments(type, id);
+
+        res.status(200).json({
+            ok: true,
+            list: documents,
+        })
+    } catch (error) {
+        errorHandler(error, res);
+
+    }
+}
+
+async function getDocumentsByProcessClient(req, res, netx) {
+    try {
+        const id_process = req.params.id_process;
+        const id_client = req.params.id_client;
+
+        const process = await ProcessService.getProcessId(id_process);
+        const client = await ClientService.getById(id_client);
+
+        // const documents = [];
+        const documents = await DocumentServices.getDocumentsByProcessClient(process._id, client._id);
+
+        res.status(200).json({
+            ok: true,
+            list: documents,
+        })
+    } catch (error) {
+        errorHandler(error, res);
+
+    }
+}
 
 async function getDocumentsByCliente(req, res, next) {
     try {
@@ -26,20 +75,22 @@ async function getDocumentsByCliente(req, res, next) {
 }
 
 async function saveDocumentsByCliente(req, res, next) {
-    const id_client = req.params.id_client;
     try {
-        const body = req.body.documents || '';
+        const id_client = req.params.id_client;
+        const id_process = req.body.id_process || '';
+        const ids_checkList = req.body.list_checks || '';
 
-        if (!body) {
+        if (!ids_checkList) {
             return res.status(400).json({
                 ok: false,
                 message: 'Faltan los documentos viejo'
             })
         }
 
+        const process = await ProcessService.getProcessId(id_process);
         const client = await ClientService.getById(id_client);
 
-        const checkList = await (await CheckListService.getCheckListByIds(body)).map(({ _id, name }) => ({ checklist: _id, client: client._id, name, }));
+        const checkList = await (await CheckListService.getCheckListByIds(ids_checkList)).map(({ _id, name }) => ({ process: process._id, client: client._id, checklist: _id, name, }));
 
         const documents = await DocumentServices.getDocumentsByClientId(client._id)
 
@@ -91,6 +142,7 @@ const removeDocuments = (saved, news) => {
  *  Metodo para el manejo de error
  ************************************************/
 const errorHandler = (error, res) => {
+    console.log('error para verificacion', error);
     if (error.hasOwnProperty('status')) {
         return res.status(error.status).json({
             ok: false,
@@ -110,6 +162,8 @@ const errorHandler = (error, res) => {
  ************************************************/
 
 module.exports = {
+    getDocuments,
     getDocumentsByCliente,
-    saveDocumentsByCliente
+    getDocumentsByProcessClient,
+    saveDocumentsByCliente,
 }
