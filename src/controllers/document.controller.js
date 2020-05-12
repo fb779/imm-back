@@ -92,7 +92,8 @@ async function saveDocumentsByCliente(req, res, next) {
 
         const checkList = await (await CheckListService.getCheckListByIds(ids_checkList)).map(({ _id, name }) => ({ process: process._id, client: client._id, checklist: _id, name, }));
 
-        const documents = await DocumentServices.getDocumentsByClientId(client._id)
+        // const documents = await DocumentServices.getDocumentsByClientId(client._id)
+        const documents = await DocumentServices.getDocumentsByProcessClient(process._id, client._id)
 
         const create = newDocuments(checkList, documents);
         const remove = removeDocuments(documents, checkList);

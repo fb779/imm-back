@@ -4,7 +4,7 @@
 const moment = require('moment');
 const path = require('path');
 const fs = require('fs');
-const { uploadDir, typeFilesUpload } = require('./../config/config');
+const { uploadDir, typeFilesUpload, typesStatusDocument } = require('./../config/config');
 
 const ProcessService = require('../services/process.services');
 const ClientService = require('../services/client.services');
@@ -52,24 +52,37 @@ async function uploadFormsGuides(req, res, next) {
 
 async function uploadDocuments(req, res, next) {
     try {
-        var description = req.body.description || '';
-        // const type_document = req.body.type_document.toLowerCase() || null;
-        const id_process_query = req.query.process;
-        const id_process_params = req.body.process;
         const id_document = req.params.id_document;
 
-        // // const process = await ProcessService.getProcessId(id_process);
-        // const document = await DocumentServices.getDocumentById(id_document);
-        // const client = await ClientService.getById(document.client);
+        if (req.files.length > 0) {
+            return res.status(404).json({
+                ok: false,
+                message: 'Error, No selecciono ningun documento'
+            })
+        }
 
-        // const id_client = client._id;
+        const document = await DocumentServices.getDocumentById(id_document);
+
+        // const files_upload = Object.keys(req.files);
+
+        const process = await ProcessService.getProcessId(document.process);
+        const client = await ClientService.getById(document.client);
+
+        const files_upload = req.files[Object.keys(req.files)[0]]
+
+        const rt = loadSingleFilesServer(files_upload, nameFile(files_upload, typeFilesUpload.documents, process._id, client._id, document.name));
+
+        document.status = typesStatusDocument.uploaded;
+        document.file_name = rt.name;
+        document.extension = rt.extension;
+        document.directory = rt.directory;
+
+        await document.save();
 
         return res.status(200).json({
             ok: true,
-            message: `Llegamos a cargar documentos`,
-            id_document,
-            id_process_query,
-            id_process_params
+            // message: `Documento cargado`,
+            // document
         });
     } catch (error) {
         errorHandler(error, res);
@@ -105,9 +118,9 @@ const nameFile = (file, type_document, id_process, id_client, keyFile) => {
 
     if (type_document === typeFilesUpload.documents && keyFile) {
         // nombreArchivo = `${ keyFile.replace(/\s/gi, '-') }.${ moment().unix() }.${ extension }`;
-        nombreArchivo = `${ keyFile.replace(/\s/gi, '-') }.${ extension }`;
+        nombreArchivo = `${ keyFile.replace(/[&\/\\#,+()$~%.'":*?<>{}]/gi, '').replace(/\s/gi, '-') }.${ extension }`;
     } else {
-        nombreArchivo = `${ nombreCortado[0].replace(/\s/gi, '-') }.${ extension }`;
+        nombreArchivo = `${ nombreCortado[0].replace(/[&\/\\#,+()$~%.'":*?<>{}]/gi, '').replace(/\s/gi, '-') }.${ extension }`;
     }
 
     // definicion de la rua de guardado
@@ -118,20 +131,24 @@ const nameFile = (file, type_document, id_process, id_client, keyFile) => {
 
 
 function loadSingleFilesServer(file, file_path, res) {
-    // Use the mv() method to place the file somewhere on your server
-    const name = file_path.split('/').pop();
-    const extension = file_path.split('.').pop();
+    try {
+        const name = file_path.split('/').pop();
+        const extension = file_path.split('.').pop();
 
-    file.mv(file_path);
+        // Use the mv() method to place the file somewhere on your server
+        file.mv(file_path);
 
-    return {
-        original_name: file.name,
-        name,
-        extension,
-        directory: file_path,
-        mimetype: file.mimetype,
-        size: file.size
-    };
+        return {
+            original_name: file.name,
+            name,
+            extension,
+            directory: file_path,
+            mimetype: file.mimetype,
+            size: file.size
+        };
+    } catch (error) {
+
+    }
 }
 
 

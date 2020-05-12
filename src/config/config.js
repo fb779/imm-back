@@ -71,6 +71,13 @@ const typesDocument = {
     process: 'process',
 };
 
+const typesStatusDocument = {
+    create: 'CREATE',
+    uploaded: 'UPLOADED',
+    approved: 'APPROVED',
+    rejected: 'REJECTED',
+}
+
 /*******************************************
  * Exports de los datos
  *******************************************/
@@ -90,5 +97,6 @@ module.exports = {
     typeFiles,
     typeFilesUpload,
     typeExtensionFiles,
-    typesDocument
+    typesDocument,
+    typesStatusDocument,
 };

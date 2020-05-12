@@ -2,6 +2,32 @@
  *  Importaciones
  ************************************************/
 const FamilyService = require('../services/family.services');
+const ClientService = require('../services/client.services');
+const ProcessService = require('../services/process.services');
+
+async function getFamilyByClient(req, res, next) {
+    try {
+        const id_client = req.params.id_client;
+
+        const client = await ClientService.getById(id_client);
+
+        const processes = await (await ProcessService.getProcessesByClient(client._id)).map(({ _id }) => _id.toString());
+
+        const members = await (await FamilyService.getFamilyMembersByProcesses(processes)).map(({ client }) => client);
+        // const list = await FamilyService.getFamilyByProcess(process);
+
+        return res.status(200).json({
+            ok: true,
+            list: members,
+        });
+    } catch (error) {
+        errorHandler(error, res);
+        // return res.status(500).json({
+        //     ok: false,
+        //     message: 'catch, llegamos a los familiares'
+        // });
+    }
+}
 
 async function getFamilyByProcess(req, res, next) {
     try {
@@ -118,6 +144,7 @@ const errorHandler = (error, res) => {
  *  Export de metodos
  ************************************************/
 module.exports = {
+    getFamilyByClient,
     getFamilyByProcess,
     createFamilyMember,
     editFamilyMember,

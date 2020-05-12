@@ -19,6 +19,22 @@ function getFamilyByProcess(process) {
     })
 }
 
+function getFamilyMembersByProcesses(process) {
+    return new Promise(async(resolve, reject) => {
+        try {
+            const familyList = await Family.find({ process: { $in: process } }).select('-_id -process -createdAt -updatedAt -__v').populate([{ path: 'client', select: '-email -createdAt -updatedAt -__v -active' }]);
+
+            resolve(familyList);
+        } catch (error) {
+            reject({
+                status: 500,
+                message: 'Error, the client doesn\'t find',
+                errors: error
+            });
+        }
+    })
+}
+
 function createFamilyMember(process, client) {
     return new Promise(async(resolve, reject) => {
         try {
@@ -112,6 +128,7 @@ function deleteFamilyMember(id_process, id_client) {
 
 module.exports = {
     getFamilyByProcess,
+    getFamilyMembersByProcesses,
     createFamilyMember,
     editFamilyMember,
     deleteFamilyMember,

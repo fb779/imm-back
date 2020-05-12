@@ -18,8 +18,9 @@ const auth = require('../../middlewares/auth.guard');
  *  CRUD basico para el recurso
  ************************************************/
 
+
 router.get('/:id_process', [auth.isAuth], FamilyCtrl.getFamilyByProcess);
-// router.get('/:id', [auth.isAuth], FamilyCtrl.getFamilyByProcess);
+router.get('/client/:id_client', [], FamilyCtrl.getFamilyByClient);
 router.post('/:id_process', [auth.isAuth], FamilyCtrl.createFamilyMember);
 router.put('/:id_process', [auth.isAuth], FamilyCtrl.editFamilyMember);
 router.delete('/:id_process/:id_client', [auth.isAuth], FamilyCtrl.deleteFamilyMember);

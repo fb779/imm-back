@@ -73,7 +73,7 @@ function getDocuments(type, id) {
 function getDocumentsByClientId(id_client) {
     return new Promise(async(resolve, reject) => {
         try {
-            const list_documents = await Document.find({ client: id_client }).select('-createdAt -updatedAt -__v');
+            const list_documents = await Document.find({ client: id_client }).select('-createdAt -updatedAt -__v').sort('process checklist');
 
             return resolve(list_documents);
 
@@ -90,7 +90,7 @@ function getDocumentsByClientId(id_client) {
 function getDocumentsByProcessClient(id_process, id_client) {
     return new Promise(async(resolve, reject) => {
         try {
-            const list_documents = await Document.find({ process: id_process, client: id_client }).select('-createdAt -updatedAt -__v');
+            const list_documents = await Document.find({ process: id_process, client: id_client }).select('-createdAt -updatedAt -__v').sort('checklist');
 
             return resolve(list_documents);
 
@@ -119,27 +119,27 @@ function createDocumentsByClient(itemsChecklist) {
     });
 }
 
-// function uploadDocument(id_document, new_document) {
-//     return new Promise(async(resolve, reject) => {
-//         try {
-//             const document = Document.findById(id_document);
+function uploadDocument(id_document, new_document) {
+    return new Promise(async(resolve, reject) => {
+        try {
+            const document = Document.findById(id_document);
 
-//             document.name = new_document.name;
-//             document.description = new_document.description;
-//             document.type = new_document.type;
+            document.description = new_document.description;
+            document.status = new_document.status;
+            document.extension = new_document.extension;
 
-//             await document.save();
+            await document.save();
 
-//             return resolve(document);
-//         } catch (error) {
-//             return reject({
-//                 status: 500,
-//                 message: 'Error to edit document',
-//                 errors: error
-//             });
-//         }
-//     });
-// }
+            return resolve(document);
+        } catch (error) {
+            return reject({
+                status: 500,
+                message: 'Error to edit document',
+                errors: error
+            });
+        }
+    });
+}
 
 function deleteDocuments(documents) {
     return new Promise(async(resolve, reject) => {
@@ -185,7 +185,7 @@ module.exports = {
     getDocumentsByClientId,
     getDocumentsByProcessClient,
     createDocumentsByClient,
-    // uploadDocument,
+    uploadDocument,
     deleteDocuments,
     deleteDocumentsByClient,
 }
