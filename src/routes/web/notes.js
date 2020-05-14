@@ -7,37 +7,35 @@ var Note = require('../../model/note.model');
 const router = express.Router();
 
 router.get('/', (req, res, next) => {
-    res.send('Notas');
+  res.send('Notas');
 });
 
 router.get('/add', (req, res, next) => {
-    res.render(`${pathViews}/add-note`);
+  res.render(`${pathViews}/add-note`);
 
 
 
 });
 
 router.post('/new-note', (req, res, next) => {
-    // console.log(req.body);
-    const { title, description } = req.body;
+  const { title, description } = req.body;
 
-    note = new Note({ title, description });
+  note = new Note({ title, description });
 
-    note.save((err, noteSave) => {
-        if (err) {
-            return res.status(400).json({
-                ok: false,
-                mensaje: 'Error al crear una nota',
-                errors: err
-            });
-        }
+  note.save((err, noteSave) => {
+    if (err) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'Error al crear una nota',
+        errors: err
+      });
+    }
 
-        return res.status(200).json({
-            ok: true,
-            nota: noteSave
-        });
+    return res.status(200).json({
+      ok: true,
+      nota: noteSave
     });
-    // res.render(`${ pathViews }/add-note`);
+  });
 });
 
 module.exports = router;

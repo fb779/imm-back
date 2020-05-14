@@ -13,14 +13,6 @@ const router = express.Router();
  *  CRUD's especiales
  ************************************************/
 
-// router.post('/assigned', [auth.isAuth], processCtrl.setAssignConsultan);
-// router.post('/create-process', processCtrl.createProcess);
-// router.post('/save-form', [auth.isAuth], processCtrl.saveForm);
-// router.post('/save-consultan', [auth.isAuth], processCtrl.setAssignConsultan);
-// router.get('/form-process/:id', [auth.isAuth], processCtrl.getFormProcess);
-// router.get('/assigned-process', [auth.isAuth], processCtrl.getProcessesAssigned);
-// router.get('/assigned', [auth.isAuth], processCtrl.getProcessToAssignan);
-
 
 /************************************************
  *  CRUD basico para el recurso
@@ -33,8 +25,5 @@ router.post('/:id/form', [auth.isAuth], processCtrl.createFormProcess);
 router.post('/', [auth.isAuth], processCtrl.createProcess);
 router.put('/:id/form', [auth.isAuth], processCtrl.editProcessIdForm);
 router.put('/:id', [auth.isAuth], processCtrl.editProcess);
-// router.delete('/:id', [], processCtrl.deleteProcess);
-
-
 
 module.exports = router;

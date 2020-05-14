@@ -11,6 +11,4 @@ const auth = require('./../../middlewares/auth.guard');
 
 router.use('/files', [auth.isAuth], express.static(path.join(__dirname, '..', '..', 'public', 'processes')));
 
-// app.use('/documents', express.static(path.join(__dirname, 'public')));
-
 module.exports = router;

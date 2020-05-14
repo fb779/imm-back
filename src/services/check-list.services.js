@@ -1,245 +1,244 @@
 const CheckList = require('../model/check-list.model');
 
 function getListCheckList() {
-    return new Promise(async(resolve, reject) => {
-        try {
-            const list = await CheckList.find().populate({ path: 'visa_categories' });
+  return new Promise(async(resolve, reject) => {
+    try {
+      const list = await CheckList.find().populate({ path: 'visa_categories' });
 
-            return resolve(list);
-        } catch (error) {
-            reject({
-                status: 500,
-                message: 'Error to create checklist',
-                errors: error
-            });
-        }
-    })
+      return resolve(list);
+    } catch (error) {
+      reject({
+        status: 500,
+        message: 'Error to create checklist',
+        errors: error
+      });
+    }
+  })
 }
 
 function getCheckListById(id_checklist) {
-    return new Promise(async(resolve, reject) => {
-        try {
+  return new Promise(async(resolve, reject) => {
+    try {
 
-            const checklist = await CheckList.findById(id_checklist).populate([{ path: 'client' }]);
+      const checklist = await CheckList.findById(id_checklist).populate([{ path: 'client' }]);
 
-            if (!checklist) {
-                return reject({
-                    status: 404,
-                    message: `The CheckList isn't found`,
-                    errors: `The CheckList doesn't find with this Id: ${id_checklist}`,
-                });
-            }
+      if (!checklist) {
+        return reject({
+          status: 404,
+          message: `The CheckList isn't found`,
+          errors: `The CheckList doesn't find with this Id: ${id_checklist}`,
+        });
+      }
 
-            return resolve(list_items);
-        } catch (error) {
-            return reject({
-                status: 500,
-                message: 'Error to find items checklist',
-                errors: error
-            });
-        }
-    })
+      return resolve(list_items);
+    } catch (error) {
+      return reject({
+        status: 500,
+        message: 'Error to find items checklist',
+        errors: error
+      });
+    }
+  })
 }
 
 function getCheckListByIds(ids) {
-    return new Promise(async(resolve, reject) => {
-        try {
+  return new Promise(async(resolve, reject) => {
+    try {
 
-            const list_ids = [...new Set(ids.split(',').filter(el => (el.trim()) ? true : false).map(el => el.trim()))];
+      const list_ids = [...new Set(ids.split(',').filter(el => (el.trim()) ? true : false).map(el => el.trim()))];
 
-            const list_items = await CheckList.find({ _id: { $in: list_ids } }).select('_id name');
+      const list_items = await CheckList.find({ _id: { $in: list_ids } }).select('_id name');
 
-            if (list_items.length !== list_ids.length) {
-                return reject({
-                    status: 404,
-                    message: 'Error to find all items checklist',
-                    errors: error
-                });
-            }
+      if (list_items.length !== list_ids.length) {
+        return reject({
+          status: 404,
+          message: 'Error to find all items checklist',
+          errors: error
+        });
+      }
 
-            return resolve(list_items);
-        } catch (error) {
-            return reject({
-                status: 500,
-                message: 'Error to find items checklist',
-                errors: error
-            });
-        }
-    })
+      return resolve(list_items);
+    } catch (error) {
+      return reject({
+        status: 500,
+        message: 'Error to find items checklist',
+        errors: error
+      });
+    }
+  })
 }
 
 
 // crear nuevo VisaCategorye
 function createCheckList(newCheckList) {
-    return new Promise(async(resolve, reject) => {
-        try {
+  return new Promise(async(resolve, reject) => {
+    try {
 
-            if (newCheckList.visa_categories) {
-                newCheckList.visa_categories = await [...new Set(
-                    newCheckList.visa_categories.split(',').filter(
-                        el => (el.trim()) ? true : false
-                    ).map(
-                        el => el.trim()
-                    )
-                )];
-            }
+      if (newCheckList.visa_categories) {
+        newCheckList.visa_categories = await [...new Set(
+          newCheckList.visa_categories.split(',').filter(
+            el => (el.trim()) ? true : false
+          ).map(
+            el => el.trim()
+          )
+        )];
+      }
 
-            console.log(newCheckList);
+      const check = new CheckList(newCheckList);
 
-            const check = new CheckList(newCheckList);
-            await check.save();
+      await check.save();
 
-            resolve(check);
-        } catch (error) {
-            reject({
-                status: 400,
-                message: 'Error to create Checklist',
-                errors: error
-            });
-        }
-    });
+      resolve(check);
+    } catch (error) {
+      reject({
+        status: 400,
+        message: 'Error to create Checklist',
+        errors: error
+      });
+    }
+  });
 }
 
 function editCheckList(id, newCheckList) {
 
-    return new Promise(async(resolve, reject) => {
-        try {
-            const check = await CheckList.findById(id);
+  return new Promise(async(resolve, reject) => {
+    try {
+      const check = await CheckList.findById(id);
 
-            if (!check) {
-                reject({
-                    status: 400,
-                    message: 'Error, CheckList doesn\'t exist',
-                    errors: ''
-                });
-            }
+      if (!check) {
+        reject({
+          status: 400,
+          message: 'Error, CheckList doesn\'t exist',
+          errors: ''
+        });
+      }
 
-            if (newCheckList.visa_categories) {
+      if (newCheckList.visa_categories) {
 
-                newCheckList.visa_categories = await [...new Set(
-                    newCheckList.visa_categories.split(',').filter(
-                        el => (el.trim()) ? true : false
-                    ).map(
-                        el => el.trim()
-                    )
-                )];
+        newCheckList.visa_categories = await [...new Set(
+          newCheckList.visa_categories.split(',').filter(
+            el => (el.trim()) ? true : false
+          ).map(
+            el => el.trim()
+          )
+        )];
 
-                check.visa_categories = newCheckList.visa_categories;
-            }
+        check.visa_categories = newCheckList.visa_categories;
+      }
 
-            if (newCheckList.name) { check.name = newCheckList.name; }
-            if (newCheckList.description) { check.description = newCheckList.description; }
-            if (newCheckList.group) { check.group = newCheckList.group; }
-            if (newCheckList.required) { check.required = newCheckList.required; }
+      if (newCheckList.name) { check.name = newCheckList.name; }
+      if (newCheckList.description) { check.description = newCheckList.description; }
+      if (newCheckList.group) { check.group = newCheckList.group; }
+      if (newCheckList.required) { check.required = newCheckList.required; }
 
-            await check.save();
+      await check.save();
 
-            resolve(check);
+      resolve(check);
 
-        } catch (error) {
-            reject({
-                status: 400,
-                message: 'Error to edit CheckList',
-                errors: error
-            });
-        }
-    });
+    } catch (error) {
+      reject({
+        status: 400,
+        message: 'Error to edit CheckList',
+        errors: error
+      });
+    }
+  });
 }
 
 
 function deleteCheckList(id) {
-    return new Promise(async(resolve, reject) => {
-        try {
-            const check = await CheckList.findByIdAndRemove(id);
+  return new Promise(async(resolve, reject) => {
+    try {
+      const check = await CheckList.findByIdAndRemove(id);
 
-            if (!check) {
-                reject({
-                    status: 400,
-                    message: 'Error, the CheckList doesn\'t delete',
-                    errors: error
-                })
-            }
+      if (!check) {
+        reject({
+          status: 400,
+          message: 'Error, the CheckList doesn\'t delete',
+          errors: error
+        })
+      }
 
-            resolve(check);
-        } catch (error) {
-            reject({
-                status: 400,
-                message: 'Error, the CheckList doesn\'t deletel',
-                errors: error
-            });
-        }
-    });
+      resolve(check);
+    } catch (error) {
+      reject({
+        status: 400,
+        message: 'Error, the CheckList doesn\'t deletel',
+        errors: error
+      });
+    }
+  });
 }
 
 function disableCheckList(id) {
-    return new Promise(async(resolve, reject) => {
-        try {
+  return new Promise(async(resolve, reject) => {
+    try {
 
-            const check = await CheckList.findById(id);
+      const check = await CheckList.findById(id);
 
-            if (!check) {
-                reject({
-                    status: 400,
-                    message: 'Error, CheckList doesn\'t exist',
-                    errors: ''
-                });
-            }
+      if (!check) {
+        reject({
+          status: 400,
+          message: 'Error, CheckList doesn\'t exist',
+          errors: ''
+        });
+      }
 
-            if (check.active) {
-                check.active = false;
-            }
+      if (check.active) {
+        check.active = false;
+      }
 
-            await check.save();
+      await check.save();
 
-            resolve(check);
-        } catch (error) {
-            reject({
-                status: 400,
-                message: 'Error, the CheckList doesn\'t deletel',
-                errors: error
-            });
-        }
-    });
+      resolve(check);
+    } catch (error) {
+      reject({
+        status: 400,
+        message: 'Error, the CheckList doesn\'t deletel',
+        errors: error
+      });
+    }
+  });
 }
 
 function enableCheckList(id) {
-    return new Promise(async(resolve, reject) => {
-        try {
+  return new Promise(async(resolve, reject) => {
+    try {
 
-            const check = await CheckList.findById(id);
+      const check = await CheckList.findById(id);
 
-            if (!check) {
-                reject({
-                    status: 400,
-                    message: 'Error, CheckList doesn\'t exist',
-                    errors: ''
-                });
-            }
+      if (!check) {
+        reject({
+          status: 400,
+          message: 'Error, CheckList doesn\'t exist',
+          errors: ''
+        });
+      }
 
-            if (!check.active) {
-                check.active = true;
-            }
+      if (!check.active) {
+        check.active = true;
+      }
 
-            await check.save();
+      await check.save();
 
-            resolve(check);
-        } catch (error) {
-            reject({
-                status: 400,
-                message: 'Error, the CheckList doesn\'t deletel',
-                errors: error
-            });
-        }
-    });
+      resolve(check);
+    } catch (error) {
+      reject({
+        status: 400,
+        message: 'Error, the CheckList doesn\'t deletel',
+        errors: error
+      });
+    }
+  });
 }
 
 
 module.exports = {
-    createCheckList,
-    editCheckList,
-    deleteCheckList,
-    disableCheckList,
-    enableCheckList,
-    getCheckListById,
-    getCheckListByIds
+  createCheckList,
+  editCheckList,
+  deleteCheckList,
+  disableCheckList,
+  enableCheckList,
+  getCheckListById,
+  getCheckListByIds
 }

@@ -20,7 +20,7 @@ const auth = require('../../middlewares/auth.guard');
 
 
 router.get('/:id_process', [auth.isAuth], FamilyCtrl.getFamilyByProcess);
-router.get('/client/:id_client', [], FamilyCtrl.getFamilyByClient);
+router.get('/client/:id_client', [auth.isAuth], FamilyCtrl.getFamilyByClient);
 router.post('/:id_process', [auth.isAuth], FamilyCtrl.createFamilyMember);
 router.put('/:id_process', [auth.isAuth], FamilyCtrl.editFamilyMember);
 router.delete('/:id_process/:id_client', [auth.isAuth], FamilyCtrl.deleteFamilyMember);

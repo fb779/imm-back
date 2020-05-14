@@ -5,13 +5,11 @@ const pathViews = 'users';
 var router = express.Router();
 
 router.get('/signin', (req, res, next) => {
-    res.render(`${pathViews}/signin`);
-    // res.send('Sign in');
+  res.render(`${pathViews}/signin`);
 });
 
 router.get('/signup', (req, res, next) => {
-    res.render(`${pathViews}/signup`);
-    // res.send('Sing up');
+  res.render(`${pathViews}/signup`);
 });
 
 module.exports = router;

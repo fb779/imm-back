@@ -6,14 +6,14 @@ const { rolesValidos } = require('./../config/config')
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
-    email: { type: String, unique: true, required: [true, 'El correo es necesario'], lowercase: true },
-    first_name: { type: String, required: [true, 'El Nombre es necesario'], },
-    last_name: { type: String, required: [true, 'El Apellido es necesario'], },
-    password: { type: String, required: [true, 'La contraseña es necesario'] },
-    img: { type: String, required: false, default: '' },
-    active: { type: Boolean, default: false },
-    role: { type: String, default: 'CLIENT_ROLE', enum: rolesValidos, uppercase: true },
-    client: { type: Schema.Types.ObjectId, ref: 'Client', default: null, required: false },
+  email: { type: String, unique: true, required: [true, 'El correo es necesario'], lowercase: true },
+  first_name: { type: String, required: [true, 'El Nombre es necesario'], },
+  last_name: { type: String, required: [true, 'El Apellido es necesario'], },
+  password: { type: String, required: [true, 'La contraseña es necesario'] },
+  img: { type: String, required: false, default: '' },
+  active: { type: Boolean, default: false },
+  role: { type: String, default: 'CLIENT_ROLE', enum: rolesValidos, uppercase: true },
+  client: { type: Schema.Types.ObjectId, ref: 'Client', default: null, required: false },
 }, { timestamps: true, collection: 'users' });
 
 UserSchema.plugin(uniqueValidator, { message: '{PATH} is not unique' });
@@ -22,40 +22,40 @@ UserSchema.plugin(uniqueValidator, { message: '{PATH} is not unique' });
  * Hook to before to save user to encrypt password
  */
 UserSchema.pre('save', async function(next) {
-    const user = this;
+  const user = this;
 
-    if (!user.isModified('password')) {
-        return next();
-    }
-
-    user.password = await this.encryptPassword(user.password);
+  if (!user.isModified('password')) {
     return next();
+  }
+
+  user.password = await this.encryptPassword(user.password);
+  return next();
 });
 
 /**
  * Hook to after save user to replace the password
  */
 UserSchema.post('save', function(next) {
-    const user = this;
-    user.password = ':)';
+  const user = this;
+  user.password = ':)';
 
-    return next;
+  return next;
 });
 
 /**
  * method of encript password
  */
 UserSchema.methods.encryptPassword = async(password) => {
-    const salt = await bcrypt.genSaltSync(10);
-    const hash = bcrypt.hashSync(password, salt);
-    return hash;
+  const salt = await bcrypt.genSaltSync(10);
+  const hash = bcrypt.hashSync(password, salt);
+  return hash;
 };
 
-// /**
-//  * method to verify password
-//  **/
+/**
+ * method to verify password
+ **/
 UserSchema.methods.verifyPassword = function(password) {
-    return bcrypt.compareSync(password, this.password);
+  return bcrypt.compareSync(password, this.password);
 
 };
 

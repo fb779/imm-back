@@ -9,178 +9,130 @@ const VisaCategoryServices = require('../services/visa-category.services');
 const campos = '_id first_name last_name email role active';
 
 async function getProcess(req, res, next) {
-    try {
-        const user = req.user || null;
+  try {
+    const user = req.user || null;
 
-        var ListProcess = [];
+    var ListProcess = [];
 
-        switch (user.role) {
-            case 'ADMIN_ROLE':
-                {
-                    ListProcess = await Process.find({ status: 'FORM' }).populate({ path: 'client' }).populate({ path: 'visa_category' });
-                }
-                break;
-            case 'USER_ROLE':
-                {
-                    ListProcess = await Process.find({ consultant: user._id, status: 'ASIGNED' }).populate({ path: 'client' }).populate({ path: 'visa_category' });
-                }
-                break;
-            case 'CLIENT_ROLE':
-                {
-                    ListProcess = await Process.find({ client: user.client }).populate({ path: 'client' }).populate({ path: 'visa_category' });
-                }
-                break;
-                // default:
-                //     {
-
-                //     }
-                //     break;
+    switch (user.role) {
+      case 'ADMIN_ROLE':
+        {
+          ListProcess = await Process.find({ status: 'FORM' }).populate({ path: 'client' }).populate({ path: 'visa_category' });
         }
-
-        res.status(200).json({
-            ok: true,
-            list: ListProcess
-        });
-    } catch (error) {
-        errorHandler(error, res);
-        // res.status(500).json({
-        //     ok: false,
-        //     message: 'Error, Process',
-        //     error
-        // });
+        break;
+      case 'USER_ROLE':
+        {
+          ListProcess = await Process.find({ consultant: user._id, status: 'ASIGNED' }).populate({ path: 'client' }).populate({ path: 'visa_category' });
+        }
+        break;
+      case 'CLIENT_ROLE':
+        {
+          ListProcess = await Process.find({ client: user.client }).populate({ path: 'client' }).populate({ path: 'visa_category' });
+        }
+        break;
     }
+
+    res.status(200).json({
+      ok: true,
+      list: ListProcess
+    });
+  } catch (error) {
+    errorHandler(error, res);
+  }
 }
 
 async function getProcessId(req, res, next) {
-    try {
-        const id = req.params.id;
-        const user = req.user;
+  try {
+    const id = req.params.id;
+    const user = req.user;
 
-        const process = await Process.findOne({ _id: id }).populate([{ path: 'client', select: '-active -createdAt -updatedAt -__v' }, { path: 'visa_category', select: '-createdAt -updatedAt -__v' }]);
+    const process = await Process.findOne({ _id: id }).populate([{ path: 'client', select: '-active -createdAt -updatedAt -__v' }, { path: 'visa_category', select: '-createdAt -updatedAt -__v' }]);
 
-        if (!process) {
-            return res.status(404).json({
-                data: {
-                    ok: true,
-                    messages: 'Process doesn\'t exist'
-                }
-            });
+    if (!process) {
+      return res.status(404).json({
+        data: {
+          ok: true,
+          messages: 'Process doesn\'t exist'
         }
-
-        // verificacion de identidad para el proceso
-        // if (process.client._id.toString() !== user.client) {
-        //     return res.status(403).json({
-        //         data: {
-        //             ok: true,
-        //             messages: `You don't have permissions`
-        //         }
-        //     });
-        // }
-
-        res.status(200).json({
-            ok: true,
-            process
-        });
-    } catch (error) {
-        errorHandler(error, res);
-        // res.status(500).json({
-        //     ok: false,
-        //     message: 'Error, Process',
-        //     error
-
-        // });
+      });
     }
+
+    res.status(200).json({
+      ok: true,
+      process
+    });
+  } catch (error) {
+    errorHandler(error, res);
+  }
 }
 
 async function createProcess(req, res, next) {
-    try {
-        const body = req.body;
+  try {
+    const body = req.body;
 
-        // consultar el cliente
-        const client = await ClientServices.getByEmail(body.client);
+    // consultar el cliente
+    const client = await ClientServices.getByEmail(body.client);
 
-        // consultar el tipo de visado
-        const visa = await VisaCategoryServices.getByName(body.visa_category);
+    // consultar el tipo de visado
+    const visa = await VisaCategoryServices.getByName(body.visa_category);
 
-        body.client = client;
-        body.visa_category = visa;
+    body.client = client;
+    body.visa_category = visa;
 
-        const process = await ProcessServices.createProcess(body);
+    const process = await ProcessServices.createProcess(body);
 
-        res.status(200).json({
-            ok: true,
-            body,
-            process,
-        });
-    } catch (error) {
-        errorHandler(error, res);
-        // res.status(error.status).json({
-        //     ok: false,
-        //     message: error.message,
-        //     errors: error.errors
-        // });
-    }
+    res.status(200).json({
+      ok: true,
+      body,
+      process,
+    });
+  } catch (error) {
+    errorHandler(error, res);
+  }
 }
 
 async function editProcess(req, res, next) {
-    try {
-        const id_process = req.params.id;
-        const user = req.user;
-        const body = req.body;
-        const id_form = body._id;
+  try {
+    const id_process = req.params.id;
+    const user = req.user;
+    const body = req.body;
+    const id_form = body._id;
 
-        // consultar el proceso
-        const process = await Process.findById(id_process)
+    // consultar el proceso
+    const process = await Process.findById(id_process)
 
-        if (!process) {
-            return res.status(404).json({
-                data: {
-                    ok: false,
-                    messages: 'Process doesn\'t exist'
-                }
-            });
+    if (!process) {
+      return res.status(404).json({
+        data: {
+          ok: false,
+          messages: 'Process doesn\'t exist'
         }
-
-        if (body.client && process.client != body.client) {
-            process.client = body.client;
-        }
-
-        if (body.consultant && process.consultant != body.consultant) {
-            process.consultant = body.consultant;
-        }
-
-        // if (body.visa_category && process.visa_category != body.visa_category) {
-        //     process.visa_category = body.visa_category;
-        // }
-
-        // if (body.code && process.code != body.code) {
-        //     process.code = body.code;
-        // }
-
-        if (body.status && process.status != body.status) {
-            process.status = body.status;
-        }
-
-        // if (body.active && process.active != body.active) {
-        //     process.active = body.active;
-        // }
-
-        // guardado del proceso con el consultor
-        await process.save();
-
-
-        return res.status(200).json({
-            ok: true,
-            process,
-        });
-    } catch (error) {
-        errorHandler(error, res);
-        // res.status(error.status).json({
-        //     ok: false,
-        //     message: error.message,
-        //     errors: error.errors
-        // });
+      });
     }
+
+    if (body.client && process.client != body.client) {
+      process.client = body.client;
+    }
+
+    if (body.consultant && process.consultant != body.consultant) {
+      process.consultant = body.consultant;
+    }
+
+    if (body.status && process.status != body.status) {
+      process.status = body.status;
+    }
+
+    // guardado del proceso con el consultor
+    await process.save();
+
+
+    return res.status(200).json({
+      ok: true,
+      process,
+    });
+  } catch (error) {
+    errorHandler(error, res);
+  }
 }
 
 // async function deleteProcess(req, res, next) {
@@ -204,166 +156,135 @@ async function editProcess(req, res, next) {
 // }
 
 async function getProcessIdClient(req, res, next) {
-    try {
-        const id = req.params.id;
-        const user = req.user
+  try {
+    const id = req.params.id;
+    const user = req.user
 
-        const process = await Process.findOne({ _id: id, client: user.client }, { 'client': 1 }).populate([{ path: 'client', select: '-active -createdAt -updatedAt -__v' }]);
+    const process = await Process.findOne({ _id: id, client: user.client }, { 'client': 1 }).populate([{ path: 'client', select: '-active -createdAt -updatedAt -__v' }]);
 
-        if (!process) {
-            return res.status(404).json({
-                data: {
-                    ok: true,
-                    messages: 'Process doesn\'t exist'
-                }
-            });
+    if (!process) {
+      return res.status(404).json({
+        data: {
+          ok: true,
+          messages: 'Process doesn\'t exist'
         }
-
-        res.status(200).json({
-            ok: true,
-            message: 'Load client to process',
-            process,
-            client: process.client
-        })
-    } catch (error) {
-        errorHandler(error, res);
-        // res.status(error.status).json({
-        //     ok: false,
-        //     message: error.message,
-        //     errors: error.errors
-        // });
+      });
     }
+
+    res.status(200).json({
+      ok: true,
+      message: 'Load client to process',
+      process,
+      client: process.client
+    })
+  } catch (error) {
+    errorHandler(error, res);
+  }
 }
 
 async function createFormProcess(req, res, next) {
-    try {
-        const id_process = req.params.id;
-        const body = req.body;
+  try {
+    const id_process = req.params.id;
+    const body = req.body;
 
-        const process = await Process.findOne({ _id: id_process }).populate([{ path: 'client' }, { path: 'visa_category' }]);
+    const process = await Process.findOne({ _id: id_process }).populate([{ path: 'client' }, { path: 'visa_category' }]);
 
-        await ClientServices.editClient(process.client._id, body);
+    await ClientServices.editClient(process.client._id, body);
 
-        const form = await FormServices.createForm(process, body);
+    const form = await FormServices.createForm(process, body);
 
-        process.status = 'FORM';
+    process.status = 'FORM';
 
-        await process.save();
+    await process.save();
 
-        res.status(200).json({
-            ok: true,
-            message: `Estamos en la creacion del formulario asociado`,
-            // id_process,
-            // process,
-            // body,
-            form
-        })
-    } catch (error) {
-        errorHandler(error, res);
-        // res.status(error.status).json({
-        //     ok: false,
-        //     message: error.message,
-        //     errors: error.errors
-        // });
-    }
+    res.status(200).json({
+      ok: true,
+      form
+    })
+  } catch (error) {
+    errorHandler(error, res);
+  }
 }
 
 async function getProcessIdForm(req, res, next) {
-    try {
-        const id = req.params.id;
+  try {
+    const id = req.params.id;
 
-        const process = await Process.findOne({ _id: id }).populate([{ path: 'client' }, { path: 'visa_category' }]);
+    const process = await Process.findOne({ _id: id }).populate([{ path: 'client' }, { path: 'visa_category' }]);
 
-        if (!process) {
-            return res.status(404).json({
-                data: {
-                    ok: false,
-                    messages: 'Process references doesn\'t exist'
-                }
-            });
+    if (!process) {
+      return res.status(404).json({
+        data: {
+          ok: false,
+          messages: 'Process references doesn\'t exist'
         }
-
-        const form = await FormServices.getFormByProcess(process);
-
-        if (!form) {
-            return res.status(404).json({
-                data: {
-                    ok: false,
-                    messages: 'Form doesn\'t exist'
-                }
-            });
-        }
-
-        return res.status(200).json({
-            ok: true,
-            message: `Estamos en la carga del formulario asociado`,
-            // process,
-            form
-        })
-    } catch (error) {
-        errorHandler(error, res);
-        // return res.status(error.status).json({
-        //     ok: false,
-        //     message: error.message,
-        //     errors: error.errors
-        // });
+      });
     }
+
+    const form = await FormServices.getFormByProcess(process);
+
+    if (!form) {
+      return res.status(404).json({
+        data: {
+          ok: false,
+          messages: 'Form doesn\'t exist'
+        }
+      });
+    }
+
+    return res.status(200).json({
+      ok: true,
+      form
+    })
+  } catch (error) {
+    errorHandler(error, res);
+  }
 }
 
 async function editProcessIdForm(req, res, next) {
-    try {
-        const id_process = req.params.id;
-        const id_form = req.body._id;
-        const body = req.body;
+  try {
+    const id_process = req.params.id;
+    const id_form = req.body._id;
+    const body = req.body;
 
-        const process = await Process.findById(id_process).populate([{ path: 'client' }]);
+    const process = await Process.findById(id_process).populate([{ path: 'client' }]);
 
-        await ClientServices.editClient(process.client._id, body);
+    await ClientServices.editClient(process.client._id, body);
 
-        const form = await FormServices.editForm(process, body);
+    const form = await FormServices.editForm(process, body);
 
-        return res.status(200).json({
-            data: {
-                ok: true,
-                messages: 'Edit form',
-                id_process,
-                id_form,
-                body,
-                process,
-                form,
-            }
-        });
-    } catch (error) {
-        errorHandler(error, res);
-        // return res.status(error.status).json({
-        //     ok: false,
-        //     message: error.message,
-        //     errors: error.errors
-        // });
-        // return res.status(500).json({
-        //     ok: false,
-        //     message: 'error en la actualizacion de informacion del form',
-        //     errors: error
-        // });
-    }
+    return res.status(200).json({
+      data: {
+        ok: true,
+        messages: 'Edit form',
+        id_process,
+        id_form,
+        body,
+        process,
+        form,
+      }
+    });
+  } catch (error) {
+    errorHandler(error, res);
+  }
 }
 
 /************************************************
  *  Metodo para el manejo de error
  ************************************************/
 const errorHandler = (error, res) => {
-    if (error.hasOwnProperty('status')) {
-        return res.status(error.status).json({
-            ok: false,
-            message: error.message,
-            error: error.errors
-        })
-    }
-    return res.status(500).json({
-        ok: true,
-        message: 'error en el servicio de creacion del listado de documentos',
-        error
+  if (error.hasOwnProperty('status')) {
+    return res.status(error.status).json({
+      ok: false,
+      message: error.message,
+      error: error.errors
     })
+  }
+  return res.status(500).json({
+    ok: true,
+    message: 'error en el servicio de creacion del listado de documentos',
+    error
+  })
 }
 
 /************************************************
@@ -371,13 +292,13 @@ const errorHandler = (error, res) => {
  ************************************************/
 
 module.exports = {
-    getProcess,
-    getProcessId,
-    createProcess,
-    editProcess,
-    // deleteProcess,
-    getProcessIdClient,
-    createFormProcess,
-    editProcessIdForm,
-    getProcessIdForm,
+  getProcess,
+  getProcessId,
+  createProcess,
+  editProcess,
+  // deleteProcess,
+  getProcessIdClient,
+  createFormProcess,
+  editProcessIdForm,
+  getProcessIdForm,
 }

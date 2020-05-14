@@ -15,15 +15,10 @@ const auth = require('./../../middlewares/auth.guard');
 /************************************************
  *  Router
  ************************************************/
-
-
-
 router.get('/', [auth.isAuth], documentCtrl.getDocuments);
 router.get('/:id_process/:id_client', [auth.isAuth], documentCtrl.getDocumentsByProcessClient);
 router.get('/:id_client', [auth.isAuth], documentCtrl.getDocumentsByCliente);
 router.post('/:id_client', [auth.isAuth], documentCtrl.saveDocumentsByCliente);
-// router.post('/', [], documentCtrl.createCliente);
-// router.put('/:id', [], documentCtrl.editCliente);
-// router.delete('/:id', [], documentCtrl.deleteCliente);
+router.put('/:id_document', [], documentCtrl.updateStatusDocument);
 
 module.exports = router;

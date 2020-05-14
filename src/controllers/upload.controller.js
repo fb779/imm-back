@@ -12,81 +12,75 @@ const DocumentServices = require('../services/document.services');
 const FormsGuidesService = require('../services/forms-guides.services');
 
 async function uploadFormsGuides(req, res, next) {
-    try {
-        var description = req.body.description || '';
-        const type_document = req.body.type_document.toLowerCase() || null;
-        const id_process = req.params.id_process;
+  try {
+    var description = req.body.description || '';
+    const type_document = req.body.type_document.toLowerCase() || null;
+    const id_process = req.params.id_process;
 
-        if (!type_document || !Object.values(typeFilesUpload).includes(type_document)) {
-            return res.status(404).json({
-                ok: false,
-                message: 'Error, no esta dentro de las opciones permitidas'
-            })
-        }
-
-        const process = await ProcessService.getProcessId(id_process);
-
-        const files_upload = req.files[Object.keys(req.files)[0]]
-
-        const rt = loadSingleFilesServer(files_upload, nameFile(files_upload, type_document, process._id, null, null));
-
-        var data = {
-            process: process._id,
-            name: rt.name,
-            description,
-            type: type_document,
-            directory: rt.directory,
-        };
-
-        const forms_guides = await FormsGuidesService.createFormGudide(data);
-
-        return res.status(200).json({
-            ok: true,
-            // data: forms_guides,
-
-        })
-    } catch (error) {
-        errorHandler(error, res);
+    if (!type_document || !Object.values(typeFilesUpload).includes(type_document)) {
+      return res.status(404).json({
+        ok: false,
+        message: 'Error, no esta dentro de las opciones permitidas'
+      })
     }
+
+    const process = await ProcessService.getProcessId(id_process);
+
+    const files_upload = req.files[Object.keys(req.files)[0]]
+
+    const rt = loadSingleFilesServer(files_upload, nameFile(files_upload, type_document, process._id, null, null));
+
+    var data = {
+      process: process._id,
+      name: rt.name,
+      description,
+      type: type_document,
+      directory: rt.directory,
+    };
+
+    const forms_guides = await FormsGuidesService.createFormGudide(data);
+
+    return res.status(200).json({
+      ok: true,
+    })
+  } catch (error) {
+    errorHandler(error, res);
+  }
 }
 
 async function uploadDocuments(req, res, next) {
-    try {
-        const id_document = req.params.id_document;
+  try {
+    const id_document = req.params.id_document;
 
-        if (req.files.length > 0) {
-            return res.status(404).json({
-                ok: false,
-                message: 'Error, No selecciono ningun documento'
-            })
-        }
-
-        const document = await DocumentServices.getDocumentById(id_document);
-
-        // const files_upload = Object.keys(req.files);
-
-        const process = await ProcessService.getProcessId(document.process);
-        const client = await ClientService.getById(document.client);
-
-        const files_upload = req.files[Object.keys(req.files)[0]]
-
-        const rt = loadSingleFilesServer(files_upload, nameFile(files_upload, typeFilesUpload.documents, process._id, client._id, document.name));
-
-        document.status = typesStatusDocument.uploaded;
-        document.file_name = rt.name;
-        document.extension = rt.extension;
-        document.directory = rt.directory;
-
-        await document.save();
-
-        return res.status(200).json({
-            ok: true,
-            // message: `Documento cargado`,
-            // document
-        });
-    } catch (error) {
-        errorHandler(error, res);
+    if (req.files.length > 0) {
+      return res.status(404).json({
+        ok: false,
+        message: 'Error, No selecciono ningun documento'
+      })
     }
+
+    const document = await DocumentServices.getDocumentById(id_document);
+
+    const process = await ProcessService.getProcessId(document.process);
+    const client = await ClientService.getById(document.client);
+
+    const files_upload = req.files[Object.keys(req.files)[0]]
+
+    const rt = loadSingleFilesServer(files_upload, nameFile(files_upload, typeFilesUpload.documents, process._id, client._id, document.name));
+
+    document.status = typesStatusDocument.uploaded;
+    document.file_name = rt.name;
+    document.extension = rt.extension;
+    document.directory = rt.directory;
+
+    await document.save();
+
+    return res.status(200).json({
+      ok: true,
+    });
+  } catch (error) {
+    errorHandler(error, res);
+  }
 };
 
 /************************************************
@@ -94,61 +88,61 @@ async function uploadDocuments(req, res, next) {
  ************************************************/
 
 const nameFile = (file, type_document, id_process, id_client, keyFile) => {
-    var nombreCortado = file.name.split('.');
-    var extension = nombreCortado[nombreCortado.length - 1];
-    var params = [];
+  var nombreCortado = file.name.split('.');
+  var extension = nombreCortado[nombreCortado.length - 1];
+  var params = [];
 
-    if (id_process) {
-        params.push(id_process);
+  if (id_process) {
+    params.push(id_process);
+  }
+
+  if (type_document && type_document !== typeFilesUpload.documents) {
+    params.push(type_document);
+  }
+
+  if (type_document && type_document === typeFilesUpload.documents) {
+    if (!id_client) {
+      throw ({ message: `Error, the client is required` })
     }
+    params.push(id_client);
+  }
 
-    if (type_document && type_document !== typeFilesUpload.documents) {
-        params.push(type_document);
-    }
+  // definicion del nombre del archivo
+  var nombreArchivo = '';
 
-    if (type_document && type_document === typeFilesUpload.documents) {
-        if (!id_client) {
-            throw ({ message: `Error, the client is required` })
-        }
-        params.push(id_client);
-    }
+  if (type_document === typeFilesUpload.documents && keyFile) {
+    // nombreArchivo = `${ keyFile.replace(/\s/gi, '-') }.${ moment().unix() }.${ extension }`;
+    nombreArchivo = `${ keyFile.replace(/[&\/\\#,+()$~%.'":*?<>{}]/gi, '').replace(/\s/gi, '-') }.${ extension }`;
+  } else {
+    nombreArchivo = `${ nombreCortado[0].replace(/[&\/\\#,+()$~%.'":*?<>{}]/gi, '').replace(/\s/gi, '-') }.${ extension }`;
+  }
 
-    // definicion del nombre del archivo
-    var nombreArchivo = '';
+  // definicion de la rua de guardado
+  var file_path = path.join(uploadDir, params.join('/'), nombreArchivo)
 
-    if (type_document === typeFilesUpload.documents && keyFile) {
-        // nombreArchivo = `${ keyFile.replace(/\s/gi, '-') }.${ moment().unix() }.${ extension }`;
-        nombreArchivo = `${ keyFile.replace(/[&\/\\#,+()$~%.'":*?<>{}]/gi, '').replace(/\s/gi, '-') }.${ extension }`;
-    } else {
-        nombreArchivo = `${ nombreCortado[0].replace(/[&\/\\#,+()$~%.'":*?<>{}]/gi, '').replace(/\s/gi, '-') }.${ extension }`;
-    }
-
-    // definicion de la rua de guardado
-    var file_path = path.join(uploadDir, params.join('/'), nombreArchivo)
-
-    return file_path;
+  return file_path;
 }
 
 
 function loadSingleFilesServer(file, file_path, res) {
-    try {
-        const name = file_path.split('/').pop();
-        const extension = file_path.split('.').pop();
+  try {
+    const name = file_path.split('/').pop();
+    const extension = file_path.split('.').pop();
 
-        // Use the mv() method to place the file somewhere on your server
-        file.mv(file_path);
+    // Use the mv() method to place the file somewhere on your server
+    file.mv(file_path);
 
-        return {
-            original_name: file.name,
-            name,
-            extension,
-            directory: file_path,
-            mimetype: file.mimetype,
-            size: file.size
-        };
-    } catch (error) {
+    return {
+      original_name: file.name,
+      name,
+      extension,
+      directory: file_path,
+      mimetype: file.mimetype,
+      size: file.size
+    };
+  } catch (error) {
 
-    }
+  }
 }
 
 
@@ -165,7 +159,7 @@ function loadSingleFilesServer(file, file_path, res) {
 //             }
 //         });
 //     }
-//     // console.log(req.files);
+
 //     const files_upload = Object.keys(req.files).map((file) => loadFileServer(req.files[file], file, process, client));
 //     var fsup = [];
 //     await Promise.all(
@@ -209,18 +203,18 @@ function loadSingleFilesServer(file, file_path, res) {
  *  Metodo para el manejo de error
  ************************************************/
 const errorHandler = (error, res) => {
-    if (error.hasOwnProperty('status')) {
-        return res.status(error.status).json({
-            ok: false,
-            message: error.message,
-            error: error.errors
-        })
-    }
-    return res.status(500).json({
-        ok: false,
-        message: 'error en el servicio de upload files',
-        error
+  if (error.hasOwnProperty('status')) {
+    return res.status(error.status).json({
+      ok: false,
+      message: error.message,
+      error: error.errors
     })
+  }
+  return res.status(500).json({
+    ok: false,
+    message: 'error en el servicio de upload files',
+    error
+  })
 }
 
 /************************************************
@@ -228,6 +222,6 @@ const errorHandler = (error, res) => {
  ************************************************/
 
 module.exports = {
-    uploadFormsGuides,
-    uploadDocuments
+  uploadFormsGuides,
+  uploadDocuments
 }
