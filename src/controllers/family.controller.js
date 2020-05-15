@@ -26,8 +26,13 @@ async function getFamilyByClient(req, res, next) {
 
 async function getFamilyByProcess(req, res, next) {
   try {
-    const process = req.params.id_process;
-    const list = await FamilyService.getFamilyByProcess(process);
+    const id_process = req.params.id_process;
+
+    const process = await ProcessService.getProcessId(id_process);
+
+    const list = await FamilyService.getFamilyByProcess(process._id);
+
+    list.splice(0, 0, { client: process.client });
 
     return res.status(200).json({
       ok: true,

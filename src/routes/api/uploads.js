@@ -22,9 +22,9 @@ const router = express.Router();
  * Configuracion del middleware fileUpload
  ************************************************/
 router.use(fileUpload({
-    createParentPath: true, // crea el las rutas automaticamente
-    safeFileNames: true, // elimina caracteres especiales de los nombres
-    preserveExtension: 4, // define la cantidad de caracteres de la extension
+  createParentPath: true, // crea el las rutas automaticamente
+  safeFileNames: true, // elimina caracteres especiales de los nombres
+  preserveExtension: 4, // define la cantidad de caracteres de la extension
 }));
 
 
@@ -33,6 +33,6 @@ router.use(fileUpload({
  ************************************************/
 
 router.post('/forms-guides/:id_process', [auth.isAuth], UpController.uploadFormsGuides);
-router.post('/documents/:id_document', [], UpController.uploadDocuments);
+router.post('/documents/:id_document', [auth.isAuth], UpController.uploadDocuments);
 
 module.exports = router;

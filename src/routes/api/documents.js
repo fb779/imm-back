@@ -19,6 +19,6 @@ router.get('/', [auth.isAuth], documentCtrl.getDocuments);
 router.get('/:id_process/:id_client', [auth.isAuth], documentCtrl.getDocumentsByProcessClient);
 router.get('/:id_client', [auth.isAuth], documentCtrl.getDocumentsByCliente);
 router.post('/:id_client', [auth.isAuth], documentCtrl.saveDocumentsByCliente);
-router.put('/:id_document', [], documentCtrl.updateStatusDocument);
+router.put('/:id_document', [auth.isAuth], documentCtrl.updateStatusDocument);
 
 module.exports = router;
