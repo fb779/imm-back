@@ -9,7 +9,7 @@ const router = express.Router();
  *  Importes
  ********************************************************/
 
-// const api = require('./api/principal');
+const api = require('./api/principal');
 const login = require('./api/login');
 const process = require('./api/process');
 const consultant = require('./api/consultant');
@@ -27,6 +27,7 @@ const static_files = require('./api/static-files');
  *  Rutas
  ********************************************************/
 
+router.use('/', api);
 router.use('/api/v1/login', login);
 router.use('/api/v1/users', users);
 router.use('/api/v1/clients', client);
