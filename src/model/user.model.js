@@ -24,12 +24,11 @@ UserSchema.plugin(uniqueValidator, { message: '{PATH} is not unique' });
 UserSchema.pre('save', async function(next) {
   const user = this;
 
-  if (!user.isModified('password')) {
-    return next();
+  if (user.isModified('password')) {
+    user.password = await this.encryptPassword(user.password);
   }
-
-  user.password = await this.encryptPassword(user.password);
   return next();
+
 });
 
 /**

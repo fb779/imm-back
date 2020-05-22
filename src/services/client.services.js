@@ -47,6 +47,21 @@ function getByEmail(email) {
     }
   });
 }
+/** verificacion de existencia del usuario por el email */
+function getClientByEmail(email) {
+  return new Promise(async(resolve, reject) => {
+    try {
+      var client = await Client.findOne({ email: email });
+      resolve(client);
+    } catch (error) {
+      reject({
+        status: 500,
+        message: 'Error, the client doesn\'t find',
+        errors: error
+      });
+    }
+  });
+}
 
 // crear nuevo cliente
 function createClient(newClient) {
@@ -114,16 +129,16 @@ function deleteClient(id) {
       const client = await Client.findByIdAndRemove(id);
 
       if (!client) {
-        reject({
+        return reject({
           status: 400,
           message: 'Error, the client doesn\'t deletel',
           errors: error
         })
       }
 
-      resolve(client);
+      return resolve(client);
     } catch (error) {
-      reject({
+      return reject({
         status: 400,
         message: 'Error, the client doesn\'t deletel',
         errors: error
@@ -139,4 +154,5 @@ module.exports = {
   deleteClient,
   getById,
   getByEmail,
+  getClientByEmail
 }

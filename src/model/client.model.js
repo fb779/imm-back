@@ -35,7 +35,7 @@ const ClientSchema = new Schema({
   birthday: { type: Date, min, max, required: [false, 'The birthday is required'] },
   age: { type: Number, default: null },
   country_citizenship: { type: String, required: false },
-  other_citizenship: { type: String, required: false },
+  other_citizenship: { type: String, default: '', required: false },
   country_residence: { type: String, required: false },
   status_residence: { type: String, required: false },
   status_residence_other: { type: String, default: '', required: false },
@@ -52,7 +52,7 @@ ClientSchema.pre('save', async function(next) {
   const client = this;
 
 
-  if (client.isModified('status_residence') && client.status_residence != 5) {
+  if (client.status_residence != 5) {
     // verificacion y borado de informacion del campo
     client.status_residence_other = '';
   }
