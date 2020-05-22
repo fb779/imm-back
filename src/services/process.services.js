@@ -73,29 +73,34 @@ function getProcessesByClient(id_client) {
 function createProcess(newProcess) {
   return new Promise(async(resolve, reject) => {
     try {
-
-
       const listProcess = await Process.find({ active: true, client: newProcess.client, visa_category: newProcess.visa_category });
 
       if (listProcess.length > 0) {
-        return reject({
+        throw ({
           status: 400,
           message: 'Error, The client has process active',
           errors: 'The client has process active'
         });
+        // return reject({
+        //   status: 400,
+        //   message: 'Error, The client has process active',
+        //   errors: 'The client has process active'
+        // });
       }
 
       const process = new Process(newProcess);
 
       await process.save();
 
-      resolve(process);
+      return resolve(process);
     } catch (error) {
-      reject({
-        status: 400,
-        message: 'Error to create Process',
-        errors: error
-      });
+      console.log('no se crea el proceso', error);
+      reject(error)
+        // return reject({
+        //   status: 400,
+        //   message: 'Error to create Process',
+        //   errors: error
+        // });
     }
   });
 }
