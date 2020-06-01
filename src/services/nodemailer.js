@@ -46,7 +46,7 @@ function sendMail(_options) {
 }
 
 
-function getPlantilla(username, password) {
+function getNewUserTemplate(username, password) {
   let _html = `
   <!DOCTYPE html>
   <html lang="en">
@@ -138,5 +138,5 @@ function getPlantilla(username, password) {
 
 module.exports = {
   sendMail,
-  getPlantilla
+  getNewUserTemplate
 }

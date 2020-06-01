@@ -5,10 +5,13 @@ const ProcessService = require('../services/process.services');
 const VisaCategoryServices = require('../services/visa-category.services');
 
 async function postWoocommerceWebhook(req, res, next) {
+  // const body = req.body;
+  // console.log('recibo de woocommerce', body);
+  // return res.status(200).json({ ok: true, message: 'ok order' });
+
   try {
     // const body = req.body;
-    // console.log(body);
-    // return res.status(200).json({ ok: true, message: 'llego la info' });
+    // console.log('recibo de woocommerce', body);
 
     // Validación de información inicial
     let { billing, line_items } = validationsData(req.body);
@@ -37,10 +40,7 @@ async function postWoocommerceWebhook(req, res, next) {
 
     const process = await ProcessService.createProcess({ client, visa_category })
 
-
     console.log('fin de la ejecucion', billing);
-    // res.status(200).json({ ok: true });
-
   } catch (error) {
     console.log('manejo del error', error);
     // errorHandler(error, res);

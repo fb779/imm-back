@@ -11,7 +11,7 @@ const UserSchema = new Schema({
   last_name: { type: String, required: [true, 'El Apellido es necesario'], },
   password: { type: String, required: [true, 'La contraseña es necesario'] },
   img: { type: String, required: false, default: '' },
-  active: { type: Boolean, default: false },
+  active: { type: Boolean, default: true },
   role: { type: String, default: 'CLIENT_ROLE', enum: rolesValidos, uppercase: true },
   client: { type: Schema.Types.ObjectId, ref: 'Client', default: null, required: false },
 }, { timestamps: true, collection: 'users' });

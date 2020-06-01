@@ -11,7 +11,7 @@ router.get('/', async(req, res, next) => {
     mOption = {
       to: "bar@example.com",
       subject: "Hello testing",
-      html: mailServices.getPlantilla('bar@example.com', 'perritolindo')
+      html: mailServices.getNewUserTemplate('bar@example.com', 'perritolindo')
     }
 
     const info = await mailServices.sendMail(mOption);
