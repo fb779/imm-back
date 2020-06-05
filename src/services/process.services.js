@@ -24,7 +24,7 @@ function getProcessId(id_process, params = {}) {
 
   return new Promise(async(resolve, reject) => {
     try {
-      const process = await Process.findById(id_process).populate([
+      const process = await Process.findById(id_process).select('-__v -createdAt -updatedAt').populate([
         { path: 'client', select: '-active -createdAt -updatedAt -__v' },
         { path: 'visa_category', select: '-createdAt -updatedAt -__v' }
       ]);

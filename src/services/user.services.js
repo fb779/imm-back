@@ -1,5 +1,26 @@
 const User = require('../model/user.model');
 
+function getUserById(id_user) {
+  return new Promise(async(resolve, reject) => {
+    try {
+      const user = await User.findById(id_user).select('-password -createdAt -updatedAt -__v')
+
+      if (!user) {
+        return reject({
+          status: 404,
+          message: `The User isn't found`,
+          errors: `The user doesn't find with this Id: ${id_user}`,
+        });
+      }
+
+      resolve(user);
+    } catch (error) {
+      reject(error)
+    }
+  });
+
+}
+
 function getUserByEmail(_email) {
   return new Promise(async(resolve, reject) => {
     try {
@@ -9,7 +30,6 @@ function getUserByEmail(_email) {
       reject(error)
     }
   });
-
 }
 
 function createUser(newUser) {
@@ -36,6 +56,7 @@ function generatePassword() {
 }
 
 module.exports = {
+  getUserById,
   getUserByEmail,
   createUser,
   generatePassword

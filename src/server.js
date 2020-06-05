@@ -21,5 +21,5 @@ db.then(db => {
 
   })
   .catch((err) => {
-    console.error('connection error:', err);
+    console.error('DB connection error:', err);
   });
