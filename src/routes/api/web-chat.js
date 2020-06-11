@@ -20,7 +20,7 @@ const router = express.Router();
  * Definicion de rutas
  ************************************************/
 
-// router.use([auth.isAuth, hasRole])
+router.use([auth.isAuth])
 router.post('/', [], WebChatController.createMessage);
 router.get('/:id_process/', [], WebChatController.loadMessage);
 

@@ -20,6 +20,7 @@ const ProcessSchema = new Schema({
   code: { type: String, uppercase: true },
   status: { type: String, default: 'ACTIVE', enum: statusVisa, uppercase: true },
   active: { type: Boolean, default: true },
+  companion: { type: Number, default: 1 },
 }, { timestamps: true, collection: 'process' });
 
 /**
