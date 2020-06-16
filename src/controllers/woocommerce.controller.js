@@ -8,7 +8,7 @@ async function postWoocommerceWebhook(req, res, next) {
   try {
     // const body = req.body;
     // console.log(body);
-    // return res.status(200).json({ ok: true, message: 'llego la info' });
+    // return res.status(200).json({ ok: true, message: 'the info is ready' });
 
     // Validación de información inicial
     let { billing, line_items } = validationsData(req.body);

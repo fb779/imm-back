@@ -46,7 +46,7 @@ function editForm(process, oldForm) {
       if (oldForm.destiny) { form.destiny = oldForm.destiny; }
       if (oldForm.marital_status) { form.marital_status = oldForm.marital_status; }
 
-      form.number_accompanying = oldForm.number_accompanying;
+      // form.number_accompanying = oldForm.number_accompanying;
       if (oldForm.purpose_visit) { form.purpose_visit = oldForm.purpose_visit; }
       if (oldForm.letter_invitation) { form.letter_invitation = oldForm.letter_invitation; }
       if (oldForm.stay_canada) { form.stay_canada = oldForm.stay_canada; }
