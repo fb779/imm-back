@@ -147,6 +147,29 @@ function deleteClient(id) {
   });
 }
 
+function editEmailClient(id, newEmail) {
+  return new Promise(async(resolve, reject) => {
+    try {
+      const client = await Client.findByIdAndRemove(id);
+
+      if (!client) {
+        return reject({
+          status: 400,
+          message: 'Error, the client doesn\'t deletel',
+          errors: error
+        })
+      }
+
+      return resolve(client);
+    } catch (error) {
+      return reject({
+        status: 400,
+        message: 'Error, the client doesn\'t deletel',
+        errors: error
+      });
+    }
+  });
+}
 
 module.exports = {
   createClient,

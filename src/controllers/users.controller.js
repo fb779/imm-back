@@ -1,18 +1,13 @@
 /************************************************
  *  Importaciones
  ************************************************/
-
-/**
- * getUser
- * getListUsers
- * createUser
- * editUser
- * deleteUser
- * getUsersConsultans
- * getUsersClients
- */
 const User = require('../model/user.model');
-const campos = '_id first_name last_name email img role active client createdAt updatedAt';
+const userServices = require('../services/user.services');
+const campos = '_id first_name last_name email role active client img';
+
+/************************************************
+ *  Metodos
+ ************************************************/
 
 /**
  * Busca un usuario por su identificador
@@ -60,11 +55,19 @@ function getUser(req, res, next) {
  * es posible habilitar paginacion con las configuraciones respectivas
  */
 function getListUsers(req, res, next) {
-  var offset = req.query.offset || 0;
-  offset = Number(offset);
-  var limit = req.query.limit || 20;
 
-  User.find({}, campos)
+  let offset = req.query.offset || 0;
+  offset = Number(offset);
+  let limit = req.query.limit || 20;
+  let role = req.query.role || null;
+
+  let filters = {}
+
+  if (role) {
+    filters[`role`] = { $in: role };
+  }
+
+  User.find(filters, campos)
     .skip(offset)
     .limit(limit)
     // .populate({ path: 'usuario', select: 'nombre email img' })
@@ -73,20 +76,20 @@ function getListUsers(req, res, next) {
         return res.status(500).json({
           data: {
             ok: false,
-            message: 'Error loading to users'
+            message: 'Error loading to users',
+            err
           }
         });
       }
 
-      User.countDocuments({}, (err, conteo) => {
-        res.status(200).json({
-          data: {
-            ok: true,
-            users,
-            total: conteo
-          }
-        });
+      res.status(200).json({
+        data: {
+          ok: true,
+          users,
+          total: users.length
+        }
       });
+
     });
 }
 
@@ -129,65 +132,80 @@ function createUser(req, res, next) {
   });
 }
 
-function updateUser(req, res, next) {
-  var id = req.params.id;
-  var body = req.body;
+async function updateUser(req, res, next) {
+  try {
+    var id = req.params.id;
+    var body = req.body;
 
-  User.findById(id, campos).exec((err, userEdit) => {
-    if (err) {
-      return res.status(500).json({
-        data: {
-          ok: false,
-          mensaje: 'Error al buscar usuario',
-          errors: err
-        }
-      });
-    }
+    const user = await userServices.updateUser(id, body);
 
-    if (!userEdit) {
-      return res.status(400).json({
-        data: {
-          ok: false,
-          mensaje: 'Error, The user Id ' + id + ' doesn\'t exist',
-          errors: { messages: 'NO existe un usuario con ese ID' }
-        }
-      });
-    }
-
-    userEdit.first_name = body.first_name;
-    userEdit.last_name = body.last_name;
-    userEdit.role = body.role;
-
-    if (body.password) {
-      userEdit.password = body.password;
-    }
-
-    if (body.client) {
-      userEdit.client = body.client;
-    } else {
-      userEdit.client = null;
-    }
-
-    userEdit.save((err, usSave) => {
-      if (err) {
-        return res.status(400).json({
-          data: {
-            ok: false,
-            mensaje: 'Error al actualizar el usuario',
-            errors: err
-          }
-        });
-        return;
-      }
-
-      return res.status(200).json({
-        data: {
-          ok: true,
-          usuario: usSave
-        }
-      });
+    return res.status(200).json({
+      ok: true,
+      user,
     });
-  });
+  } catch (error) {
+    return errorHandler(error, res);
+  }
+
+  // User.findById(id, campos).exec((err, userEdit) => {
+  //   if (err) {
+  //     return res.status(500).json({
+  //       data: {
+  //         ok: false,
+  //         mensaje: 'Error al buscar usuario',
+  //         errors: err
+  //       }
+  //     });
+  //   }
+
+  //   if (!userEdit) {
+  //     return res.status(400).json({
+  //       data: {
+  //         ok: false,
+  //         mensaje: 'Error, The user Id ' + id + ' doesn\'t exist',
+  //         errors: { messages: 'The user do not exist' }
+  //       }
+  //     });
+  //   }
+
+  //   userEdit.first_name = body.first_name;
+  //   userEdit.last_name = body.last_name;
+  //   userEdit.role = body.role;
+
+  //   // if (body.password) {
+  //   //   userEdit.password = body.password;
+  //   // }
+
+  //   if (body.active) {
+  //     userEdit.active = body.active;
+  //   }
+
+  //   if (body.client) {
+  //     userEdit.client = body.client;
+  //   } else {
+  //     userEdit.client = null;
+  //   }
+
+  //   userEdit.save((err, usSave) => {
+  //     if (err) {
+  //       return res.status(400).json({
+  //         data: {
+  //           ok: false,
+  //           mensaje: 'Error al actualizar el usuario',
+  //           errors: err
+  //         }
+  //       });
+  //       return;
+  //     }
+
+  //     return res.status(200).json({
+  //       data: {
+  //         ok: true,
+  //         usuario: usSave
+  //       }
+  //     });
+  //   });
+  // });
 }
 
 function getConsultants(req, res, next) {
@@ -213,6 +231,27 @@ function getConsultants(req, res, next) {
 
 // function getListClients(req, res, next){}
 
+/************************************************
+ *  Metodo para el manejo de error
+ ************************************************/
+const errorHandler = (error, res) => {
+  if (error.hasOwnProperty('status')) {
+    return res.status(error.status).json({
+      ok: false,
+      message: error.message,
+      error: error.errors
+    })
+  }
+  return res.status(500).json({
+    ok: true,
+    message: 'Error user services',
+    error
+  })
+}
+
+/************************************************
+ *  Export de metodos
+ ************************************************/
 module.exports = {
   getUser,
   getListUsers,
