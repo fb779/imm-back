@@ -3,6 +3,7 @@
  ************************************************/
 const User = require('../model/user.model');
 const userServices = require('../services/user.services');
+const { param } = require('../routes/api/users');
 const campos = '_id first_name last_name email role active client img';
 
 /************************************************
@@ -93,43 +94,64 @@ function getListUsers(req, res, next) {
     });
 }
 
-function createUser(req, res, next) {
-  var body = req.body;
+async function createUser(req, res, next) {
+  try {
+    const body = req.body;
 
-  var newUser = new User({
-    first_name: body.first_name,
-    last_name: body.last_name,
-    email: body.email,
-    password: body.password,
-  });
+    // if (!body.password) {
+    //   body.password = await userServices.generatePassword();
+    // }
 
-  // valida si la data trae el rol o lo crea por defecto
-  if (req.body.role) {
-    newUser.role = req.body.role;
-  }
+    const newUser = await userServices.createUser(body);
 
-  if (req.body.client) {
-    newUser.client = req.body.client;
-  }
-
-  newUser.save((err, user) => {
-    if (err) {
-      return res.status(400).json({
-        data: {
-          ok: false,
-          message: 'Error al crear usuario',
-          errors: err
-        }
-      });
-    }
 
     return res.status(200).json({
-      data: {
-        ok: true,
-        user
-      }
+      ok: true,
+      body,
+      newUser,
     });
-  });
+
+  } catch (error) {
+    return errorHandler(error, res);
+  }
+
+
+  // var body = req.body;
+
+  // var newUser = new User({
+  //   first_name: body.first_name,
+  //   last_name: body.last_name,
+  //   email: body.email,
+  //   password: body.password,
+  // });
+
+  // // valida si la data trae el rol o lo crea por defecto
+  // if (req.body.role) {
+  //   newUser.role = req.body.role;
+  // }
+
+  // if (req.body.client) {
+  //   newUser.client = req.body.client;
+  // }
+
+  // newUser.save((err, user) => {
+  //   if (err) {
+  //     return res.status(400).json({
+  //       data: {
+  //         ok: false,
+  //         message: 'Error al crear usuario',
+  //         errors: err
+  //       }
+  //     });
+  //   }
+
+  //   return res.status(200).json({
+  //     data: {
+  //       ok: true,
+  //       user
+  //     }
+  //   });
+  // });
 }
 
 async function updateUser(req, res, next) {
@@ -146,66 +168,6 @@ async function updateUser(req, res, next) {
   } catch (error) {
     return errorHandler(error, res);
   }
-
-  // User.findById(id, campos).exec((err, userEdit) => {
-  //   if (err) {
-  //     return res.status(500).json({
-  //       data: {
-  //         ok: false,
-  //         mensaje: 'Error al buscar usuario',
-  //         errors: err
-  //       }
-  //     });
-  //   }
-
-  //   if (!userEdit) {
-  //     return res.status(400).json({
-  //       data: {
-  //         ok: false,
-  //         mensaje: 'Error, The user Id ' + id + ' doesn\'t exist',
-  //         errors: { messages: 'The user do not exist' }
-  //       }
-  //     });
-  //   }
-
-  //   userEdit.first_name = body.first_name;
-  //   userEdit.last_name = body.last_name;
-  //   userEdit.role = body.role;
-
-  //   // if (body.password) {
-  //   //   userEdit.password = body.password;
-  //   // }
-
-  //   if (body.active) {
-  //     userEdit.active = body.active;
-  //   }
-
-  //   if (body.client) {
-  //     userEdit.client = body.client;
-  //   } else {
-  //     userEdit.client = null;
-  //   }
-
-  //   userEdit.save((err, usSave) => {
-  //     if (err) {
-  //       return res.status(400).json({
-  //         data: {
-  //           ok: false,
-  //           mensaje: 'Error al actualizar el usuario',
-  //           errors: err
-  //         }
-  //       });
-  //       return;
-  //     }
-
-  //     return res.status(200).json({
-  //       data: {
-  //         ok: true,
-  //         usuario: usSave
-  //       }
-  //     });
-  //   });
-  // });
 }
 
 function getConsultants(req, res, next) {
@@ -229,6 +191,22 @@ function getConsultants(req, res, next) {
   });
 }
 
+async function getValid(req, res, next) {
+  try {
+    const params = req.query;
+
+    const exist = await userServices.validEmail(params);
+
+    res.status(200).json({
+      ok: true,
+      data: exist,
+    });
+  } catch (error) {
+    return errorHandler(error, res);
+  }
+
+}
+
 // function getListClients(req, res, next){}
 
 /************************************************
@@ -243,7 +221,7 @@ const errorHandler = (error, res) => {
     })
   }
   return res.status(500).json({
-    ok: true,
+    ok: false,
     message: 'Error user services',
     error
   })
@@ -257,5 +235,6 @@ module.exports = {
   getListUsers,
   createUser,
   updateUser,
-  getConsultants
+  getConsultants,
+  getValid
 }

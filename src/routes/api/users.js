@@ -15,6 +15,7 @@ router.use([auth.isAuth]);
 router.put('/:id', userCtrl.updateUser);
 router.post('/', userCtrl.createUser);
 router.get('/consultants', userCtrl.getConsultants);
+router.get('/valid', userCtrl.getValid);
 router.get('/:id', userCtrl.getUser);
 router.get('/', userCtrl.getListUsers);
 

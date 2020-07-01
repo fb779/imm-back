@@ -24,8 +24,6 @@ function getUsers(offset, limit) {
     }
   });
 
-
-
   // const users = User.find({}, campos)
   //   .select('-img -active -createdAt -updatedAt -__v')
   //   .skip(offset)
@@ -121,6 +119,8 @@ function updateUser(id, userUpdate) {
 
       if (userUpdate.role) { user.role = userUpdate.role; }
 
+      if (userUpdate.password) { user.password = userUpdate.password; }
+
       user.active = userUpdate.active;
 
       // if (userUpdate.client) {
@@ -147,6 +147,21 @@ function updatePassword(id, newPassword) {
   });
 }
 
+function validEmail(filter) {
+  return new Promise(async(resolve, reject) => {
+    try {
+      const users = await User.countDocuments(filter);
+      if (users > 0) {
+        return resolve(true);
+      }
+
+      return resolve(false);
+    } catch (error) {
+      return reject(error);
+    }
+  });
+}
+
 function generatePassword() {
   return new Promise(async(resolve, reject) => {
     try {
@@ -158,11 +173,22 @@ function generatePassword() {
   });
 }
 
+
+/**
+ * Filtros
+ */
+function makeFilters(filters) {
+
+
+}
+
+
 module.exports = {
   getUserById,
   getUserByEmail,
   createUser,
   updateUser,
   generatePassword,
-  updatePassword
+  updatePassword,
+  validEmail
 }
