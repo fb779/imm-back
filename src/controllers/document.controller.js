@@ -5,7 +5,7 @@ const DocumentServices = require('../services/document.services');
 const ProcessService = require('../services/process.services');
 const ClientService = require('../services/client.services');
 const CheckListService = require('../services/check-list.services');
-const { typesDocument, typesStatusDocument } = require('../config/config');
+const { typesStatusDocument } = require('../config/config');
 
 /************************************************
  *  Deficnicion de metodos

@@ -2,8 +2,11 @@
  *  Importaciones
  ************************************************/
 const User = require('../model/user.model');
-const userServices = require('../services/user.services');
-const { param } = require('../routes/api/users');
+const UserService = require('../services/user.services');
+const ClientService = require('../services/client.services');
+const VisaCategoryServices = require('../services/visa-category.services');
+const ProcessService = require('../services/process.services');
+
 const campos = '_id first_name last_name email role active client img';
 
 /************************************************
@@ -25,8 +28,8 @@ function getUser(req, res, next) {
           data: {
             ok: false,
             message: 'Error loading user',
-            err: err
-          }
+            err: err,
+          },
         });
       }
 
@@ -35,18 +38,16 @@ function getUser(req, res, next) {
           data: {
             ok: false,
             message: 'Error, the user ' + id + ' doesnt exist',
-            errors: [
-              'NO, the user does not exist with thi ID'
-            ]
-          }
+            errors: ['NO, the user does not exist with thi ID'],
+          },
         });
       }
 
       return res.status(200).json({
         data: {
           ok: true,
-          user
-        }
+          user,
+        },
       });
     });
 }
@@ -56,30 +57,31 @@ function getUser(req, res, next) {
  * es posible habilitar paginacion con las configuraciones respectivas
  */
 function getListUsers(req, res, next) {
-
   let offset = req.query.offset || 0;
   offset = Number(offset);
   let limit = req.query.limit || 20;
   let role = req.query.role || null;
 
-  let filters = {}
+  let filters = {};
+  let populate = [{ path: 'client', select: '-__v -createdAt -updatedAt' }]; // { path: '' };
 
   if (role) {
     filters[`role`] = { $in: role };
   }
 
   User.find(filters, campos)
-    .skip(offset)
-    .limit(limit)
+    // .skip(offset)
+    // .limit(limit)
     // .populate({ path: 'usuario', select: 'nombre email img' })
+    .populate(populate)
     .exec((err, users) => {
       if (err) {
         return res.status(500).json({
           data: {
             ok: false,
             message: 'Error loading to users',
-            err
-          }
+            err,
+          },
         });
       }
 
@@ -87,10 +89,9 @@ function getListUsers(req, res, next) {
         data: {
           ok: true,
           users,
-          total: users.length
-        }
+          total: users.length,
+        },
       });
-
     });
 }
 
@@ -98,60 +99,40 @@ async function createUser(req, res, next) {
   try {
     const body = req.body;
 
-    // if (!body.password) {
-    //   body.password = await userServices.generatePassword();
-    // }
+    let newUser = null;
 
-    const newUser = await userServices.createUser(body);
+    if (body.role.toUpperCase() === 'CLIENT_ROLE') {
+      // verificacion y creacion del cliente
+      let client = await ClientService.getClientByEmail(body.email);
 
+      if (client === null) {
+        client = await ClientService.createClient(body);
+      }
+
+      // creacion y verificacion del usuario
+      newUser = await UserService.getUserByEmail(client.email);
+
+      if (newUser === null) {
+        body['client'] = client;
+        newUser = await UserService.createUser(body);
+      }
+
+      // creacion del proceso
+      const name_process = body.process;
+      const visa_category = await VisaCategoryServices.getByName(name_process);
+
+      const process = await ProcessService.createProcess({ client, visa_category });
+    } else {
+      newUser = await UserService.createUser(body);
+    }
 
     return res.status(200).json({
       ok: true,
-      body,
       newUser,
     });
-
   } catch (error) {
     return errorHandler(error, res);
   }
-
-
-  // var body = req.body;
-
-  // var newUser = new User({
-  //   first_name: body.first_name,
-  //   last_name: body.last_name,
-  //   email: body.email,
-  //   password: body.password,
-  // });
-
-  // // valida si la data trae el rol o lo crea por defecto
-  // if (req.body.role) {
-  //   newUser.role = req.body.role;
-  // }
-
-  // if (req.body.client) {
-  //   newUser.client = req.body.client;
-  // }
-
-  // newUser.save((err, user) => {
-  //   if (err) {
-  //     return res.status(400).json({
-  //       data: {
-  //         ok: false,
-  //         message: 'Error al crear usuario',
-  //         errors: err
-  //       }
-  //     });
-  //   }
-
-  //   return res.status(200).json({
-  //     data: {
-  //       ok: true,
-  //       user
-  //     }
-  //   });
-  // });
 }
 
 async function updateUser(req, res, next) {
@@ -159,7 +140,7 @@ async function updateUser(req, res, next) {
     var id = req.params.id;
     var body = req.body;
 
-    const user = await userServices.updateUser(id, body);
+    const user = await UserService.updateUser(id, body);
 
     return res.status(200).json({
       ok: true,
@@ -171,22 +152,21 @@ async function updateUser(req, res, next) {
 }
 
 function getConsultants(req, res, next) {
-
-  User.find({ active: true, role: { $eq: "USER_ROLE" } }, '_id first_name last_name email').exec((err, consultants) => {
+  User.find({ active: true, role: { $eq: 'USER_ROLE' } }, '_id first_name last_name email').exec((err, consultants) => {
     if (err) {
       return res.status(500).json({
         data: {
           ok: false,
-          message: 'Problemas al cargar los consultores'
-        }
+          message: 'Problemas al cargar los consultores',
+        },
       });
     }
 
     return res.status(200).json({
       data: {
         ok: true,
-        consultants
-      }
+        consultants,
+      },
     });
   });
 }
@@ -195,7 +175,7 @@ async function getValid(req, res, next) {
   try {
     const params = req.query;
 
-    const exist = await userServices.validEmail(params);
+    const exist = await UserService.validEmail(params);
 
     res.status(200).json({
       ok: true,
@@ -204,7 +184,6 @@ async function getValid(req, res, next) {
   } catch (error) {
     return errorHandler(error, res);
   }
-
 }
 
 // function getListClients(req, res, next){}
@@ -217,15 +196,15 @@ const errorHandler = (error, res) => {
     return res.status(error.status).json({
       ok: false,
       message: error.message,
-      error: error.errors
-    })
+      error: error.errors,
+    });
   }
   return res.status(500).json({
     ok: false,
     message: 'Error user services',
-    error
-  })
-}
+    error,
+  });
+};
 
 /************************************************
  *  Export de metodos
@@ -236,5 +215,5 @@ module.exports = {
   createUser,
   updateUser,
   getConsultants,
-  getValid
-}
+  getValid,
+};

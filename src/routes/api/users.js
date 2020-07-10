@@ -1,12 +1,12 @@
 const express = require('express');
 
-const router = express.Router()
+const router = express.Router();
 
 /************************************************
  *  Importaciones
  ************************************************/
 const userCtrl = require('./../../controllers/users.controller');
-const auth = require('./../../middlewares/auth.guard')
+const auth = require('./../../middlewares/auth.guard');
 
 /************************************************
  *  get users
