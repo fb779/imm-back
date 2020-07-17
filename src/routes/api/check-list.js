@@ -1,6 +1,6 @@
 const express = require('express');
 
-const router = express.Router()
+const router = express.Router();
 
 /************************************************
  *  Importaciones
@@ -12,14 +12,13 @@ const auth = require('./../../middlewares/auth.guard');
  *  CRUD's especiales
  ************************************************/
 
-
-
 /************************************************
  *  CRUD basico para el recurso
  ************************************************/
 
 router.get('/', [auth.isAuth], CheckCtrl.getCheckList);
 router.get('/:id', [auth.isAuth], CheckCtrl.getCheckListId);
+router.get('/valid/:name', [auth.isAuth], CheckCtrl.validName);
 router.post('/masive', [auth.isAuth], CheckCtrl.createCheckListMasive);
 router.post('/', [auth.isAuth], CheckCtrl.createCheckList);
 router.put('/:id', [auth.isAuth], CheckCtrl.editCheckList);
