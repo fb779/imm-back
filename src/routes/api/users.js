@@ -1,20 +1,22 @@
 const express = require('express');
 
-const router = express.Router()
+const router = express.Router();
 
 /************************************************
  *  Importaciones
  ************************************************/
 const userCtrl = require('./../../controllers/users.controller');
-const auth = require('./../../middlewares/auth.guard')
+const auth = require('./../../middlewares/auth.guard');
 
 /************************************************
  *  get users
  ************************************************/
-router.put('/:id', [auth.isAuth], userCtrl.updateUser);
-router.post('/', [auth.isAuth], userCtrl.createUser);
-router.get('/consultants', [auth.isAuth], userCtrl.getConsultants);
-router.get('/:id', [auth.isAuth], userCtrl.getUser);
-router.get('/', [auth.isAuth], userCtrl.getListUsers);
+router.use([auth.isAuth]);
+router.put('/:id', userCtrl.updateUser);
+router.post('/', userCtrl.createUser);
+router.get('/consultants', userCtrl.getConsultants);
+router.get('/valid', userCtrl.getValid);
+router.get('/:id', userCtrl.getUser);
+router.get('/', userCtrl.getListUsers);
 
 module.exports = router;

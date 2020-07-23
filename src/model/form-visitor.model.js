@@ -8,7 +8,7 @@ const FormVisitorSchema = new Schema({
   client: { type: Schema.Types.ObjectId, ref: 'Client', required: [true, 'The user is required'] },
   destiny: { type: String, required: true },
   marital_status: { type: String, required: true },
-  number_accompanying: { type: Number, default: 0, required: false },
+  // number_accompanying: { type: Number, default: 0, required: false },
   purpose_visit: { type: String, required: true },
   letter_invitation: { type: String, required: true },
   stay_canada: { type: String, required: true },

@@ -10,27 +10,30 @@ async function getCheckList(req, res, next) {
     const type = req.query.type;
     let visa;
 
-    const filter = { visa_categories: { $eq: visa } }
+    // const filter = { visa_categories: { $eq: visa } };
+    const filter = {};
 
     if (!type) {
       return res.status(404).json({
         ok: true,
         messages: 'Type visa is required',
-        error: {}
+        error: {},
       });
     }
 
     if (type != 'all') {
       visa = await VisaCategoriesServices.getByName(type);
-      filter["visa_categories"] = { $in: [visa] };
+      filter['state'] = true;
+      filter['visa_categories'] = { $in: [visa] };
     }
 
-    const listCheckList = await CheckList.find(filter).select('-visa_categories -createdAt -updatedAt -__v'); //.populate({ path: 'visa_categories', match: { name: { $eq: "VISITOR" } } });
+    const listCheckList = await CheckList.find(filter).select('-createdAt -updatedAt -__v');
+    // .populate({ path: 'visa_categories', select: '-active -createdAt -updatedAt -__v', match: { name: { $eq: 'VISITOR' } } });
 
     res.status(200).json({
       ok: true,
       visa,
-      list: listCheckList
+      list: listCheckList,
     });
   } catch (error) {
     errorHandler(error, res);
@@ -41,26 +44,26 @@ async function getCheckListId(req, res, next) {
   try {
     const id = req.params.id;
 
-    const checkList = await CheckList.findById(id);
+    const checkList = await CheckList.findById(id).select('-required -createdAt -updatedAt -__v');
 
     if (!checkList) {
       return res.status(404).json({
         data: {
           ok: true,
-          messages: 'Visa doesn\'t exist'
-        }
+          messages: "Visa doesn't exist",
+        },
       });
     }
 
     res.status(200).json({
       ok: true,
-      check: checkList
+      message: 'consulta del checklist',
+      check: checkList,
     });
   } catch (error) {
     errorHandler(error, res);
   }
 }
-
 
 async function createCheckListMasive(req, res, next) {
   try {
@@ -70,18 +73,18 @@ async function createCheckListMasive(req, res, next) {
       res.status(400).json({
         ok: false,
         message: `The data isn't the correct format`,
-        error: {}
-      })
+        error: {},
+      });
     }
 
-    await body.forEach(async(el, i, ob) => {
+    await body.forEach(async (el, i, ob) => {
       ob[i] = await CheckListService.createCheckList(el);
     });
 
     res.status(200).json({
       ok: true,
       message: 'llegamos a los masivos',
-      body
+      body,
     });
   } catch (error) {
     errorHandler(error, res);
@@ -112,8 +115,7 @@ async function editCheckList(req, res, next) {
 
     return res.status(200).json({
       ok: true,
-      check: checkList
-
+      check: checkList,
     });
   } catch (error) {
     errorHandler(error, res);
@@ -128,7 +130,24 @@ async function deleteCheckList(req, res, next) {
 
     return res.status(200).json({
       ok: true,
-      check: checkList
+      check: checkList,
+    });
+  } catch (error) {
+    errorHandler(error, res);
+  }
+}
+
+async function validName(req, res, next) {
+  try {
+    const name = req.params.name;
+
+    const check = await CheckListService.getCheckListByName(name.toUpperCase());
+
+    const data = check.length > 0 ? true : false;
+
+    return res.status(200).json({
+      ok: true,
+      data,
     });
   } catch (error) {
     errorHandler(error, res);
@@ -143,15 +162,15 @@ const errorHandler = (error, res) => {
     return res.status(error.status).json({
       ok: false,
       message: error.message,
-      error: error.errors
-    })
+      error: error.errors,
+    });
   }
   return res.status(500).json({
     ok: true,
-    message: 'Error services family',
-    error
-  })
-}
+    message: 'Error services check-list',
+    error,
+  });
+};
 
 /************************************************
  *  Export de metodos
@@ -164,4 +183,5 @@ module.exports = {
   editCheckList,
   deleteCheckList,
   createCheckListMasive,
-}
+  validName,
+};

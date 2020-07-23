@@ -1,18 +1,17 @@
 /************************************************
  *  Importaciones
  ************************************************/
-
-/**
- * getUser
- * getListUsers
- * createUser
- * editUser
- * deleteUser
- * getUsersConsultans
- * getUsersClients
- */
 const User = require('../model/user.model');
-const campos = '_id first_name last_name email img role active client createdAt updatedAt';
+const UserService = require('../services/user.services');
+const ClientService = require('../services/client.services');
+const VisaCategoryServices = require('../services/visa-category.services');
+const ProcessService = require('../services/process.services');
+
+const campos = '_id first_name last_name email role active client img';
+
+/************************************************
+ *  Metodos
+ ************************************************/
 
 /**
  * Busca un usuario por su identificador
@@ -29,8 +28,8 @@ function getUser(req, res, next) {
           data: {
             ok: false,
             message: 'Error loading user',
-            err: err
-          }
+            err: err,
+          },
         });
       }
 
@@ -39,18 +38,16 @@ function getUser(req, res, next) {
           data: {
             ok: false,
             message: 'Error, the user ' + id + ' doesnt exist',
-            errors: [
-              'NO, the user does not exist with thi ID'
-            ]
-          }
+            errors: ['NO, the user does not exist with thi ID'],
+          },
         });
       }
 
       return res.status(200).json({
         data: {
           ok: true,
-          user
-        }
+          user,
+        },
       });
     });
 }
@@ -60,163 +57,163 @@ function getUser(req, res, next) {
  * es posible habilitar paginacion con las configuraciones respectivas
  */
 function getListUsers(req, res, next) {
-  var offset = req.query.offset || 0;
+  let offset = req.query.offset || 0;
   offset = Number(offset);
-  var limit = req.query.limit || 20;
+  let limit = req.query.limit || 20;
+  let role = req.query.role || null;
 
-  User.find({}, campos)
-    .skip(offset)
-    .limit(limit)
+  let filters = {};
+  let populate = [{ path: 'client', select: '-__v -createdAt -updatedAt' }]; // { path: '' };
+
+  if (role) {
+    filters[`role`] = { $in: role };
+  }
+
+  User.find(filters, campos)
+    // .skip(offset)
+    // .limit(limit)
     // .populate({ path: 'usuario', select: 'nombre email img' })
+    .populate(populate)
     .exec((err, users) => {
       if (err) {
         return res.status(500).json({
           data: {
             ok: false,
-            message: 'Error loading to users'
-          }
+            message: 'Error loading to users',
+            err,
+          },
         });
       }
 
-      User.countDocuments({}, (err, conteo) => {
-        res.status(200).json({
-          data: {
-            ok: true,
-            users,
-            total: conteo
-          }
-        });
+      res.status(200).json({
+        data: {
+          ok: true,
+          users,
+          total: users.length,
+        },
       });
     });
 }
 
-function createUser(req, res, next) {
-  var body = req.body;
+async function createUser(req, res, next) {
+  try {
+    const body = req.body;
 
-  var newUser = new User({
-    first_name: body.first_name,
-    last_name: body.last_name,
-    email: body.email,
-    password: body.password,
-  });
+    let newUser = null;
 
-  // valida si la data trae el rol o lo crea por defecto
-  if (req.body.role) {
-    newUser.role = req.body.role;
-  }
+    if (body.role.toUpperCase() === 'CLIENT_ROLE') {
+      // verificacion y creacion del cliente
+      let client = await ClientService.getClientByEmail(body.email);
 
-  if (req.body.client) {
-    newUser.client = req.body.client;
-  }
+      if (client === null) {
+        client = await ClientService.createClient(body);
+      }
 
-  newUser.save((err, user) => {
-    if (err) {
-      return res.status(400).json({
-        data: {
-          ok: false,
-          message: 'Error al crear usuario',
-          errors: err
-        }
-      });
+      // creacion y verificacion del usuario
+      newUser = await UserService.getUserByEmail(client.email);
+
+      if (newUser === null) {
+        body['client'] = client;
+        newUser = await UserService.createUser(body);
+      }
+
+      // creacion del proceso
+      const name_process = body.process;
+      const visa_category = await VisaCategoryServices.getByName(name_process);
+
+      const process = await ProcessService.createProcess({ client, visa_category });
+    } else {
+      newUser = await UserService.createUser(body);
     }
 
     return res.status(200).json({
-      data: {
-        ok: true,
-        user
-      }
+      ok: true,
+      newUser,
     });
-  });
+  } catch (error) {
+    return errorHandler(error, res);
+  }
 }
 
-function updateUser(req, res, next) {
-  var id = req.params.id;
-  var body = req.body;
+async function updateUser(req, res, next) {
+  try {
+    var id = req.params.id;
+    var body = req.body;
 
-  User.findById(id, campos).exec((err, userEdit) => {
-    if (err) {
-      return res.status(500).json({
-        data: {
-          ok: false,
-          mensaje: 'Error al buscar usuario',
-          errors: err
-        }
-      });
-    }
+    const user = await UserService.updateUser(id, body);
 
-    if (!userEdit) {
-      return res.status(400).json({
-        data: {
-          ok: false,
-          mensaje: 'Error, The user Id ' + id + ' doesn\'t exist',
-          errors: { messages: 'NO existe un usuario con ese ID' }
-        }
-      });
-    }
-
-    userEdit.first_name = body.first_name;
-    userEdit.last_name = body.last_name;
-    userEdit.role = body.role;
-
-    if (body.password) {
-      userEdit.password = body.password;
-    }
-
-    if (body.client) {
-      userEdit.client = body.client;
-    } else {
-      userEdit.client = null;
-    }
-
-    userEdit.save((err, usSave) => {
-      if (err) {
-        return res.status(400).json({
-          data: {
-            ok: false,
-            mensaje: 'Error al actualizar el usuario',
-            errors: err
-          }
-        });
-        return;
-      }
-
-      return res.status(200).json({
-        data: {
-          ok: true,
-          usuario: usSave
-        }
-      });
+    return res.status(200).json({
+      ok: true,
+      user,
     });
-  });
+  } catch (error) {
+    return errorHandler(error, res);
+  }
 }
 
 function getConsultants(req, res, next) {
-
-  User.find({ active: true, role: { $eq: "USER_ROLE" } }, '_id first_name last_name email').exec((err, consultants) => {
+  User.find({ active: true, role: { $eq: 'USER_ROLE' } }, '_id first_name last_name email').exec((err, consultants) => {
     if (err) {
       return res.status(500).json({
         data: {
           ok: false,
-          message: 'Problemas al cargar los consultores'
-        }
+          message: 'Problemas al cargar los consultores',
+        },
       });
     }
 
     return res.status(200).json({
       data: {
         ok: true,
-        consultants
-      }
+        consultants,
+      },
     });
   });
+}
+
+async function getValid(req, res, next) {
+  try {
+    const params = req.query;
+
+    const exist = await UserService.validEmail(params);
+
+    res.status(200).json({
+      ok: true,
+      data: exist,
+    });
+  } catch (error) {
+    return errorHandler(error, res);
+  }
 }
 
 // function getListClients(req, res, next){}
 
+/************************************************
+ *  Metodo para el manejo de error
+ ************************************************/
+const errorHandler = (error, res) => {
+  if (error.hasOwnProperty('status')) {
+    return res.status(error.status).json({
+      ok: false,
+      message: error.message,
+      error: error.errors,
+    });
+  }
+  return res.status(500).json({
+    ok: false,
+    message: 'Error user services',
+    error,
+  });
+};
+
+/************************************************
+ *  Export de metodos
+ ************************************************/
 module.exports = {
   getUser,
   getListUsers,
   createUser,
   updateUser,
-  getConsultants
-}
+  getConsultants,
+  getValid,
+};
