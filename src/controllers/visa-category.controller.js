@@ -7,7 +7,7 @@ const moment = require('moment');
 
 async function getVisaCateories(req, res, next) {
   try {
-    const listVisaCategories = await VisaCategory.find({ active: true }).select('-createdAt -updatedAt -__v');
+    const listVisaCategories = await VisaCategory.find({}).select('-createdAt -updatedAt -__v');
 
     res.status(200).json({
       ok: true,
@@ -36,7 +36,6 @@ async function getVisaCateoryId(req, res, next) {
 
     res.status(200).json({
       ok: true,
-      message: 'getVisaCateoryId',
       visa,
     });
   } catch (error) {
@@ -47,6 +46,8 @@ async function getVisaCateoryId(req, res, next) {
 async function createVisaCateory(req, res, next) {
   try {
     const body = req.body;
+
+    delete body._id;
 
     const visa = await VisaCategoryService.createVisaCategory(body);
 
@@ -93,6 +94,23 @@ async function deleteVisaCateory(req, res, next) {
   }
 }
 
+async function validName(req, res, next) {
+  try {
+    const _name = req.params.name || null;
+
+    const visa = await VisaCategory.find({ name: _name.toUpperCase() });
+
+    const data = visa.length > 0 ? true : false;
+
+    return res.status(200).json({
+      ok: true,
+      data,
+    });
+  } catch (error) {
+    errorHandler(error, res);
+  }
+}
+
 /************************************************
  *  Metodo para el manejo de error
  ************************************************/
@@ -121,4 +139,5 @@ module.exports = {
   createVisaCateory,
   editVisaCateory,
   deleteVisaCateory,
+  validName,
 };

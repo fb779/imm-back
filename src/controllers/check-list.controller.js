@@ -23,6 +23,7 @@ async function getCheckList(req, res, next) {
 
     if (type != 'all') {
       visa = await VisaCategoriesServices.getByName(type);
+      filter['state'] = true;
       filter['visa_categories'] = { $in: [visa] };
     }
 
@@ -93,7 +94,6 @@ async function createCheckListMasive(req, res, next) {
 async function createCheckList(req, res, next) {
   try {
     const body = req.body;
-    console.log(body);
 
     const checkList = await CheckListService.createCheckList(body);
 
@@ -110,8 +110,7 @@ async function editCheckList(req, res, next) {
   try {
     const id = req.params.id;
     const body = req.body;
-    console.log('identificador', id);
-    console.log('informacion', body);
+
     const checkList = await CheckListService.editCheckList(id, body);
 
     return res.status(200).json({
