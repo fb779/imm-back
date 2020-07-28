@@ -2,6 +2,7 @@ const User = require('../model/user.model');
 const clientService = require('../services/client.services');
 const campos = '_id first_name last_name email role active client img';
 const fields_out = '-password -createdAt -updatedAt -__v';
+const MailServices = require('../services/nodemailer');
 
 function getUsers(offset, limit) {
   return new Promise(async (resolve, reject) => {
@@ -56,6 +57,18 @@ function createUser(newUser) {
     try {
       const user = new User(newUser);
       await user.save();
+
+      if (user) {
+        const mailOptions = {
+          to: user.email,
+          data: {
+            user: newUser.email,
+            password: newUser.password,
+          },
+        };
+        await MailServices.sendMail(MailServices.templates.newuser, mailOptions);
+      }
+
       resolve(user);
     } catch (error) {
       reject(error);

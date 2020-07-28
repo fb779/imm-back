@@ -3,6 +3,7 @@ const ClientService = require('../services/client.services');
 const UserService = require('../services/user.services');
 const ProcessService = require('../services/process.services');
 const VisaCategoryServices = require('../services/visa-category.services');
+const { use } = require('../routes/api/principal');
 
 async function postWoocommerceWebhook(req, res, next) {
   // const body = req.body;
@@ -18,7 +19,7 @@ async function postWoocommerceWebhook(req, res, next) {
     let { billing, line_items } = validationsData(req.body);
 
     // respuesta de confirmacion
-    res.status(200).json({ ok: true });
+    // res.status(200).json({ ok: true });
 
     // verificacion y creacion del cliente
     let client = await ClientService.getClientByEmail(billing.email);
@@ -41,10 +42,14 @@ async function postWoocommerceWebhook(req, res, next) {
 
     const process = await ProcessService.createProcess({ client, visa_category });
 
-    console.log('fin de la ejecucion', billing);
+    if (process) {
+      console.log('fin de la ejecucion', billing);
+    }
+
+    res.status(200).json({ ok: true, client, user, process });
   } catch (error) {
-    console.log('manejo del error', error);
-    // errorHandler(error, res);
+    // console.log('manejo del error', error);
+    errorHandler(error, res);
   }
 }
 
