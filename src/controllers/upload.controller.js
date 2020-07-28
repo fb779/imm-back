@@ -20,13 +20,13 @@ async function uploadFormsGuides(req, res, next) {
     if (!type_document || !Object.values(typeFilesUpload).includes(type_document)) {
       return res.status(404).json({
         ok: false,
-        message: 'Error, no esta dentro de las opciones permitidas'
-      })
+        message: 'Error, no esta dentro de las opciones permitidas',
+      });
     }
 
     const process = await ProcessService.getProcessId(id_process);
 
-    const files_upload = req.files[Object.keys(req.files)[0]]
+    const files_upload = req.files[Object.keys(req.files)[0]];
 
     const rt = loadSingleFilesServer(files_upload, nameFile(files_upload, type_document, process._id, null, null));
 
@@ -42,7 +42,7 @@ async function uploadFormsGuides(req, res, next) {
 
     return res.status(200).json({
       ok: true,
-    })
+    });
   } catch (error) {
     errorHandler(error, res);
   }
@@ -55,8 +55,8 @@ async function uploadDocuments(req, res, next) {
     if (req.files.length > 0) {
       return res.status(404).json({
         ok: false,
-        message: 'Error, No selecciono ningun documento'
-      })
+        message: 'Error, No selecciono ningun documento',
+      });
     }
 
     const document = await DocumentServices.getDocumentById(id_document);
@@ -64,7 +64,7 @@ async function uploadDocuments(req, res, next) {
     const process = await ProcessService.getProcessId(document.process);
     const client = await ClientService.getById(document.client);
 
-    const files_upload = req.files[Object.keys(req.files)[0]]
+    const files_upload = req.files[Object.keys(req.files)[0]];
 
     const rt = loadSingleFilesServer(files_upload, nameFile(files_upload, typeFilesUpload.documents, process._id, client._id, document.name));
 
@@ -81,7 +81,7 @@ async function uploadDocuments(req, res, next) {
   } catch (error) {
     errorHandler(error, res);
   }
-};
+}
 
 /************************************************
  *  Metodo de trabajo para la carga de archivos
@@ -102,7 +102,7 @@ const nameFile = (file, type_document, id_process, id_client, keyFile) => {
 
   if (type_document && type_document === typeFilesUpload.documents) {
     if (!id_client) {
-      throw ({ message: `Error, the client is required` })
+      throw { message: `Error, the client is required` };
     }
     params.push(id_client);
   }
@@ -112,17 +112,16 @@ const nameFile = (file, type_document, id_process, id_client, keyFile) => {
 
   if (type_document === typeFilesUpload.documents && keyFile) {
     // nombreArchivo = `${ keyFile.replace(/\s/gi, '-') }.${ moment().unix() }.${ extension }`;
-    nombreArchivo = `${ keyFile.replace(/[&\/\\#,+()$~%.'":*?<>{}]/gi, '').replace(/\s/gi, '-') }.${ extension }`;
+    nombreArchivo = `${keyFile.replace(/[&\/\\#,+()$~%.'":*?<>{}]/gi, '').replace(/\s/gi, '-')}.${extension}`;
   } else {
-    nombreArchivo = `${ nombreCortado[0].replace(/[&\/\\#,+()$~%.'":*?<>{}]/gi, '').replace(/\s/gi, '-') }.${ extension }`;
+    nombreArchivo = `${nombreCortado[0].replace(/[&\/\\#,+()$~%.'":*?<>{}]/gi, '').replace(/\s/gi, '-')}.${extension}`;
   }
 
   // definicion de la rua de guardado
-  var file_path = path.join(uploadDir, params.join('/'), nombreArchivo)
+  var file_path = path.join(uploadDir, params.join('/'), nombreArchivo);
 
   return file_path;
-}
-
+};
 
 function loadSingleFilesServer(file, file_path, res) {
   try {
@@ -138,13 +137,12 @@ function loadSingleFilesServer(file, file_path, res) {
       extension,
       directory: file_path,
       mimetype: file.mimetype,
-      size: file.size
+      size: file.size,
     };
   } catch (error) {
-
+    errorHandler(error, res);
   }
 }
-
 
 // async function cargaArchivos(req, res, next) {
 //     const process = req.params.id_process || '';
@@ -207,15 +205,15 @@ const errorHandler = (error, res) => {
     return res.status(error.status).json({
       ok: false,
       message: error.message,
-      error: error.errors
-    })
+      error: error.errors,
+    });
   }
   return res.status(500).json({
     ok: false,
     message: 'error en el servicio de upload files',
-    error
-  })
-}
+    error,
+  });
+};
 
 /************************************************
  *  Expor metodos
@@ -223,5 +221,5 @@ const errorHandler = (error, res) => {
 
 module.exports = {
   uploadFormsGuides,
-  uploadDocuments
-}
+  uploadDocuments,
+};

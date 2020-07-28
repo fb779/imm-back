@@ -52,7 +52,7 @@ async function getProcessId(req, res, next) {
       return res.status(404).json({
         data: {
           ok: true,
-          messages: 'Process doesn\'t exist'
+          message: 'Process doesn\'t exist'
         }
       });
     }
@@ -105,7 +105,7 @@ async function editProcess(req, res, next) {
       return res.status(404).json({
         data: {
           ok: false,
-          messages: 'Process doesn\'t exist'
+          message: 'Process doesn\'t exist'
         }
       });
     }
@@ -166,7 +166,7 @@ async function getProcessIdClient(req, res, next) {
       return res.status(404).json({
         data: {
           ok: true,
-          messages: 'Process doesn\'t exist'
+          message: 'Process doesn\'t exist'
         }
       });
     }
@@ -216,7 +216,7 @@ async function getProcessIdForm(req, res, next) {
       return res.status(404).json({
         data: {
           ok: false,
-          messages: 'Process references doesn\'t exist'
+          message: 'Process references doesn\'t exist'
         }
       });
     }
@@ -227,7 +227,7 @@ async function getProcessIdForm(req, res, next) {
       return res.status(404).json({
         data: {
           ok: false,
-          messages: 'Form doesn\'t exist'
+          message: 'Form doesn\'t exist'
         }
       });
     }
@@ -256,7 +256,7 @@ async function editProcessIdForm(req, res, next) {
     return res.status(200).json({
       data: {
         ok: true,
-        messages: 'Edit form',
+        message: 'Edit form',
         id_process,
         id_form,
         body,
