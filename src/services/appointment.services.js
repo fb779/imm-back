@@ -1,244 +1,139 @@
-const CheckList = require('../model/appointment.model');
+const Appointment = require('../model/appointment.model');
+const _ = require('underscore');
+const moment = require('moment');
 
-// function getCheckListByName(_name) {
-//   return new Promise(async (resolve, reject) => {
-//     try {
-//       const list = await CheckList.find({ name: _name });
+function getAppointments(_filters) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const data = await Appointment.find(_filters)
+        .populate([
+          {path: 'consultant', select: '_id first_name last_name email'},
+          {path: 'client', select: '_id first_name last_name email'},
+        ])
+        .sort({date: 1, hour: 1});
 
-//       return resolve(list);
-//     } catch (error) {
-//       reject({
-//         status: 500,
-//         message: 'Error to create checklist',
-//         errors: error,
-//       });
-//     }
-//   });
-// }
+      return resolve(data);
+    } catch (error) {
+      reject({
+        status: 500,
+        message: 'Error to create checklist',
+        errors: error,
+      });
+    }
+  });
+}
 
-// function getListCheckList() {
-//   return new Promise(async (resolve, reject) => {
-//     try {
-//       const list = await CheckList.find().populate({ path: 'visa_categories' });
+function getAppointmentId(_id) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const data = await Appointment.findById(_id).populate([
+        {path: 'consultant', select: '_id first_name last_name email'},
+        {path: 'client', select: '_id first_name last_name email'},
+      ]);
 
-//       return resolve(list);
-//     } catch (error) {
-//       reject({
-//         status: 500,
-//         message: 'Error to create checklist',
-//         errors: error,
-//       });
-//     }
-//   });
-// }
+      return resolve(data);
+    } catch (error) {
+      reject({
+        status: 500,
+        message: 'Error to create checklist',
+        errors: error,
+      });
+    }
+  });
+}
 
-// function getCheckListById(id_checklist) {
-//   return new Promise(async (resolve, reject) => {
-//     try {
-//       const checklist = await CheckList.findById(id_checklist).populate([{ path: 'client' }]);
+// crear nuevo appointment
+function createAppointment(newAppointment) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const body = _.pick(newAppointment, ['consultant', 'client', 'date', 'hour', 'time']);
+      const appointmet = await Appointment.create(body);
+      // const appointmet = new Appointment(body);
 
-//       if (!checklist) {
-//         return reject({
-//           status: 404,
-//           message: `The CheckList isn't found`,
-//           errors: `The CheckList doesn't find with this Id: ${id_checklist}`,
-//         });
-//       }
+      resolve(appointmet);
+    } catch (error) {
+      reject({
+        status: 400,
+        message: 'Error to create Appointment',
+        errors: error,
+      });
+    }
+  });
+}
 
-//       return resolve(list_items);
-//     } catch (error) {
-//       return reject({
-//         status: 500,
-//         message: 'Error to find items checklist',
-//         errors: error,
-//       });
-//     }
-//   });
-// }
+// editar un appointment
+function editAppointment(id, newAppointment) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const body = _.pick(newAppointment, ['consultant', 'client', 'date', 'hour', 'time']);
+      const appointmet = await Appointment.findByIdAndUpdate(id, body, {new: true, runValidators: true, context: 'query'});
+      resolve(appointmet);
+    } catch (error) {
+      reject({
+        status: 400,
+        message: 'Error to edit Appointment',
+        errors: error,
+      });
+    }
+  });
+}
 
-// function getCheckListByIds(ids) {
-//   return new Promise(async (resolve, reject) => {
-//     try {
-//       const list_ids = [
-//         ...new Set(
-//           ids
-//             .split(',')
-//             .filter((el) => (el.trim() ? true : false))
-//             .map((el) => el.trim())
-//         ),
-//       ];
+// eliminar un appointment
+function deleteAppointment(id) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const appointmet = await Appointment.findByIdAndRemove(id);
+      resolve(appointmet);
+    } catch (error) {
+      reject({
+        status: 400,
+        message: 'Error to delete Appointment',
+        errors: error,
+      });
+    }
+  });
+}
 
-//       const list_items = await CheckList.find({ _id: { $in: list_ids } }).select('_id name');
+function disableAppointment(id) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const body = {status: false};
+      const appointmet = await Appointment.findByIdAndUpdate(id, body, {new: true, runValidators: true});
+      resolve(appointmet);
+    } catch (error) {
+      reject({
+        status: 400,
+        message: 'Error to delete Appointment',
+        errors: error,
+      });
+    }
+  });
+}
 
-//       if (list_items.length !== list_ids.length) {
-//         return reject({
-//           status: 404,
-//           message: 'Error to find all items checklist',
-//           errors: error,
-//         });
-//       }
+function validAppointment(filter) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const appointmet = await Appointment.find(filter);
 
-//       return resolve(list_items);
-//     } catch (error) {
-//       return reject({
-//         status: 500,
-//         message: 'Error to find items checklist',
-//         errors: error,
-//       });
-//     }
-//   });
-// }
+      const rta = appointmet.length > 0 ? true : false;
 
-// // crear nuevo VisaCategorye
-// function createCheckList(newCheckList) {
-//   return new Promise(async (resolve, reject) => {
-//     try {
-//       if (newCheckList.visa_categories) {
-//         newCheckList.visa_categories = await [...new Set(newCheckList.visa_categories.filter((el) => (el.trim() ? true : false)).map((el) => el.trim()))];
-//       }
+      resolve(rta);
+    } catch (error) {
+      reject({
+        status: 400,
+        message: 'Error to delete Appointment',
+        errors: error,
+      });
+    }
+  });
+}
 
-//       const check = new CheckList(newCheckList);
-
-//       await check.save();
-
-//       resolve(check);
-//     } catch (error) {
-//       reject({
-//         status: 400,
-//         message: 'Error to create Checklist',
-//         errors: error,
-//       });
-//     }
-//   });
-// }
-
-// function editCheckList(id, newCheckList) {
-//   return new Promise(async (resolve, reject) => {
-//     try {
-//       const check = await CheckList.findById(id);
-
-//       if (!check) {
-//         reject({
-//           status: 400,
-//           message: "Error, CheckList doesn't exist",
-//           errors: '',
-//         });
-//       }
-
-//       if (newCheckList.visa_categories) {
-//         newCheckList.visa_categories = await [...new Set(newCheckList.visa_categories.filter((el) => (el.trim() ? true : false)).map((el) => el.trim()))];
-
-//         check.visa_categories = newCheckList.visa_categories;
-//       }
-
-//       if (newCheckList.name) {
-//         check.name = newCheckList.name;
-//       }
-//       if (newCheckList.description) {
-//         check.description = newCheckList.description;
-//       }
-//       if (newCheckList.group) {
-//         check.group = newCheckList.group;
-//       }
-//       if (newCheckList.required) {
-//         check.required = newCheckList.required;
-//       }
-
-//       await check.save();
-
-//       resolve(check);
-//     } catch (error) {
-//       reject({
-//         status: 400,
-//         message: 'Error to edit CheckList',
-//         errors: error,
-//       });
-//     }
-//   });
-// }
-
-// function deleteCheckList(id) {
-//   return new Promise(async (resolve, reject) => {
-//     try {
-//       const check = await CheckList.findByIdAndRemove(id);
-
-//       if (!check) {
-//         reject({
-//           status: 400,
-//           message: "Error, the CheckList doesn't delete",
-//           errors: error,
-//         });
-//       }
-
-//       resolve(check);
-//     } catch (error) {
-//       reject({
-//         status: 400,
-//         message: "Error, the CheckList doesn't deletel",
-//         errors: error,
-//       });
-//     }
-//   });
-// }
-
-// function disableCheckList(id) {
-//   return new Promise(async (resolve, reject) => {
-//     try {
-//       const check = await CheckList.findById(id);
-
-//       if (!check) {
-//         reject({
-//           status: 400,
-//           message: "Error, CheckList doesn't exist",
-//           errors: '',
-//         });
-//       }
-
-//       if (check.active) {
-//         check.active = false;
-//       }
-
-//       await check.save();
-
-//       resolve(check);
-//     } catch (error) {
-//       reject({
-//         status: 400,
-//         message: "Error, the CheckList doesn't deletel",
-//         errors: error,
-//       });
-//     }
-//   });
-// }
-
-// function enableCheckList(id) {
-//   return new Promise(async (resolve, reject) => {
-//     try {
-//       const check = await CheckList.findById(id);
-
-//       if (!check) {
-//         reject({
-//           status: 400,
-//           message: "Error, CheckList doesn't exist",
-//           errors: '',
-//         });
-//       }
-
-//       if (!check.active) {
-//         check.active = true;
-//       }
-
-//       await check.save();
-
-//       resolve(check);
-//     } catch (error) {
-//       reject({
-//         status: 400,
-//         message: "Error, the CheckList doesn't deletel",
-//         errors: error,
-//       });
-//     }
-//   });
-// }
-
-module.exports = {};
+module.exports = {
+  getAppointments,
+  getAppointmentId,
+  createAppointment,
+  editAppointment,
+  deleteAppointment,
+  disableAppointment,
+  validAppointment,
+};

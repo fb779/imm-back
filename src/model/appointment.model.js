@@ -8,12 +8,12 @@ const AppointmentSchema = new Schema(
     consultant: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     client: { type: Schema.Types.ObjectId, ref: 'Client', required: false },
     date: { type: Date, require: true },
-    hour: { type: Number, require: true },
+    hour: { type: String, require: true },
     time: { type: Number, require: true },
     description: { type: String, required: false },
     state: { type: Boolean, default: true },
   },
-  { timestamps: true, collection: 'checklist' }
+  { timestamps: true, collection: 'appointment' }
 );
 
 AppointmentSchema.plugin(uniqueValidator, { message: '{PATH} is not unique' });

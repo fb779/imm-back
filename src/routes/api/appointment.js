@@ -6,7 +6,7 @@ const router = express.Router();
  *  Importaciones
  ************************************************/
 const AppointmentCtrl = require('./../../controllers/appointment.controller');
-const { isAuth } = require('./../../middlewares/auth.guard');
+const auth = require('./../../middlewares/auth.guard');
 
 /************************************************
  *  CRUD's especiales
@@ -16,13 +16,13 @@ const { isAuth } = require('./../../middlewares/auth.guard');
  *  CRUD basico para el recurso
  ************************************************/
 
-router.use(isAuth);
+router.use([auth.isAuth]);
 
 router.get('/', [], AppointmentCtrl.getAppointment);
 
-router.get('/:id', [], AppointmentCtrl.getAppointmentId);
+router.get('/valid', [], AppointmentCtrl.validAppointment);
 
-router.get('/valid/:name', [], AppointmentCtrl.validAppointment);
+router.get('/:id', [], AppointmentCtrl.getAppointmentId);
 
 router.post('/', [], AppointmentCtrl.createAppointment);
 

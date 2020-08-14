@@ -17,16 +17,17 @@ const auth = require('./../../middlewares/auth.guard');
 
 const router = express.Router();
 
-
 /************************************************
  * Configuracion del middleware fileUpload
  ************************************************/
-router.use(fileUpload({
-  createParentPath: true, // crea el las rutas automaticamente
-  safeFileNames: true, // elimina caracteres especiales de los nombres
-  preserveExtension: 4, // define la cantidad de caracteres de la extension
-}));
-
+router.use(
+  fileUpload({
+    createParentPath: true, // crea el las rutas automaticamente
+    safeFileNames: true, // elimina caracteres especiales de los nombres
+    preserveExtension: 4, // define la cantidad de caracteres de la extension
+    parseNested: false, // deshabilitacion por verificacion de seguridad (atacqued DoS e inyeccion de codigo)
+  })
+);
 
 /************************************************
  * Definicion de rutas
