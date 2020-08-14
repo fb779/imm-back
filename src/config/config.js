@@ -70,11 +70,22 @@ const typesDocument = {
   process: 'process',
 };
 
+const roles = {
+  admin: 'ADMIN_ROLE',
+  client: 'CLIENT_ROLE',
+  user: 'USER_ROLE',
+};
+
 const typesStatusDocument = {
   create: 'CREATE',
   uploaded: 'UPLOADED',
   approved: 'APPROVED',
   rejected: 'REJECTED',
+};
+
+const formats = {
+  input: 'ddd MMM DD YYYY HH:mm:ss Z',
+  output: 'YYYY-MM-DD',
 };
 
 /*******************************************
@@ -89,6 +100,7 @@ module.exports = {
   statusVisa,
   typeVisa,
   rolesValidos,
+  roles,
   titles,
   sexs,
   relationships,
@@ -98,4 +110,5 @@ module.exports = {
   typeExtensionFiles,
   typesDocument,
   typesStatusDocument,
+  formats,
 };
