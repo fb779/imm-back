@@ -24,7 +24,7 @@ async function getCheckList(req, res, next) {
     if (type != 'all') {
       visa = await VisaCategoriesServices.getByName(type);
       filter['state'] = true;
-      filter['visa_categories'] = { $in: [visa] };
+      filter['visa_categories'] = {$in: [visa]};
     }
 
     const listCheckList = await CheckList.find(filter).select('-createdAt -updatedAt -__v');

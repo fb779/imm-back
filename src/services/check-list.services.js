@@ -1,9 +1,10 @@
 const CheckList = require('../model/check-list.model');
+const _ = require('underscore');
 
 function getCheckListByName(_name) {
   return new Promise(async (resolve, reject) => {
     try {
-      const list = await CheckList.find({ name: _name });
+      const list = await CheckList.find({name: _name});
 
       return resolve(list);
     } catch (error) {
@@ -19,7 +20,7 @@ function getCheckListByName(_name) {
 function getListCheckList() {
   return new Promise(async (resolve, reject) => {
     try {
-      const list = await CheckList.find().populate({ path: 'visa_categories' });
+      const list = await CheckList.find().populate({path: 'visa_categories'});
 
       return resolve(list);
     } catch (error) {
@@ -35,7 +36,7 @@ function getListCheckList() {
 function getCheckListById(id_checklist) {
   return new Promise(async (resolve, reject) => {
     try {
-      const checklist = await CheckList.findById(id_checklist).populate([{ path: 'client' }]);
+      const checklist = await CheckList.findById(id_checklist).populate([{path: 'client'}]);
 
       if (!checklist) {
         return reject({
@@ -68,7 +69,7 @@ function getCheckListByIds(ids) {
         ),
       ];
 
-      const list_items = await CheckList.find({ _id: { $in: list_ids } }).select('_id name');
+      const list_items = await CheckList.find({_id: {$in: list_ids}}).select('_id name');
 
       if (list_items.length !== list_ids.length) {
         return reject({
@@ -97,9 +98,12 @@ function createCheckList(newCheckList) {
         newCheckList.visa_categories = await [...new Set(newCheckList.visa_categories.filter((el) => (el.trim() ? true : false)).map((el) => el.trim()))];
       }
 
-      const check = new CheckList(newCheckList);
+      const nCheckList = _.pick(newCheckList, ['name', 'group', 'state', 'visa_categories', 'description']);
 
-      await check.save();
+      // const check = new CheckList.create(newCheckList);
+      // await check.save();
+      console.log('Nuevo Checklist', nCheckList);
+      const check = await CheckList.create(nCheckList);
 
       resolve(check);
     } catch (error) {
@@ -112,7 +116,7 @@ function createCheckList(newCheckList) {
   });
 }
 
-function editCheckList(id, newCheckList) {
+function editCheckList(id, editCheckList) {
   return new Promise(async (resolve, reject) => {
     try {
       const check = await CheckList.findById(id);
@@ -125,24 +129,26 @@ function editCheckList(id, newCheckList) {
         });
       }
 
-      if (newCheckList.visa_categories) {
-        newCheckList.visa_categories = await [...new Set(newCheckList.visa_categories.filter((el) => (el.trim() ? true : false)).map((el) => el.trim()))];
+      if (editCheckList.visa_categories) {
+        editCheckList.visa_categories = await [...new Set(editCheckList.visa_categories.filter((el) => (el.trim() ? true : false)).map((el) => el.trim()))];
 
-        check.visa_categories = newCheckList.visa_categories;
+        check.visa_categories = editCheckList.visa_categories;
       }
 
-      if (newCheckList.name) {
-        check.name = newCheckList.name;
+      if (editCheckList.name) {
+        check.name = editCheckList.name;
       }
-      if (newCheckList.description) {
-        check.description = newCheckList.description;
+      if (editCheckList.description) {
+        check.description = editCheckList.description;
       }
-      if (newCheckList.group) {
-        check.group = newCheckList.group;
+      if (editCheckList.group) {
+        check.group = editCheckList.group;
       }
-      if (newCheckList.required) {
-        check.required = newCheckList.required;
+      if (editCheckList.required) {
+        check.required = editCheckList.required;
       }
+
+      check.state = editCheckList.state;
 
       await check.save();
 

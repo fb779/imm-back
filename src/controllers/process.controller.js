@@ -17,24 +17,27 @@ async function getProcess(req, res, next) {
     switch (user.role) {
       case 'ADMIN_ROLE':
         {
-          ListProcess = await Process.find({ status: 'FORM' }).populate({ path: 'client' }).populate({ path: 'visa_category' });
+          // ListProcess = await Process.find({status: 'FORM'}).populate({path: 'client'}).populate({path: 'visa_category'});
+          ListProcess = await ProcessServices.getProcesses({status: 'FORM'}, [{path: 'client'}, {path: 'visa_category'}]);
         }
         break;
       case 'USER_ROLE':
         {
-          ListProcess = await Process.find({ consultant: user._id, status: 'ASIGNED' }).populate({ path: 'client' }).populate({ path: 'visa_category' });
+          // ListProcess = await Process.find({consultant: user._id, status: 'ASIGNED'}).populate([{path: 'client'}, {path: 'visa_category'}]);
+          ListProcess = await ProcessServices.getProcesses({consultant: user._id, status: 'ASIGNED'}, [{path: 'client'}, {path: 'visa_category'}]);
         }
         break;
       case 'CLIENT_ROLE':
         {
-          ListProcess = await Process.find({ client: user.client }).populate({ path: 'client' }).populate({ path: 'visa_category' });
+          // ListProcess = await Process.find({client: user.client}).populate([{path: 'client'}, {path: 'visa_category'}, {path: 'consultant'}]);
+          ListProcess = await ProcessServices.getProcesses({client: user.client}, [{path: 'client'}, {path: 'visa_category'}, {path: 'consultant'}]);
         }
         break;
     }
 
     res.status(200).json({
       ok: true,
-      list: ListProcess
+      list: ListProcess,
     });
   } catch (error) {
     errorHandler(error, res);
@@ -46,20 +49,23 @@ async function getProcessId(req, res, next) {
     const id = req.params.id;
     const user = req.user;
 
-    const process = await Process.findOne({ _id: id }).populate([{ path: 'client', select: '-active -createdAt -updatedAt -__v' }, { path: 'visa_category', select: '-createdAt -updatedAt -__v' }]);
+    const process = await Process.findOne({_id: id}).populate([
+      {path: 'client', select: '-active -createdAt -updatedAt -__v'},
+      {path: 'visa_category', select: '-createdAt -updatedAt -__v'},
+    ]);
 
     if (!process) {
       return res.status(404).json({
         data: {
           ok: true,
-          message: 'Process doesn\'t exist'
-        }
+          message: "Process doesn't exist",
+        },
       });
     }
 
     res.status(200).json({
       ok: true,
-      process
+      process,
     });
   } catch (error) {
     errorHandler(error, res);
@@ -99,14 +105,14 @@ async function editProcess(req, res, next) {
     const id_form = body._id;
 
     // consultar el proceso
-    const process = await Process.findById(id_process)
+    const process = await Process.findById(id_process);
 
     if (!process) {
       return res.status(404).json({
         data: {
           ok: false,
-          message: 'Process doesn\'t exist'
-        }
+          message: "Process doesn't exist",
+        },
       });
     }
 
@@ -124,7 +130,6 @@ async function editProcess(req, res, next) {
 
     // guardado del proceso con el consultor
     await process.save();
-
 
     return res.status(200).json({
       ok: true,
@@ -158,16 +163,16 @@ async function editProcess(req, res, next) {
 async function getProcessIdClient(req, res, next) {
   try {
     const id = req.params.id;
-    const user = req.user
+    const user = req.user;
 
-    const process = await Process.findOne({ _id: id, client: user.client }, { 'client': 1 }).populate([{ path: 'client', select: '-active -createdAt -updatedAt -__v' }]);
+    const process = await Process.findOne({_id: id, client: user.client}, {client: 1}).populate([{path: 'client', select: '-active -createdAt -updatedAt -__v'}]);
 
     if (!process) {
       return res.status(404).json({
         data: {
           ok: true,
-          message: 'Process doesn\'t exist'
-        }
+          message: "Process doesn't exist",
+        },
       });
     }
 
@@ -175,8 +180,8 @@ async function getProcessIdClient(req, res, next) {
       ok: true,
       message: 'Load client to process',
       process,
-      client: process.client
-    })
+      client: process.client,
+    });
   } catch (error) {
     errorHandler(error, res);
   }
@@ -187,7 +192,7 @@ async function createFormProcess(req, res, next) {
     const id_process = req.params.id;
     const body = req.body;
 
-    const process = await Process.findOne({ _id: id_process }).populate([{ path: 'client' }, { path: 'visa_category' }]);
+    const process = await Process.findOne({_id: id_process}).populate([{path: 'client'}, {path: 'visa_category'}]);
 
     await ClientServices.editClient(process.client._id, body);
 
@@ -199,8 +204,8 @@ async function createFormProcess(req, res, next) {
 
     res.status(200).json({
       ok: true,
-      form
-    })
+      form,
+    });
   } catch (error) {
     errorHandler(error, res);
   }
@@ -210,14 +215,14 @@ async function getProcessIdForm(req, res, next) {
   try {
     const id = req.params.id;
 
-    const process = await Process.findOne({ _id: id }).populate([{ path: 'client' }, { path: 'visa_category' }]);
+    const process = await Process.findOne({_id: id}).populate([{path: 'client'}, {path: 'visa_category'}]);
 
     if (!process) {
       return res.status(404).json({
         data: {
           ok: false,
-          message: 'Process references doesn\'t exist'
-        }
+          message: "Process references doesn't exist",
+        },
       });
     }
 
@@ -227,15 +232,15 @@ async function getProcessIdForm(req, res, next) {
       return res.status(404).json({
         data: {
           ok: false,
-          message: 'Form doesn\'t exist'
-        }
+          message: "Form doesn't exist",
+        },
       });
     }
 
     return res.status(200).json({
       ok: true,
-      form
-    })
+      form,
+    });
   } catch (error) {
     errorHandler(error, res);
   }
@@ -247,7 +252,7 @@ async function editProcessIdForm(req, res, next) {
     const id_form = req.body._id;
     const body = req.body;
 
-    const process = await Process.findById(id_process).populate([{ path: 'client' }]);
+    const process = await Process.findById(id_process).populate([{path: 'client'}]);
 
     await ClientServices.editClient(process.client._id, body);
 
@@ -262,7 +267,7 @@ async function editProcessIdForm(req, res, next) {
         body,
         process,
         form,
-      }
+      },
     });
   } catch (error) {
     errorHandler(error, res);
@@ -277,15 +282,15 @@ const errorHandler = (error, res) => {
     return res.status(error.status).json({
       ok: false,
       message: error.message,
-      error: error.errors
-    })
+      error: error.errors,
+    });
   }
   return res.status(500).json({
     ok: true,
     message: 'error en el servicio de creacion del listado de documentos',
-    error
-  })
-}
+    error,
+  });
+};
 
 /************************************************
  *  Export de metodos
@@ -301,4 +306,4 @@ module.exports = {
   createFormProcess,
   editProcessIdForm,
   getProcessIdForm,
-}
+};

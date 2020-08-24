@@ -1,18 +1,19 @@
 const Process = require('../model/proceso.model');
 
-function getProcesses() {
+function getProcesses(filter, populate) {
   return new Promise(async (resolve, reject) => {
     try {
-      const listProcesses = await Process.find().populate([
-        { path: 'client', select: '-active -createdAt -updatedAt -__v' },
-        { path: 'visa_category', select: '-createdAt -updatedAt -__v' },
-      ]);
+      const listProcesses = await Process.find(filter).populate(populate);
+      // .populate([
+      //   {path: 'client', select: '-active -createdAt -updatedAt -__v'},
+      //   {path: 'visa_category', select: '-createdAt -updatedAt -__v'},
+      // ]);
 
       resolve(listProcesses);
     } catch (error) {
       reject({
         status: 400,
-        message: 'Error to create Process',
+        message: 'Error to find Process',
         errors: error,
       });
     }
@@ -25,8 +26,8 @@ function getProcessId(id_process, params = {}) {
       const process = await Process.findById(id_process)
         .select('-__v -createdAt -updatedAt')
         .populate([
-          { path: 'client', select: '-active -createdAt -updatedAt -__v' },
-          { path: 'visa_category', select: '-createdAt -updatedAt -__v' },
+          {path: 'client', select: '-active -createdAt -updatedAt -__v'},
+          {path: 'visa_category', select: '-createdAt -updatedAt -__v'},
         ]);
 
       if (!process) {
@@ -51,9 +52,10 @@ function getProcessId(id_process, params = {}) {
 function getProcessesByClient(id_client) {
   return new Promise(async (resolve, reject) => {
     try {
-      const listProcesses = await Process.find({ client: id_client }).populate([
-        { path: 'client', select: '-active -createdAt -updatedAt -__v' },
-        { path: 'visa_category', select: '-createdAt -updatedAt -__v' },
+      const listProcesses = await Process.find({client: id_client}).populate([
+        {path: 'client', select: '-active -createdAt -updatedAt -__v'},
+        {path: 'consultant', select: '-active -createdAt -updatedAt -__v'},
+        {path: 'visa_category', select: '-createdAt -updatedAt -__v'},
       ]);
 
       resolve(listProcesses);
@@ -71,7 +73,7 @@ function getProcessesByClient(id_client) {
 function createProcess(newProcess) {
   return new Promise(async (resolve, reject) => {
     try {
-      const listProcess = await Process.find({ active: true, client: newProcess.client, visa_category: newProcess.visa_category });
+      const listProcess = await Process.find({active: true, client: newProcess.client, visa_category: newProcess.visa_category});
 
       if (listProcess.length > 0) {
         throw {
@@ -197,7 +199,7 @@ function disableProcess(id) {
 function getListByClientVisaCategory(client, visa) {
   return new Promise(async (resolve, reject) => {
     try {
-      const process = Process.find({ client: client._id, visa_vategory: visa._id });
+      const process = Process.find({client: client._id, visa_vategory: visa._id});
       await process.save();
 
       resolve(process);
