@@ -33,6 +33,18 @@ UserSchema.pre('save', async function (next) {
   return next();
 });
 
+UserSchema.pre('findOneAndUpdate', async function (next) {
+  const user = this.getUpdate();
+  const that = this.schema;
+
+  if (user.password) {
+    // user.password = that.methods.encryptPasswordSync(user.password);
+    user.password = await that.methods.encryptPassword(user.password);
+  }
+
+  return next();
+});
+
 /**
  * Hook to after save user to replace the password
  */

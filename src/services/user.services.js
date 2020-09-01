@@ -1,8 +1,9 @@
 const User = require('../model/user.model');
 const clientService = require('../services/client.services');
 const campos = '_id first_name last_name email role active client img';
-const fields_out = '-password -createdAt -updatedAt -__v';
+const fields_out = '-createdAt -updatedAt -__v';
 const MailServices = require('../services/nodemailer');
+const _ = require('underscore');
 
 function getUsers(offset, limit) {
   return new Promise(async (resolve, reject) => {
@@ -44,7 +45,7 @@ function getUserById(id_user) {
 function getUserByEmail(_email) {
   return new Promise(async (resolve, reject) => {
     try {
-      const user = await User.findOne({ email: _email });
+      const user = await User.findOne({email: _email});
       resolve(user);
     } catch (error) {
       reject(error);
@@ -79,7 +80,7 @@ function createUser(newUser) {
 function updateUser(id, userUpdate) {
   return new Promise(async (resolve, reject) => {
     try {
-      const user = await User.findById(id).select(fields_out);
+      const user = await User.findById(id).select(fields_out).populate('client');
 
       if (!user) {
         throw {
@@ -105,15 +106,7 @@ function updateUser(id, userUpdate) {
         user.role = userUpdate.role;
       }
 
-      if (userUpdate.password) {
-        user.password = userUpdate.password;
-      }
-
-      user.active = userUpdate.active;
-
-      // if (userUpdate.client) {
-      //   user.client = userUpdate.client;
-      // }
+      user.active = userUpdate.active || user.active;
 
       await user.save();
 
@@ -124,9 +117,33 @@ function updateUser(id, userUpdate) {
   });
 }
 
-function updatePassword(id, newPassword) {
+function updatePassword(id, oldPassword, newPassword) {
   return new Promise(async (resolve, reject) => {
     try {
+      const user = await User.findById(id).select(fields_out);
+
+      if (!user) {
+        throw {
+          status: 400,
+          message: "Error, user doesn't exist",
+          errors: '',
+        };
+      }
+
+      if (!user.verifyPassword(oldPassword)) {
+        return reject({
+          status: 400,
+          ok: false,
+          message: `Old password isn't correct`,
+        });
+      }
+
+      user.password = newPassword;
+
+      await user.save();
+
+      // const user = await User.findByIdAndUpdate(id, {password: newPassword}, {new: true, runValidators: true});
+
       return resolve(true);
     } catch (error) {
       return reject(error);
@@ -170,7 +187,7 @@ module.exports = {
   getUserByEmail,
   createUser,
   updateUser,
-  generatePassword,
   updatePassword,
+  generatePassword,
   validEmail,
 };

@@ -6,6 +6,7 @@ const UserService = require('../services/user.services');
 const ClientService = require('../services/client.services');
 const VisaCategoryServices = require('../services/visa-category.services');
 const ProcessService = require('../services/process.services');
+const {roles} = require('../config/config');
 
 const campos = '_id first_name last_name email role active client img';
 
@@ -18,10 +19,10 @@ const campos = '_id first_name last_name email role active client img';
  * Search and find user by Id
  */
 function getUser(req, res, next) {
-  var id = req.params.id;
+  const id = req.params.id;
 
   User.findById(id, campos)
-    .populate({ path: 'client' })
+    .populate({path: 'client'})
     .exec((err, user) => {
       if (err) {
         return res.status(500).json({
@@ -63,10 +64,10 @@ function getListUsers(req, res, next) {
   let role = req.query.role || null;
 
   let filters = {};
-  let populate = [{ path: 'client', select: '-__v -createdAt -updatedAt' }]; // { path: '' };
+  let populate = [{path: 'client', select: '-__v -createdAt -updatedAt'}]; // { path: '' };
 
   if (role) {
-    filters[`role`] = { $in: role };
+    filters[`role`] = {$in: role};
   }
 
   User.find(filters, campos)
@@ -121,7 +122,7 @@ async function createUser(req, res, next) {
       const name_process = body.process;
       const visa_category = await VisaCategoryServices.getByName(name_process);
 
-      const process = await ProcessService.createProcess({ client, visa_category });
+      const process = await ProcessService.createProcess({client, visa_category});
     } else {
       newUser = await UserService.createUser(body);
     }
@@ -137,14 +138,41 @@ async function createUser(req, res, next) {
 
 async function updateUser(req, res, next) {
   try {
-    var id = req.params.id;
-    var body = req.body;
+    const user = req.user;
+    const id = req.params.id;
+    const body = req.body;
 
-    const user = await UserService.updateUser(id, body);
+    const userEdit = await UserService.updateUser(id, body);
+
+    if (user.role === roles.client) {
+      userEdit.client = await ClientService.editClient(user.client, body);
+    }
 
     return res.status(200).json({
       ok: true,
-      user,
+      user: userEdit,
+    });
+  } catch (error) {
+    return errorHandler(error, res);
+  }
+}
+
+async function updateUserPassword(req, res, next) {
+  try {
+    const user = req.user;
+    const id = req.params.id;
+    const password = req.body.old_password;
+    const newPassword = req.body.new_password;
+
+    if ((id !== user._id && user.role !== roles.admin) || (id === user._id && user.role !== roles.client)) {
+      throw {status: 404, message: `You do not have permission to modify`};
+    }
+
+    const userEditPassword = await UserService.updatePassword(id, password, newPassword);
+
+    return res.status(200).json({
+      ok: true,
+      data: userEditPassword,
     });
   } catch (error) {
     return errorHandler(error, res);
@@ -152,14 +180,15 @@ async function updateUser(req, res, next) {
 }
 
 function getConsultants(req, res, next) {
-  User.find({ active: true, role: { $eq: 'USER_ROLE' } }, '_id first_name last_name email').exec((err, consultants) => {
+  User.find({active: true, role: {$eq: 'USER_ROLE'}}, '_id first_name last_name email').exec((err, consultants) => {
     if (err) {
-      return res.status(500).json({
-        data: {
-          ok: false,
-          message: 'Problemas al cargar los consultores',
-        },
-      });
+      return errorHandler(err);
+      // return res.status(500).json({
+      //   data: {
+      //     ok: false,
+      //     message: 'Problemas al cargar los consultores',
+      //   },
+      // });
     }
 
     return res.status(200).json({
@@ -214,6 +243,7 @@ module.exports = {
   getListUsers,
   createUser,
   updateUser,
+  updateUserPassword,
   getConsultants,
   getValid,
 };

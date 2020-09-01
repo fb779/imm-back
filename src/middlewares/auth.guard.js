@@ -8,12 +8,13 @@ function isAuth(req, res, next) {
     return res.status(401).send({
       data: {
         ok: false,
-        message: 'You don\'t have authorization'
-      }
+        message: "You don't have authorization",
+      },
     });
   }
 
-  authSer.decodeToken(token)
+  authSer
+    .decodeToken(token)
     .then((response) => {
       req.user = response.user;
       next();
@@ -22,8 +23,8 @@ function isAuth(req, res, next) {
       res.status(response.status).send({
         data: {
           ok: false,
-          message: response.message
-        }
+          message: response.message,
+        },
       });
     });
 }
@@ -32,7 +33,7 @@ function extractToken(req) {
   let token = '';
 
   if (req.headers.authorization) {
-    token = req.headers.authorization.split(" ")[1];
+    token = req.headers.authorization.split(' ')[1];
   } else if (req.query.token) {
     token = req.query.token;
   }
@@ -40,6 +41,19 @@ function extractToken(req) {
   return token;
 }
 
-module.exports = {
-  isAuth
+// funcion de verificacion de token valido para autenticar la peticion
+function isAdminRole(req, res, next) {
+  next();
 }
+
+function isUserRole(req, res, next) {
+  next();
+}
+
+function isClientRole(req, res, next) {
+  next();
+}
+
+module.exports = {
+  isAuth,
+};

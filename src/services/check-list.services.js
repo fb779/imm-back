@@ -102,7 +102,7 @@ function createCheckList(newCheckList) {
 
       // const check = new CheckList.create(newCheckList);
       // await check.save();
-      console.log('Nuevo Checklist', nCheckList);
+
       const check = await CheckList.create(nCheckList);
 
       resolve(check);
