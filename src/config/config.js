@@ -6,7 +6,10 @@ const path = require('path');
 /*******************************************
  * Definicion de ruta para upload
  *******************************************/
+const rootDir = 'public';
 const uploadDir = path.join(__dirname, '../public/processes/');
+// const uploadDirPhoto = path.join(__dirname, '../public/users/');
+const uploadDirPhoto = path.join(__dirname, '..', rootDir, 'users');
 
 /*******************************************
  * Definicion de enum para validaciones
@@ -96,7 +99,9 @@ module.exports = {
   port: process.env.SER_PORT || 3001,
   seed: process.env.SEED,
   db_url: process.env.MONGODB_URI || `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`,
+  rootDir,
   uploadDir,
+  uploadDirPhoto,
   statusVisa,
   typeVisa,
   rolesValidos,

@@ -1,11 +1,11 @@
 /************************************************
  *  Importaciones
  ************************************************/
-const moment = require('moment');
 const path = require('path');
 const fs = require('fs');
-const { uploadDir, typeFilesUpload, typesStatusDocument } = require('./../config/config');
+const {uploadDir, uploadDirPhoto, typeFilesUpload, typesStatusDocument} = require('./../config/config');
 
+const UserService = require('../services/user.services');
 const ProcessService = require('../services/process.services');
 const ClientService = require('../services/client.services');
 const DocumentServices = require('../services/document.services');
@@ -83,6 +83,45 @@ async function uploadDocuments(req, res, next) {
   }
 }
 
+async function uploadPhoto(req, res, next) {
+  try {
+    const user = req.user;
+    const id = req.params.id;
+
+    if (!req.files || req.files.length > 0) {
+      throw {
+        status: 404,
+        ok: false,
+        message: 'Error, No selecciono ningun documento',
+      };
+    }
+
+    const archivo = req.files[Object.keys(req.files)[0]];
+    const [name, ext] = archivo.name.split('.');
+
+    const userUpdate = await UserService.getUserById(id);
+
+    let file_name = `${uploadDirPhoto}/${userUpdate._id}-${new Date().getMilliseconds()}.${ext}`;
+
+    const rt = loadSingleFilesServer(archivo, file_name);
+
+    removeOldPhoto(userUpdate.img);
+
+    userUpdate.img = rt.name;
+
+    await userUpdate.save();
+
+    // userUpdate.img = userUpdate.img64;
+
+    return res.status(200).json({
+      ok: true,
+      data: userUpdate,
+    });
+  } catch (error) {
+    errorHandler(error, res);
+  }
+}
+
 /************************************************
  *  Metodo de trabajo para la carga de archivos
  ************************************************/
@@ -102,7 +141,7 @@ const nameFile = (file, type_document, id_process, id_client, keyFile) => {
 
   if (type_document && type_document === typeFilesUpload.documents) {
     if (!id_client) {
-      throw { message: `Error, the client is required` };
+      throw {message: `Error, the client is required`};
     }
     params.push(id_client);
   }
@@ -144,58 +183,12 @@ function loadSingleFilesServer(file, file_path, res) {
   }
 }
 
-// async function cargaArchivos(req, res, next) {
-//     const process = req.params.id_process || '';
-//     const client = req.params.id_client || '';
-//     const body = req.body || '';
-//     if (!req.files || Object.keys(req.files).length === 0) {
-//         return res.status(400).json({
-//             ok: false,
-//             mesaje: 'No selecciono nada',
-//             errors: {
-//                 message: 'Debe seleccionar un archivo'
-//             }
-//         });
-//     }
-
-//     const files_upload = Object.keys(req.files).map((file) => loadFileServer(req.files[file], file, process, client));
-//     var fsup = [];
-//     await Promise.all(
-//         files_upload
-//     ).then(x => {
-//         fsup = x;
-//     });
-//     return res.status(200).json({
-//         ok: true,
-//         mensaje: `llegaron los archivos al upload`,
-//         process,
-//         client,
-//         body,
-//         fsup,
-//     });
-// }
-
-// function loadFileServer(file, keyFile, process, client) {
-//     var archivo = file;
-//     var nombreCortado = archivo.name.split('.');
-//     var extension = nombreCortado[nombreCortado.length - 1];
-
-//     // definicion del nombre del archivo
-//     var nombreArchivo = `${ keyFile.replace(/\s/gi, '-') }.${ moment().unix() }.${ extension }`;
-
-//     // definicion de la rua de guardado
-//     var file_path = `${uploadDir}/${ process }/${ client }/${nombreArchivo}`;
-
-//     // Use the mv() method to place the file somewhere on your server
-//     archivo.mv(file_path)
-
-//     return ({
-//         original_name: file.name,
-//         name: nombreArchivo,
-//         mimetype: file.mimetype,
-//         size: file.size
-//     });
-// }
+function removeOldPhoto(photoPath) {
+  var pathOld = `${uploadDirPhoto}/${photoPath}`;
+  if (photoPath && fs.existsSync(pathOld)) {
+    fs.unlinkSync(pathOld);
+  }
+}
 
 /************************************************
  *  Metodo para el manejo de error
@@ -222,4 +215,5 @@ const errorHandler = (error, res) => {
 module.exports = {
   uploadFormsGuides,
   uploadDocuments,
+  uploadPhoto,
 };

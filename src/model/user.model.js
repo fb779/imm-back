@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
 const bcrypt = require('bcryptjs');
-const {rolesValidos} = require('./../config/config');
+const {rolesValidos, uploadDirPhoto} = require('./../config/config');
+const path = require('path');
+const fs = require('fs');
 
 const Schema = mongoose.Schema;
 
@@ -20,6 +22,19 @@ const UserSchema = new Schema(
 );
 
 UserSchema.plugin(uniqueValidator, {message: '{PATH} is not unique'});
+
+// UserSchema.virtual('img64').get(function () {
+//   let pathImg = path.resolve(uploadDirPhoto, `${this.img}`);
+//   let [name, ext] = this.img.split('.');
+//   const prefijo = ext.includes('svg') ? `data:image/${ext}+xml;base64,` : `data:image/${ext};base64,`;
+//   let file = '';
+
+//   if (this.img && fs.existsSync(pathImg)) {
+//     file = prefijo + fs.readFileSync(pathImg, {encoding: 'base64'});
+//   }
+
+//   return file;
+// });
 
 /**
  * Hook to before to save user to encrypt password

@@ -35,5 +35,6 @@ router.use(
 
 router.post('/forms-guides/:id_process', [auth.isAuth], UpController.uploadFormsGuides);
 router.post('/documents/:id_document', [auth.isAuth], UpController.uploadDocuments);
+router.post('/photo/:id', [auth.isAuth], UpController.uploadPhoto);
 
 module.exports = router;

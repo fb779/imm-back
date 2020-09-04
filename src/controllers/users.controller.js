@@ -8,7 +8,7 @@ const VisaCategoryServices = require('../services/visa-category.services');
 const ProcessService = require('../services/process.services');
 const {roles} = require('../config/config');
 
-const campos = '_id first_name last_name email role active client img';
+const campos = '_id first_name last_name email role active client img img64';
 
 /************************************************
  *  Metodos
@@ -144,9 +144,9 @@ async function updateUser(req, res, next) {
 
     const userEdit = await UserService.updateUser(id, body);
 
-    if (user.role === roles.client) {
-      userEdit.client = await ClientService.editClient(user.client, body);
-    }
+    // if (user.role === roles.client) {
+    //   userEdit.client = await ClientService.editClient(user.client, body);
+    // }
 
     return res.status(200).json({
       ok: true,
@@ -164,7 +164,7 @@ async function updateUserPassword(req, res, next) {
     const password = req.body.old_password;
     const newPassword = req.body.new_password;
 
-    if ((id !== user._id && user.role !== roles.admin) || (id === user._id && user.role !== roles.client)) {
+    if (id !== user._id && user.role !== roles.admin) {
       throw {status: 404, message: `You do not have permission to modify`};
     }
 

@@ -106,11 +106,39 @@ function updateUser(id, userUpdate) {
         user.role = userUpdate.role;
       }
 
+      // user.img = userUpdate.img || user.img;
+
       user.active = userUpdate.active || user.active;
 
       await user.save();
 
       return resolve(user);
+    } catch (error) {
+      return reject(error);
+    }
+  });
+}
+
+function updatePhoto(id, photoPath) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const user = await User.findById(id).select(fields_out);
+
+      if (!user) {
+        throw {
+          status: 400,
+          message: "Error, user doesn't exist",
+          errors: '',
+        };
+      }
+
+      user.img = photoPath;
+
+      await user.save();
+
+      // const user = await User.findByIdAndUpdate(id, {img: photoPath}, {new: true, runValidators: true});
+
+      return resolve(true);
     } catch (error) {
       return reject(error);
     }
@@ -187,6 +215,7 @@ module.exports = {
   getUserByEmail,
   createUser,
   updateUser,
+  updatePhoto,
   updatePassword,
   generatePassword,
   validEmail,
