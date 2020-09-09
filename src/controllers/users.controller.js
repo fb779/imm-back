@@ -8,7 +8,7 @@ const VisaCategoryServices = require('../services/visa-category.services');
 const ProcessService = require('../services/process.services');
 const {roles} = require('../config/config');
 
-const campos = '_id first_name last_name email role active client img img64';
+const campos = '_id first_name last_name email role active client img bio';
 
 /************************************************
  *  Metodos

@@ -106,6 +106,10 @@ function updateUser(id, userUpdate) {
         user.role = userUpdate.role;
       }
 
+      if (userUpdate.bio) {
+        user.bio = userUpdate.bio;
+      }
+
       // user.img = userUpdate.img || user.img;
 
       user.active = userUpdate.active || user.active;
