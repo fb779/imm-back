@@ -3,9 +3,7 @@
  ************************************************/
 const AppointmentService = require('../services/appointment.services');
 const {roles, formats} = require('../config/config');
-const _ = require('underscore');
 const moment = require('moment');
-const appointmentServices = require('../services/appointment.services');
 
 async function getAppointment(req, res, next) {
   try {
@@ -69,7 +67,7 @@ async function validAppointment(req, res, next) {
       throw {
         status: 400,
         ok: false,
-        message: 'Error en la llegada de informacion',
+        message: 'Error in the information',
       };
     }
 
@@ -79,7 +77,7 @@ async function validAppointment(req, res, next) {
       filter['consultant'] = user._id;
     }
 
-    const data = await appointmentServices.validAppointment(filter);
+    const data = await AppointmentService.validAppointment(filter);
 
     res.status(200).json({
       ok: true,

@@ -21,6 +21,7 @@ const family = require('./api/family');
 const documents = require('./api/documents');
 const forms_guides = require('./api/forms-guides');
 const appointment = require('./api/appointment');
+const coupons = require('./api/coupons');
 const web_chat = require('./api/web-chat');
 const uploads = require('./api/uploads');
 const static_files = require('./api/static-files');
@@ -42,6 +43,7 @@ router.use('/api/v1/documents', documents);
 router.use('/api/v1/forms-guides', forms_guides);
 router.use('/api/v1/chat', web_chat);
 router.use('/api/v1/appointment', appointment);
+router.use('/api/v1/coupon', coupons);
 
 /********************************************************
  * - Carga de archivos (Upload)
