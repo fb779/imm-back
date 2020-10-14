@@ -67,7 +67,7 @@ function getListUsers(req, res, next) {
   let populate = [{path: 'client', select: '-__v -createdAt -updatedAt'}]; // { path: '' };
 
   if (role) {
-    filters[`role`] = {$in: role};
+    filters['role'] = {$in: role};
   }
 
   User.find(filters, campos)

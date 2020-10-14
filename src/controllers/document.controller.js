@@ -5,7 +5,7 @@ const DocumentServices = require('../services/document.services');
 const ProcessService = require('../services/process.services');
 const ClientService = require('../services/client.services');
 const CheckListService = require('../services/check-list.services');
-const { typesStatusDocument } = require('../config/config');
+const {typesStatusDocument} = require('../config/config');
 
 /************************************************
  *  Deficnicion de metodos
@@ -17,11 +17,11 @@ async function getDocuments(req, res, next) {
     const id = req.query.id || null;
 
     if (!type) {
-      throw ({
+      throw {
         status: 400,
         message: `Error en los parametros`,
-        errors: {}
-      });
+        errors: {},
+      };
     }
 
     const documents = await DocumentServices.getDocuments(type, id);
@@ -29,10 +29,9 @@ async function getDocuments(req, res, next) {
     res.status(200).json({
       ok: true,
       list: documents,
-    })
+    });
   } catch (error) {
     errorHandler(error, res);
-
   }
 }
 
@@ -49,10 +48,9 @@ async function getDocumentsByProcessClient(req, res, netx) {
     res.status(200).json({
       ok: true,
       list: documents,
-    })
+    });
   } catch (error) {
     errorHandler(error, res);
-
   }
 }
 
@@ -64,11 +62,10 @@ async function getDocumentsByCliente(req, res, next) {
 
     res.status(200).json({
       ok: true,
-      list: documents
-    })
+      list: documents,
+    });
   } catch (error) {
     errorHandler(error, res);
-
   }
 }
 
@@ -81,16 +78,16 @@ async function saveDocumentsByCliente(req, res, next) {
     if (!ids_checkList) {
       return res.status(400).json({
         ok: false,
-        message: 'Faltan los documentos viejo'
-      })
+        message: 'Faltan los documentos viejo',
+      });
     }
 
     const process = await ProcessService.getProcessId(id_process);
     const client = await ClientService.getById(id_client);
 
-    const checkList = await (await CheckListService.getCheckListByIds(ids_checkList)).map(({ _id, name }) => ({ process: process._id, client: client._id, checklist: _id, name, }));
+    const checkList = await (await CheckListService.getCheckListByIds(ids_checkList)).map(({_id, name}) => ({process: process._id, client: client._id, checklist: _id, name}));
 
-    const documents = await DocumentServices.getDocumentsByProcessClient(process._id, client._id)
+    const documents = await DocumentServices.getDocumentsByProcessClient(process._id, client._id);
 
     const create = newDocuments(checkList, documents);
     const remove = removeDocuments(documents, checkList);
@@ -121,11 +118,11 @@ async function updateStatusDocument(req, res, next) {
     const status = req.body.status.toUpperCase() || null;
     const comment = req.body.comment || '';
 
-    if (!(Object.values(typesStatusDocument)).includes(status)) {
-      throw ({
+    if (!Object.values(typesStatusDocument).includes(status)) {
+      throw {
         status: 404,
         message: `The type status is invalid`,
-      })
+      };
     }
 
     const document = await DocumentServices.getDocumentById(id_document);
@@ -133,7 +130,7 @@ async function updateStatusDocument(req, res, next) {
     document.status = status;
 
     if (status === typesStatusDocument.rejected) {
-      document.comments.push({ comment });
+      document.comments.push({comment});
     }
 
     await document.save();
@@ -142,9 +139,8 @@ async function updateStatusDocument(req, res, next) {
       ok: true,
       message: `Actualizando mi estado de documento`,
       document,
-      status
-
-    })
+      status,
+    });
   } catch (error) {
     errorHandler(error, res);
   }
@@ -155,20 +151,20 @@ async function updateStatusDocument(req, res, next) {
  ************************************************/
 
 const newDocuments = (news, saved) => {
-  const listado = saved.map(el => (el.checklist.toString()));
+  const listado = saved.map((el) => el.checklist.toString());
 
-  return news.filter(el => {
-    return (listado.indexOf(el.checklist.toString()) == -1) ? true : false;
-  })
-}
+  return news.filter((el) => {
+    return listado.indexOf(el.checklist.toString()) == -1 ? true : false;
+  });
+};
 
 const removeDocuments = (saved, news) => {
-  const listado = news.map(el => (el.checklist.toString()));
+  const listado = news.map((el) => el.checklist.toString());
 
-  return saved.filter(el => {
-    return (listado.indexOf(el.checklist.toString()) == -1) ? true : false;
+  return saved.filter((el) => {
+    return listado.indexOf(el.checklist.toString()) == -1 ? true : false;
   });
-}
+};
 
 /************************************************
  *  Metodo para el manejo de error
@@ -178,15 +174,15 @@ const errorHandler = (error, res) => {
     return res.status(error.status).json({
       ok: false,
       message: error.message,
-      error: error.errors
-    })
+      error: error.errors,
+    });
   }
   return res.status(500).json({
-    ok: true,
+    ok: false,
     message: 'error en el servicio de creacion del listado de documentos',
-    error
-  })
-}
+    error,
+  });
+};
 
 /************************************************
  *  Export de metodos
@@ -198,4 +194,4 @@ module.exports = {
   getDocumentsByProcessClient,
   saveDocumentsByCliente,
   updateStatusDocument,
-}
+};

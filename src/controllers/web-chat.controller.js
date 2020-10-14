@@ -20,7 +20,7 @@ async function loadMessage(req, res, next) {
       ok: true,
       data: chats,
       // message: `cargando los mensajes del proceso`,
-    })
+    });
   } catch (error) {
     errorHandler(error, res);
   }
@@ -40,7 +40,7 @@ async function createMessage(req, res, next) {
       ok: true,
       data: newChat,
       // message: `creando los mensajes del proceso`,
-    })
+    });
   } catch (error) {
     errorHandler(error, res);
   }
@@ -54,15 +54,15 @@ const errorHandler = (error, res) => {
     return res.status(error.status).json({
       ok: false,
       message: error.message,
-      error: error.errors
-    })
+      error: error.errors,
+    });
   }
   return res.status(500).json({
-    ok: true,
+    ok: false,
     message: 'error en el servicio de creacion del listado de documentos',
-    error
-  })
-}
+    error,
+  });
+};
 
 /************************************************
  *  exports
@@ -70,5 +70,5 @@ const errorHandler = (error, res) => {
 
 module.exports = {
   loadMessage,
-  createMessage
-}
+  createMessage,
+};

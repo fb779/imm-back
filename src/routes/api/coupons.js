@@ -9,6 +9,7 @@ router.get('/', [auth.isAuth], couponCtrl.getCouponList);
 router.get('/valid', [auth.isAuth], couponCtrl.validCoupon);
 router.get('/:id', [auth.isAuth], couponCtrl.getCoupnId);
 router.post('/', [auth.isAuth], couponCtrl.createCoupn);
+router.put('/:id', [auth.isAuth], couponCtrl.editCoupon);
 router.delete('/:id', [auth.isAuth], couponCtrl.deleteCoupon);
 
 module.exports = router;

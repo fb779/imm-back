@@ -286,7 +286,7 @@ const errorHandler = (error, res) => {
     });
   }
   return res.status(500).json({
-    ok: true,
+    ok: false,
     message: 'error en el servicio de creacion del listado de documentos',
     error,
   });

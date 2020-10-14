@@ -166,7 +166,7 @@ const errorHandler = (error, res) => {
     });
   }
   return res.status(500).json({
-    ok: true,
+    ok: false,
     message: 'Error services check-list',
     error,
   });

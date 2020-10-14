@@ -4,13 +4,12 @@
 const moment = require('moment');
 const path = require('path');
 const fs = require('fs');
-const { uploadDir, typeFilesUpload } = require('./../config/config');
+const {uploadDir, typeFilesUpload} = require('./../config/config');
 
 const ProcessService = require('../services/process.services');
 const ClientService = require('../services/client.services');
 const DocumentServices = require('../services/document.services');
 const FormsGuidesService = require('../services/forms-guides.services');
-
 
 /************************************************
  *  Deficnicion de metodos
@@ -23,12 +22,11 @@ async function getFormGuideById(req, res, netx) {
 
     res.status(200).json({
       ok: true,
-      data: form_guide
-    })
+      data: form_guide,
+    });
   } catch (error) {
     errorHandler(error, res);
   }
-
 }
 
 async function getFormsGuidesByProcess(req, res, next) {
@@ -40,8 +38,8 @@ async function getFormsGuidesByProcess(req, res, next) {
 
     res.status(200).json({
       ok: true,
-      list
-    })
+      list,
+    });
   } catch (error) {
     errorHandler(error, res);
   }
@@ -53,26 +51,23 @@ async function getFormsGuidesByClient(req, res, net) {
     const id_client = req.params.id_client;
     const type = req.query.type || null;
 
-
     const client = await ClientService.getById(id_client);
     const processes = await ProcessService.getProcessesByClient(client._id);
 
-    const list_processes = processes.map(el => el._id.toString());
+    const list_processes = processes.map((el) => el._id.toString());
 
     const formsGuides = await FormsGuidesService.getformsGuidesByProcesses(list_processes, type);
 
-
     return res.status(200).json({
       ok: true,
-      list: formsGuides
-    })
+      list: formsGuides,
+    });
   } catch (error) {
     errorHandler(error, res);
   }
 }
 async function deleteFormGuideById(req, res, next) {
   try {
-
     const id_form_guide = req.params.id_form_guide;
 
     const formguide = await FormsGuidesService.deleteFormGuide(id_form_guide);
@@ -80,9 +75,9 @@ async function deleteFormGuideById(req, res, next) {
     if (fs.existsSync(formguide.directory)) {
       fs.unlink(formguide.directory, (err) => {
         if (err) {
-          throw ({
-            message: 'el archivo no se elimina'
-          })
+          throw {
+            message: 'el archivo no se elimina',
+          };
         }
       });
     }
@@ -90,13 +85,11 @@ async function deleteFormGuideById(req, res, next) {
     res.status(200).json({
       ok: true,
       formguide,
-    })
+    });
   } catch (error) {
     errorHandler(error, res);
   }
 }
-
-
 
 /************************************************
  *  Metodo para el manejo de error
@@ -106,15 +99,15 @@ const errorHandler = (error, res) => {
     return res.status(error.status).json({
       ok: false,
       message: error.message,
-      error: error.errors
-    })
+      error: error.errors,
+    });
   }
   return res.status(500).json({
-    ok: true,
+    ok: false,
     message: 'error en el servicio de formularios y guias',
-    error
-  })
-}
+    error,
+  });
+};
 
 /************************************************
  *  Export de metodos
@@ -125,4 +118,4 @@ module.exports = {
   getFormsGuidesByProcess,
   getFormsGuidesByClient,
   deleteFormGuideById,
-}
+};

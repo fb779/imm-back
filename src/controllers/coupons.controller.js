@@ -1,6 +1,8 @@
 const CouponService = require('../services/coupon.services');
 const {roles, formats} = require('../config/config');
 const moment = require('moment');
+const _ = require('underscore');
+const {use} = require('../routes/api/coupons');
 
 async function getCouponList(req, res, next) {
   try {
@@ -13,7 +15,7 @@ async function getCouponList(req, res, next) {
     let filter = {};
 
     if (user.role !== roles.admin) {
-      filter = {activation: {$lte: _date.toDate()}, expiration: {$gte: _date.toDate()}};
+      filter = {activation: {$lte: _date.toDate()}, expiration: {$gte: _date.toDate()}, 'share.to': user._id};
     }
 
     const data = await CouponService.getCouponList(filter);
@@ -43,7 +45,6 @@ async function getCoupnId(req, res, next) {
 
     res.json({
       ok: true,
-      message: `recibido para la prueba de getCoupnId`,
       data,
     });
   } catch (error) {
@@ -53,12 +54,16 @@ async function getCoupnId(req, res, next) {
 
 async function createCoupn(req, res, next) {
   try {
+    const user = req.user;
     const body = req.body;
 
-    const activation = moment(body.activation).hour(00).minute(00).toDate();
-    const expiration = moment(body.expiration).hour(23).minute(59).toDate();
+    // const share = transformShare(body.share, user._id);
+    const share = await CouponService.transformListData(body.share, user._id);
 
-    const inputs = {...body, activation, expiration};
+    const activation = moment(body.activation).hour(00).minute(00);
+    const expiration = moment(body.expiration).hour(23).minute(59);
+
+    const inputs = {...body, activation, expiration, share};
 
     const data = await CouponService.createCoupon(inputs);
 
@@ -71,9 +76,56 @@ async function createCoupn(req, res, next) {
   }
 }
 
-async function editCliente(req, res, next) {
+async function editCoupon(req, res, next) {
   try {
-    res.json({ok: true, message: `recibido para la prueba de editCliente`});
+    const user = req.user;
+    const id = req.params.id || null;
+    const body = _.pick(req.body, ['percent', 'group', 'code', 'activation', 'expiration', 'share']);
+
+    const coupon = await CouponService.editCoupon(id, body);
+
+    if (!coupon) {
+      throw {
+        status: 400,
+        ok: false,
+        message: `Coupon no encontrado`,
+      };
+    }
+
+    /**
+     * Manejo listados para el from en administrador
+     */
+
+    // TODO: obtener el listado de los usuarios "(to)" que fueron asignados por el usuario "(from)" caso admin
+    const listFrom = CouponService.filterListFrom(coupon.share, user._id);
+
+    // TODO: obtener el listado de los items nuevos (body.share) para adicionar en la lista coupon.share
+    const newItemsList = CouponService.newListItems(listFrom, body.share, user._id);
+
+    let deleteItemList = CouponService.deleteListItems(listFrom, body.share);
+
+    if (user.role === roles.admin) {
+      const newDelete = CouponService.deleteRelatedItems(coupon.share, deleteItemList);
+      deleteItemList = deleteItemList.concat(newDelete);
+    }
+
+    coupon.addItemsShare(newItemsList);
+
+    coupon.deleteItemsShare(deleteItemList);
+
+    await coupon.save().then((model) => {
+      return model
+        .populate([
+          {path: 'share.to', select: 'role first_name last_name email'},
+          {path: 'share.from', select: 'role first_name last_name email'},
+        ])
+        .execPopulate();
+    });
+
+    res.json({
+      ok: true,
+      data: coupon,
+    });
   } catch (error) {
     errorHandler(error, res);
   }
@@ -139,7 +191,7 @@ const errorHandler = (error, res) => {
     });
   }
   return res.status(500).json({
-    ok: true,
+    ok: false,
     message: 'Error services coupon',
     error,
   });
@@ -152,7 +204,21 @@ module.exports = {
   getCouponList,
   getCoupnId,
   createCoupn,
-  // editCliente,
+  editCoupon,
   deleteCoupon,
   validCoupon,
 };
+
+/************************************************
+ *  Internal Metodos
+ ************************************************/
+
+/**
+ * Method to transform input list to data structure to save
+ */
+function transformShare(list, from) {
+  return list.map((el) => ({
+    to: el,
+    from,
+  }));
+}

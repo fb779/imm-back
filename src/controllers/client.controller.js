@@ -15,8 +15,8 @@ async function getClientes(req, res, next) {
     return res.status(200).json({
       data: {
         ok: true,
-        list: listClients
-      }
+        list: listClients,
+      },
     });
   });
 }
@@ -31,17 +31,17 @@ async function getClienteId(req, res, next) {
       return res.status(404).json({
         data: {
           ok: true,
-          messages: 'Client doesn\'t exist'
-        }
-      })
+          messages: "Client doesn't exist",
+        },
+      });
     }
 
     return res.status(200).json({
       data: {
         ok: true,
-        client
-      }
-    })
+        client,
+      },
+    });
   } catch (error) {
     errorHandler(error, res);
   }
@@ -55,8 +55,8 @@ async function createCliente(req, res, next) {
     return res.status(200).json({
       data: {
         ok: true,
-        client
-      }
+        client,
+      },
     });
   } catch (error) {
     errorHandler(error, res);
@@ -74,13 +74,12 @@ async function editCliente(req, res, next) {
       data: {
         ok: true,
         messages: 'edit client to id',
-        client
-      }
-    })
+        client,
+      },
+    });
   } catch (error) {
     errorHandler(error, res);
   }
-
 }
 
 async function deleteCliente(req, res, next) {
@@ -93,9 +92,9 @@ async function deleteCliente(req, res, next) {
       data: {
         ok: true,
         messages: 'deleted client to id',
-        client
-      }
-    })
+        client,
+      },
+    });
   } catch (error) {
     errorHandler(error, res);
   }
@@ -109,15 +108,15 @@ const errorHandler = (error, res) => {
     return res.status(error.status).json({
       ok: false,
       message: error.message,
-      error: error.errors
-    })
+      error: error.errors,
+    });
   }
   return res.status(500).json({
-    ok: true,
+    ok: false,
     message: 'Error services client',
-    error
-  })
-}
+    error,
+  });
+};
 
 /************************************************
  *  Export de metodos
@@ -128,4 +127,4 @@ module.exports = {
   createCliente,
   editCliente,
   deleteCliente,
-}
+};

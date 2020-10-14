@@ -11,9 +11,9 @@ async function getFamilyByClient(req, res, next) {
 
     const client = await ClientService.getById(id_client);
 
-    const processes = await (await ProcessService.getProcessesByClient(client._id)).map(({ _id }) => _id.toString());
+    const processes = await (await ProcessService.getProcessesByClient(client._id)).map(({_id}) => _id.toString());
 
-    const members = await (await FamilyService.getFamilyMembersByProcesses(processes)).map(({ client }) => client);
+    const members = await (await FamilyService.getFamilyMembersByProcesses(processes)).map(({client}) => client);
 
     return res.status(200).json({
       ok: true,
@@ -32,11 +32,11 @@ async function getFamilyByProcess(req, res, next) {
 
     const list = await FamilyService.getFamilyByProcess(process._id);
 
-    list.splice(0, 0, { client: process.client });
+    list.splice(0, 0, {client: process.client});
 
     return res.status(200).json({
       ok: true,
-      list
+      list,
     });
   } catch (error) {
     errorHandler(error, res);
@@ -52,10 +52,8 @@ async function createFamilyMember(req, res, next) {
     res.status(200).json({
       ok: true,
       message: 'crear family member',
-      familiMember
-
+      familiMember,
     });
-
   } catch (error) {
     errorHandler(error, res);
   }
@@ -70,7 +68,7 @@ async function editFamilyMember(req, res, next) {
     res.status(200).json({
       ok: true,
       message: 'Miembro de la familia editado',
-      familyMember
+      familyMember,
     });
   } catch (error) {
     errorHandler(error, res);
@@ -89,8 +87,8 @@ async function deleteFamilyMember(req, res, next) {
       message: 'se elimino el familiar',
       id_process,
       id_client,
-      familyMember
-    })
+      familyMember,
+    });
   } catch (error) {
     errorHandler(error, res);
   }
@@ -104,15 +102,15 @@ const errorHandler = (error, res) => {
     return res.status(error.status).json({
       ok: false,
       message: error.message,
-      error: error.errors
-    })
+      error: error.errors,
+    });
   }
   return res.status(500).json({
-    ok: true,
+    ok: false,
     message: 'error en el servicio de creacion del listado de documentos',
-    error
-  })
-}
+    error,
+  });
+};
 
 /************************************************
  *  Export de metodos
@@ -123,4 +121,4 @@ module.exports = {
   createFamilyMember,
   editFamilyMember,
   deleteFamilyMember,
-}
+};
