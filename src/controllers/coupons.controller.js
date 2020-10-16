@@ -14,9 +14,22 @@ async function getCouponList(req, res, next) {
 
     let filter = {};
 
-    if (user.role !== roles.admin) {
-      filter = {activation: {$lte: _date.toDate()}, expiration: {$gte: _date.toDate()}, 'share.to': user._id};
+    switch (user.role) {
+      case roles.admin:
+        break;
+
+      case roles.user:
+        filter = {expiration: {$gte: _date.toDate()}, 'share.to': user._id};
+        break;
+
+      default:
+        filter = {activation: {$lte: _date.toDate()}, expiration: {$gte: _date.toDate()}, 'share.to': user._id};
+        break;
     }
+
+    // if (user.role === roles.admin) {
+    //   filter = {activation: {$lte: _date.toDate()}, expiration: {$gte: _date.toDate()}, 'share.to': user._id};
+    // }
 
     const data = await CouponService.getCouponList(filter);
 
@@ -80,9 +93,16 @@ async function editCoupon(req, res, next) {
   try {
     const user = req.user;
     const id = req.params.id || null;
-    const body = _.pick(req.body, ['percent', 'group', 'code', 'activation', 'expiration', 'share']);
+    let body = _.pick(req.body, ['share']);
 
-    const coupon = await CouponService.editCoupon(id, body);
+    let coupon;
+
+    if (user.role === roles.admin) {
+      const body = _.pick(req.body, ['percent', 'group', 'code', 'activation', 'expiration', 'share']);
+      coupon = await CouponService.editCoupon(id, body);
+    } else {
+      coupon = await CouponService.getCouponId(id);
+    }
 
     if (!coupon) {
       throw {
