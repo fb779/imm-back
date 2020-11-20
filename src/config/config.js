@@ -16,12 +16,12 @@ const uploadDirPhoto = path.join(__dirname, '..', rootDir, 'users');
  *******************************************/
 const titles = {
   values: ['mr', 'mrs', 'miss', 'ms'],
-  message: '{VALUE} no es un tipo permitido',
+  message: `{VALUE} isn't a valid type`,
 };
 
 const sexs = {
   values: ['1', '2'],
-  message: '{VALUE} no es un tipo permitido',
+  message: `{VALUE} isn't a valid type`,
 };
 
 const typeVisa = {
@@ -59,6 +59,11 @@ const typeExtensionFiles = {
   message: `{VALUE} isn't a valid status `,
 };
 
+const activateStep = {
+  values: ['ACTIVE', 'INACTIVE'],
+  message: `{VALUE} isn't a valid status `,
+};
+
 /*******************************************
  * Definicion objetos constantes
  *******************************************/
@@ -84,6 +89,11 @@ const typesStatusDocument = {
   uploaded: 'UPLOADED',
   approved: 'APPROVED',
   rejected: 'REJECTED',
+};
+
+const valuesActivateStep = {
+  active: 'ACTIVE',
+  inactive: 'INACTIVE',
 };
 
 const formats = {
@@ -115,5 +125,7 @@ module.exports = {
   typeExtensionFiles,
   typesDocument,
   typesStatusDocument,
+  activateStep,
+  valuesActivateStep,
   formats,
 };

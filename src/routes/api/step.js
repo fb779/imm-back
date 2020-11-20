@@ -7,7 +7,7 @@ const express = require('express');
  *  Imports
  ************************************************/
 const auth = require('./../../middlewares/auth.guard');
-const WebChatController = require('../../controllers/web-chat.controller');
+const StepCtrl = require('../../controllers/step.controller');
 
 /************************************************
  * Inicialización
@@ -20,8 +20,12 @@ const router = express.Router();
  ************************************************/
 
 router.use([auth.isAuth]);
-router.post('/', [], WebChatController.createMessage);
-router.get('/:id_process/', [], WebChatController.loadMessage);
+router.get('/', [], StepCtrl.getStepList);
+router.get('/valid', [], StepCtrl.validStepName);
+router.get('/:id', [], StepCtrl.getStepId);
+router.post('/', [], StepCtrl.createStep);
+router.put('/:id', [], StepCtrl.editStep);
+router.delete('/:id', [], StepCtrl.deleteStep);
 
 /************************************************
  * export de rutas

@@ -23,6 +23,7 @@ const forms_guides = require('./api/forms-guides');
 const appointment = require('./api/appointment');
 const coupons = require('./api/coupons');
 const web_chat = require('./api/web-chat');
+const step = require('./api/step');
 const uploads = require('./api/uploads');
 const static_files = require('./api/static-files');
 
@@ -30,26 +31,29 @@ const static_files = require('./api/static-files');
  *  Rutas
  ********************************************************/
 
-router.use('/', principal);
-router.use('/api/v1/login', login);
-router.use('/api/v1/users', users);
-router.use('/api/v1/clients', client);
-router.use('/api/v1/process', process);
-router.use('/api/v1/consultant', consultant);
-router.use('/api/v1/visa-category', visaCategory);
-router.use('/api/v1/check-list', checkList);
-router.use('/api/v1/family', family);
-router.use('/api/v1/documents', documents);
-router.use('/api/v1/forms-guides', forms_guides);
-router.use('/api/v1/chat', web_chat);
-router.use('/api/v1/appointment', appointment);
-router.use('/api/v1/coupon', coupons);
+router.use('/prueba', principal);
+router.use('/login', login);
+router.use('/users', users);
+router.use('/clients', client);
+router.use('/process', process);
+router.use('/consultant', consultant);
+router.use('/visa-category', visaCategory);
+router.use('/check-list', checkList);
+router.use('/family', family);
+router.use('/documents', documents);
+router.use('/forms-guides', forms_guides);
+router.use('/chat', web_chat);
+router.use('/appointment', appointment);
+router.use('/coupon', coupons);
+router.use('/step', step);
 
 /********************************************************
  * - Carga de archivos (Upload)
  * - Archivos estaticos (Static Files)
  ********************************************************/
-router.use('/api/v1/upload', uploads);
-router.use('/api/v1/', static_files);
+// router.use('/api/v1/upload', uploads);
+// router.use('/api/v1/', static_files);
+router.use('/upload', uploads);
+router.use('/', static_files);
 
 module.exports = router;

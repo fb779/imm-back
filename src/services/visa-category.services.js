@@ -1,10 +1,27 @@
 const VisaCategory = require('../model/visa-category.model');
 
 // obtener un tipo de visa por su nombre
+function getVCList() {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const list = await VisaCategory.find().select('-createdAt -updatedAt -__v');
+
+      resolve(list);
+    } catch (error) {
+      reject({
+        status: 500,
+        message: 'Error to load list VisaCategory',
+        errors: error,
+      });
+    }
+  });
+}
+
+// obtener un tipo de visa por su nombre
 function getByName(name) {
   return new Promise(async (resolve, reject) => {
     try {
-      const visa = await VisaCategory.findOne({ name: { $eq: name.toUpperCase() } }).select('-createdAt -updatedAt -__v');
+      const visa = await VisaCategory.findOne({name: {$eq: name.toUpperCase()}}).select('-createdAt -updatedAt -__v');
 
       if (!visa) {
         reject({
@@ -108,4 +125,5 @@ module.exports = {
   editVisaCategory,
   deleteVisaCategory,
   getByName,
+  getVCList,
 };
