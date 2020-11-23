@@ -18,6 +18,9 @@ const StepSchema = new Schema(
 
 StepSchema.plugin(uniqueValidator, {message: '{PATH} is not unique'});
 
+/**
+ * method to validate if visa_categorie ref exist in collection
+ */
 StepSchema.path('visa_categorie').validate(async function (value) {
   const val = await VisaCategorieModel.findById(value);
   return !val ? false : true;

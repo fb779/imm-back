@@ -17,19 +17,16 @@ async function getProcess(req, res, next) {
     switch (user.role) {
       case 'ADMIN_ROLE':
         {
-          // ListProcess = await Process.find({status: 'FORM'}).populate({path: 'client'}).populate({path: 'visa_category'});
-          ListProcess = await ProcessServices.getProcesses({status: 'FORM'}, [{path: 'client'}, {path: 'visa_category'}]);
+          ListProcess = await ProcessServices.getProcesses({status: {$in: ['FORM', 'ASIGNED']}}, [{path: 'client'}, {path: 'visa_category'}]);
         }
         break;
       case 'USER_ROLE':
         {
-          // ListProcess = await Process.find({consultant: user._id, status: 'ASIGNED'}).populate([{path: 'client'}, {path: 'visa_category'}]);
           ListProcess = await ProcessServices.getProcesses({consultant: user._id, status: 'ASIGNED'}, [{path: 'client'}, {path: 'visa_category'}]);
         }
         break;
       case 'CLIENT_ROLE':
         {
-          // ListProcess = await Process.find({client: user.client}).populate([{path: 'client'}, {path: 'visa_category'}, {path: 'consultant'}]);
           ListProcess = await ProcessServices.getProcesses({client: user.client}, [{path: 'client'}, {path: 'visa_category'}, {path: 'consultant'}]);
         }
         break;

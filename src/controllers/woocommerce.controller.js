@@ -3,20 +3,11 @@ const ClientService = require('../services/client.services');
 const UserService = require('../services/user.services');
 const ProcessService = require('../services/process.services');
 const VisaCategoryServices = require('../services/visa-category.services');
-const { use } = require('../routes/api/principal');
 
 async function postWoocommerceWebhook(req, res, next) {
-  // const body = req.body;
-  // console.log('recibo de woocommerce', body);
-  // return res.status(200).json({ ok: true, message: 'ok order' });
-
   try {
-    // const body = req.body;
-    // console.log(body);
-    // return res.status(200).json({ ok: true, message: 'the info is ready' });
-
     // Validación de información inicial
-    let { billing, line_items } = validationsData(req.body);
+    let {billing, line_items} = validationsData(req.body);
 
     // respuesta de confirmacion
     // res.status(200).json({ ok: true });
@@ -40,13 +31,14 @@ async function postWoocommerceWebhook(req, res, next) {
     const name_process = line_items[0].name;
     const visa_category = await VisaCategoryServices.getByName(name_process);
 
-    const process = await ProcessService.createProcess({ client, visa_category });
+    const process = await ProcessService.createProcess({client, visa_category});
 
     if (process) {
       console.log('fin de la ejecucion', billing);
     }
 
-    res.status(200).json({ ok: true, client, user, process });
+    // res.status(200).json({ok: true, client, user, process});
+    res.status(200).json({ok: true});
   } catch (error) {
     // console.log('manejo del error', error);
     errorHandler(error, res);
@@ -60,22 +52,22 @@ async function postWoocommerceWebhook(req, res, next) {
 const validationsData = (body) => {
   // falla la llegada de informacion de woocommerce
   if (Object.keys(body).length === 0) {
-    throw { status: 400, message: `Error, the information not exist` };
+    throw {status: 400, message: `Error, the information not exist`};
   }
 
-  let { billing, line_items } = body;
+  let {billing, line_items} = body;
 
   // fallo de la informacion del comprador, verificacion del email
   if (Object.keys(billing).length === 0 || !billing.hasOwnProperty('email') || !billing.email) {
-    throw { status: 404, message: `Error, the billing information isn't exit` };
+    throw {status: 404, message: `Error, the billing information isn't exit`};
   }
 
   // fallo de la informacion de compra
   if (line_items.length === 0) {
-    throw { status: 404, message: `Error, the product isn't exist` };
+    throw {status: 404, message: `Error, the product isn't exist`};
   }
 
-  return { billing, line_items };
+  return {billing, line_items};
 };
 
 /************************************************

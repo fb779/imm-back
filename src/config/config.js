@@ -64,6 +64,11 @@ const activateStep = {
   message: `{VALUE} isn't a valid status `,
 };
 
+const statusStep = {
+  values: ['INPROGRESS', 'COMPLETE'],
+  message: `{VALUE} isn't a valid status `,
+};
+
 /*******************************************
  * Definicion objetos constantes
  *******************************************/
@@ -94,6 +99,11 @@ const typesStatusDocument = {
 const valuesActivateStep = {
   active: 'ACTIVE',
   inactive: 'INACTIVE',
+};
+
+const valuesStatusStep = {
+  inprogres: 'IN-PROGRES',
+  complete: 'COMPLETE',
 };
 
 const formats = {
@@ -127,5 +137,7 @@ module.exports = {
   typesStatusDocument,
   activateStep,
   valuesActivateStep,
+  statusStep,
+  valuesStatusStep,
   formats,
 };
