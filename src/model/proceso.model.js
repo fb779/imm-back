@@ -8,24 +8,32 @@ const StepModel = require('./step.model');
 
 const Schema = mongoose.Schema;
 
-const StepProcessSchema = new Schema({
-  name: {type: String, required: true},
-  status: {type: String, default: valuesStatusStep.inprogres, enum: statusStep, uppercase: true},
-});
+// const StepProcessSchema = new Schema({
+//   name: {type: String, required: true},
+//   status: {type: String, default: valuesStatusStep.inprogres, enum: statusStep, uppercase: true},
+// });
 
 const ProcessSchema = new Schema(
   {
     client: {type: Schema.Types.ObjectId, ref: 'Client', required: [true, 'The user is required']},
     consultant: {type: Schema.Types.ObjectId, ref: 'User', required: [false, 'The consultan is required']},
     visa_category: {type: Schema.Types.ObjectId, ref: 'VisaCategory', required: [true, 'The type visa is required']},
-    code: {type: String, uppercase: true},
+    code: {type: String, uppercase: true, unique: true},
     status: {type: String, default: 'ACTIVE', enum: statusVisa, uppercase: true},
     active: {type: Boolean, default: true},
     companion: {type: Number, default: 1},
-    steps: [StepProcessSchema],
+    // steps: [StepProcessSchema],
+    steps: [
+      {
+        name: {type: String, required: true},
+        status: {type: String, default: valuesStatusStep.inprogres, enum: statusStep, uppercase: true},
+      },
+    ],
   },
   {timestamps: true, collection: 'process'}
 );
+
+ProcessSchema.plugin(uniqueValidator, {message: '{PATH} is not unique'});
 
 /**
  * Hook to before to save user to create a unique code

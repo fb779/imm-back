@@ -11,7 +11,6 @@ async function getVisaCateories(req, res, next) {
 
     res.status(200).json({
       ok: true,
-      message: 'getVisaCateories',
       list: listVisaCategories,
     });
   } catch (error) {
@@ -53,7 +52,6 @@ async function createVisaCateory(req, res, next) {
 
     res.status(200).json({
       ok: true,
-      message: 'createVisaCateory',
       visa,
     });
   } catch (error) {
@@ -70,7 +68,6 @@ async function editVisaCateory(req, res, next) {
 
     res.status(200).json({
       ok: true,
-      message: 'edit Visa Cateory',
       visa,
     });
   } catch (error) {
@@ -86,7 +83,6 @@ async function deleteVisaCateory(req, res, next) {
 
     res.status(200).json({
       ok: true,
-      message: 'deleteVisaCateory',
       visa,
     });
   } catch (error) {

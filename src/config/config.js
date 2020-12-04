@@ -65,7 +65,7 @@ const activateStep = {
 };
 
 const statusStep = {
-  values: ['INPROGRESS', 'COMPLETE'],
+  values: ['IN-PROGRES', 'COMPLETE'],
   message: `{VALUE} isn't a valid status `,
 };
 

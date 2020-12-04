@@ -6,6 +6,7 @@ const ProcessServices = require('../services/process.services');
 const FormServices = require('../services/form.services');
 const ClientServices = require('../services/client.services');
 const VisaCategoryServices = require('../services/visa-category.services');
+const {valuesStatusStep} = require('../config/config');
 const campos = '_id first_name last_name email role active';
 
 async function getProcess(req, res, next) {
@@ -17,7 +18,7 @@ async function getProcess(req, res, next) {
     switch (user.role) {
       case 'ADMIN_ROLE':
         {
-          ListProcess = await ProcessServices.getProcesses({status: {$in: ['FORM', 'ASIGNED']}}, [{path: 'client'}, {path: 'visa_category'}]);
+          ListProcess = await ProcessServices.getProcesses({status: {$in: ['FORM']}}, [{path: 'client'}, {path: 'visa_category'}]);
         }
         break;
       case 'USER_ROLE':
@@ -271,6 +272,22 @@ async function editProcessIdForm(req, res, next) {
   }
 }
 
+async function editStepProcess(req, res, next) {
+  try {
+    const id = req.params.id;
+    const status = req.body.status;
+
+    const data = await ProcessServices.setStatusStep(id, status);
+
+    res.status(200).json({
+      ok: true,
+      data,
+    });
+  } catch (error) {
+    errorHandler(error, res);
+  }
+}
+
 /************************************************
  *  Metodo para el manejo de error
  ************************************************/
@@ -303,4 +320,5 @@ module.exports = {
   createFormProcess,
   editProcessIdForm,
   getProcessIdForm,
+  editStepProcess,
 };

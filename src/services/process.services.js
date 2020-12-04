@@ -3,11 +3,7 @@ const Process = require('../model/proceso.model');
 function getProcesses(filter, populate) {
   return new Promise(async (resolve, reject) => {
     try {
-      const listProcesses = await Process.find(filter).populate(populate);
-      // .populate([
-      //   {path: 'client', select: '-active -createdAt -updatedAt -__v'},
-      //   {path: 'visa_category', select: '-createdAt -updatedAt -__v'},
-      // ]);
+      const listProcesses = await Process.find(filter).populate(populate).sort('visa_category');
 
       resolve(listProcesses);
     } catch (error) {
@@ -81,11 +77,6 @@ function createProcess(newProcess) {
           message: 'Error, The client has process active',
           errors: 'The client has process active',
         };
-        // return reject({
-        //   status: 400,
-        //   message: 'Error, The client has process active',
-        //   errors: 'The client has process active'
-        // });
       }
 
       const process = new Process(newProcess);
@@ -94,13 +85,7 @@ function createProcess(newProcess) {
 
       return resolve(process);
     } catch (error) {
-      // console.log('no se crea el proceso', error);
       reject(error);
-      // return reject({
-      //   status: 400,
-      //   message: 'Error to create Process',
-      //   errors: error
-      // });
     }
   });
 }
@@ -172,41 +157,18 @@ function disableProcess(id) {
   });
 }
 
-// function deleteProcess(id) {
-//     return new Promise(async(resolve, reject) => {
-//         try {
-//             const process = await Process.findByIdAndRemove(id);
-
-//             if (!process) {
-//                 reject({
-//                     status: 400,
-//                     message: 'Error, the Process doesn\'t delete',
-//                     errors: error
-//                 })
-//             }
-
-//             resolve(process);
-//         } catch (error) {
-//             reject({
-//                 status: 400,
-//                 message: 'Error, the Process doesn\'t deletel',
-//                 errors: error
-//             });
-//         }
-//     });
-// }
-
-function getListByClientVisaCategory(client, visa) {
+function setStatusStep(id, status) {
   return new Promise(async (resolve, reject) => {
     try {
-      const process = Process.find({client: client._id, visa_vategory: visa._id});
-      await process.save();
+      const filter = {$set: {'steps.$.status': status}};
 
-      resolve(process);
+      const data = await Process.findOneAndUpdate({steps: {$elemMatch: {_id: id}}}, filter, {new: true, runValidators: true}).select('steps');
+
+      resolve(data);
     } catch (error) {
       reject({
         status: 400,
-        message: 'Error to create Process',
+        message: 'Error to edit status step',
         errors: error,
       });
     }
@@ -219,6 +181,6 @@ module.exports = {
   getProcessesByClient,
   createProcess,
   editProcess,
-  // deleteProcess,
   disableProcess,
+  setStatusStep,
 };

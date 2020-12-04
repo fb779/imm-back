@@ -11,7 +11,6 @@ const router = express.Router();
 const documentCtrl = require('./../../controllers/document.controller');
 const auth = require('./../../middlewares/auth.guard');
 
-
 /************************************************
  *  Router
  ************************************************/
