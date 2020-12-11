@@ -1,9 +1,7 @@
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
 const bcrypt = require('bcryptjs');
-const {rolesValidos, uploadDirPhoto} = require('./../config/config');
-const path = require('path');
-const fs = require('fs');
+const {rolesValidos} = require('./../config/config');
 
 const Schema = mongoose.Schema;
 
@@ -54,7 +52,6 @@ UserSchema.pre('findOneAndUpdate', async function (next) {
   const that = this.schema;
 
   if (user.password) {
-    // user.password = that.methods.encryptPasswordSync(user.password);
     user.password = await that.methods.encryptPassword(user.password);
   }
 

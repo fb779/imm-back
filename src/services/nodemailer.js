@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const {url_frontend} = require('../config/config');
 
 const templates = {
   newuser: 'NEW_USER',
@@ -53,12 +54,12 @@ function getKindMail(type, options) {
       mailOptions = getNewUserAcount(options);
       break;
 
-    // case templates.reset_password:
-    //   html = getResetPassword();
-    //   break;
+    case templates.reset_password:
+      mailOptions = getResetPassword(options);
+      break;
 
     default:
-      throw { status: 403, ok: false, message: `Kind of message isn't exist` };
+      throw {status: 403, ok: false, message: `Kind of message isn't exist`};
       break;
   }
 
@@ -72,6 +73,19 @@ function getNewUserAcount(_options) {
     ...defaultMailOption,
     to: _options.to,
     subject: 'New User Acount',
+    html,
+  };
+
+  return mailOptions;
+}
+
+function getResetPassword(_options) {
+  const html = getResetPasswordTemplate(_options.data.user, _options.data.link);
+
+  let mailOptions = {
+    ...defaultMailOption,
+    to: _options.to,
+    subject: 'Reset Password',
     html,
   };
 
@@ -167,7 +181,7 @@ function getNewUserTemplate(username, password) {
   return _html;
 }
 
-function getResetPassword(username, link) {
+function getResetPasswordTemplate(username, link) {
   let _html = `
   <!DOCTYPE html>
   <html lang="en">
@@ -235,7 +249,7 @@ function getResetPassword(username, link) {
           user name: ${username}
         </p>
         <p class="input">
-          Link: ${link}
+          Link: <a href="${url_frontend}/auth/reset-password?token=${link}" target="_blank"> Link </a>
         </p>
       </section>
       <section class="el-wrapper footer">

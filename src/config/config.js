@@ -118,6 +118,8 @@ const formats = {
 module.exports = {
   port: process.env.SER_PORT || 3001,
   seed: process.env.SEED,
+  reset_seed: process.env.REST_SEED,
+  url_frontend: process.env.URL_FRONTEND,
   db_url: process.env.MONGODB_URI || `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`,
   rootDir,
   uploadDir,

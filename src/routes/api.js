@@ -32,7 +32,7 @@ const static_files = require('./api/static-files');
  ********************************************************/
 
 router.use('/prueba', principal);
-router.use('/login', login);
+router.use('/auth', login);
 router.use('/users', users);
 router.use('/clients', client);
 router.use('/process', process);

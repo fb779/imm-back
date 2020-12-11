@@ -29,6 +29,10 @@ function isAuth(req, res, next) {
     });
 }
 
+/**
+ * Middleware para extraer el token del encabezado de la petición
+ *    permite la extraccion del token del encabezado de autorización o por parametro en la url
+ */
 function extractToken(req) {
   let token = '';
 
@@ -38,6 +42,44 @@ function extractToken(req) {
     token = req.query.token;
   }
 
+  return token;
+}
+
+/**
+ * Middleware para validar el token de restablecimiento del password
+ */
+function validResetToken(req, res, next) {
+  const token = extractBodyToken(req);
+
+  if (!token) {
+    return res.status(401).send({
+      ok: false,
+      message: 'Token was wront',
+    });
+  }
+
+  authSer
+    .decodeResetToken(token)
+    .then((response) => {
+      req.user = response.user;
+      next();
+    })
+    .catch((response) => {
+      res.status(response.status).send({
+        data: {
+          ok: false,
+          message: response.message,
+        },
+      });
+    });
+}
+
+/**
+ * Metodo para extraer el token del body de la petición
+ */
+function extractBodyToken(req) {
+  let {token} = req.body;
+  // delete req.body.token; // eliminacion del token en el body
   return token;
 }
 
@@ -56,4 +98,5 @@ function isClientRole(req, res, next) {
 
 module.exports = {
   isAuth,
+  validResetToken,
 };

@@ -1,6 +1,4 @@
 const User = require('../model/user.model');
-const clientService = require('../services/client.services');
-const campos = '_id first_name last_name email role active client img';
 const fields_out = '-createdAt -updatedAt -__v';
 const MailServices = require('../services/nodemailer');
 const _ = require('underscore');
@@ -215,6 +213,7 @@ function generatePassword() {
 function makeFilters(filters) {}
 
 module.exports = {
+  // getUsers,
   getUserById,
   getUserByEmail,
   createUser,
