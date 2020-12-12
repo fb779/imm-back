@@ -1,8 +1,5 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
 const moment = require('moment');
-const uniqueValidator = require('mongoose-unique-validator');
-const {rolesValidos} = require('./../config/config');
 
 const Schema = mongoose.Schema;
 
@@ -21,9 +18,9 @@ const UserResetSchema = new Schema(
     email: {type: String, required: [true, 'Email is requiered'], lowercase: true},
     token: {type: String, required: [true, 'Token is required']},
     expire: {type: Number},
+    status: {type: Boolean, default: true},
     // expire: {type: Date},
     // status: {type: String, default: statusValues.active, enum: statusValidos, uppercase: true},
-    // active: {type: Boolean, default: true},
     // user: {type: Schema.Types.ObjectId, ref: 'User', required: true},
   },
   {timestamps: true, collection: 'resetpassword', toObject: {virtuals: true}, toJSON: {virtuals: true}}
@@ -31,17 +28,26 @@ const UserResetSchema = new Schema(
 
 // UserResetSchema.plugin(uniqueValidator, {message: '{PATH} is not unique'});
 
-UserResetSchema.virtual('status').get(function () {
-  // const {token} = this;
-
-  // const buff = Buffer.from(token.split('.')[1], 'base64');
-  // const data = JSON.parse(buff.toString('utf-8'));
-  // const {exp} = data;
-
-  // return !(exp <= moment().unix());
+/**
+ * Virtual field to
+ */
+UserResetSchema.path('status').get(function (value) {
   const {expire: exp} = this;
-  return !(exp <= moment().unix());
+  const td = moment().unix();
+  return exp > td && value;
 });
+
+// UserResetSchema.virtual('status').get(function () {
+//   // const {token} = this;
+
+//   // const buff = Buffer.from(token.split('.')[1], 'base64');
+//   // const data = JSON.parse(buff.toString('utf-8'));
+//   // const {exp} = data;
+
+//   // return !(exp <= moment().unix());
+//   const {expire: exp} = this;
+//   return !(exp <= moment().unix());
+// });
 
 // async function decodeTokenAndValidDate(token) {
 //   const tk = await decodeResetToken(token);

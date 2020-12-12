@@ -1,7 +1,8 @@
 const User = require('../model/user.model');
-const fields_out = '-createdAt -updatedAt -__v';
 const MailServices = require('../services/nodemailer');
+const {passwordRegex} = require('../config/config');
 const _ = require('underscore');
+const fields_out = '-createdAt -updatedAt -__v';
 
 function getUsers(offset, limit) {
   return new Promise(async (resolve, reject) => {
@@ -181,6 +182,18 @@ function updatePassword(id, oldPassword, newPassword) {
   });
 }
 
+function resetPassword(email, newPassword) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const user = await User.findOneAndUpdate({email}, {password: newPassword}, {new: true, runValidators: true}).select(fields_out);
+
+      return resolve(user);
+    } catch (error) {
+      return reject(error);
+    }
+  });
+}
+
 function validEmail(filter) {
   return new Promise(async (resolve, reject) => {
     try {
@@ -207,6 +220,33 @@ function generatePassword() {
   });
 }
 
+function validSafePassword(password, confirmPassword) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (password !== confirmPassword) {
+        return reject({
+          status: 400,
+          ok: false,
+          message: `The password and confir-password are diferents`,
+        });
+      }
+
+      const valid = passwordRegex.test(password);
+      if (!valid) {
+        return reject({
+          status: 400,
+          ok: false,
+          message: `The password isn't strong, password need 1-8 characters, minimun 1 CapitalLetter, 1 LowerLetter and 1 numbers`,
+        });
+      }
+
+      return resolve(true);
+    } catch (error) {
+      return reject(error);
+    }
+  });
+}
+
 /**
  * Filtros
  */
@@ -220,6 +260,8 @@ module.exports = {
   updateUser,
   updatePhoto,
   updatePassword,
+  resetPassword,
   generatePassword,
   validEmail,
+  validSafePassword,
 };

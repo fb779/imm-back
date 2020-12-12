@@ -103,14 +103,14 @@ function signout(req, res, next) {
   });
 }
 
+/**
+ * Metodo para la solicitud del token de restablecimiento de password
+ *    TODO: recibir el email del usuario que solicita el reset del password.
+ *    TODO: validar que el email del usuario exista en la bd (puede ser un cliente, consultor u administrativo).
+ *    TODO: validar si el usuario tiene solicitudes validas pendientes.
+ *    TODO: crear el token para el ingreso desde el link de recuperación de clave.
+ **/
 async function requestPass(req, res, next) {
-  // OK TODO: recibir el email del usuario que solicita el reset del password.
-  // OK TODO: validar que el email del usuario exista en la bd (puede ser un cliente, consultor u administrativo).
-  // OK TODO: validar si el usuario tiene solicitudes validas pendientes.
-  // OK TODO: guardar la información en la bd.
-  // OK TODO: crear el token para el ingreso desde el link de recuperación de clave.
-  // OK TODO: Enviar email con el link de recuperacion de la contraseña.
-  // OK TODO: enviar respuesta de resultado de la solicitud.
   try {
     const {email} = req.body; // TODO: recibir el email del usuario que solicita el reset del password.
 
@@ -148,8 +148,6 @@ async function requestPass(req, res, next) {
 
     res.status(200).json({
       ok: true,
-      // request,
-      // data,
       // token: data.token,
     });
   } catch (error) {
@@ -157,18 +155,42 @@ async function requestPass(req, res, next) {
   }
 }
 
-function resetPass(req, res, next) {
+/**
+ * Metodo para la solicitud del token de restablecimiento de password
+ *    OK TODO: Validar el token, se hace por middleware (verificación de validez y fecha de expiración)
+ *    OK TODO: recepción de los datos, password, confirmPassword, token, email
+ *    OK TODO: validar el usuario exista en la bd
+ *    OK TODO: verificar el password y confirmPassword y reglas de integridad para password seguros
+ *    OK TODO: cambiar y guardar el nuevo password del usuario
+ *    OK TODO: cambiar estado de registro de restablecimiento "status": false
+ *    OK TODO: respuesta del server del proceso.
+ **/
+async function resetPass(req, res, next) {
   try {
-    const {password, confirm} = req.body;
+    const {password, confirmPassword, token} = req.body; // OK TODO: recepción de los datos, password, confirmPassword, token, email
 
-    const user = req.user;
+    const {email} = req.user;
+
+    // OK TODO: validar el usuario exista en la bd
+    const user = await UserService.getUserByEmail(email);
+    if (!user) {
+      // throw { status: 400, ok: false, message: 'Invalid Email', };
+      throw {
+        status: 200,
+      };
+    }
+
+    // OK TODO: verificar el password y confirmPassword y reglas de integridad para password seguros
+    await UserService.validSafePassword(password, confirmPassword);
+
+    // OK TODO: cambiar y guardar el nuevo password del usuario
+    await UserService.resetPassword(email, password);
+
+    // OK TODO: cambiar estado de registro de restablecimiento "status": false
+    await PasswordServices.disableTokenResetPassword(email, token);
 
     res.status(200).json({
       ok: true,
-      message: 'Peticion resetPass',
-      password,
-      confirm,
-      user,
     });
   } catch (error) {
     errorHandler(error, res);

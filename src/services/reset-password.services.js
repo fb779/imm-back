@@ -8,8 +8,9 @@ function validExistResetRequest(email) {
     try {
       const data = await UserReset.find({email});
 
-      // resolve(data);
-      resolve(data.some((el) => el.status));
+      const validResult = data.some((el) => el.status);
+
+      resolve(validResult);
     } catch (error) {
       reject(error);
     }
@@ -41,7 +42,28 @@ function createRequesPassword(user) {
   });
 }
 
+function disableTokenResetPassword(email, token) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const data = await UserReset.findOneAndUpdate({email, token, status: true}, {status: false}, {new: true, runValidators: true});
+
+      if (!data) {
+        reject({
+          status: 400,
+          ok: false,
+          message: 'Invalid Token',
+        });
+      }
+
+      resolve(data);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
 module.exports = {
   validExistResetRequest,
   createRequesPassword,
+  disableTokenResetPassword,
 };

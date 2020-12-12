@@ -111,6 +111,7 @@ const formats = {
   output: 'YYYY-MM-DD',
 };
 
+const passwordRegex = new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/);
 /*******************************************
  * Exports de los datos
  *******************************************/
@@ -142,4 +143,5 @@ module.exports = {
   statusStep,
   valuesStatusStep,
   formats,
+  passwordRegex,
 };
