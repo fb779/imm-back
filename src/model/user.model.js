@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
+const moment = require('moment');
 const bcrypt = require('bcryptjs');
-const {rolesValidos} = require('./../config/config');
+const {rolesValidos, roles} = require('./../config/config');
 
 const Schema = mongoose.Schema;
 
@@ -14,32 +15,25 @@ const UserSchema = new Schema(
     img: {type: String, required: false, default: ''},
     bio: {type: String, required: false, default: ''},
     active: {type: Boolean, default: true},
-    role: {type: String, default: 'CLIENT_ROLE', enum: rolesValidos, uppercase: true},
+    role: {type: String, default: roles.client, enum: rolesValidos, uppercase: true},
     client: {type: Schema.Types.ObjectId, ref: 'Client', default: null, required: false},
+    account_expiration: {type: Date, default: null},
   },
   {timestamps: true, collection: 'users'}
 );
 
 UserSchema.plugin(uniqueValidator, {message: '{PATH} is not unique'});
 
-// UserSchema.virtual('img64').get(function () {
-//   let pathImg = path.resolve(uploadDirPhoto, `${this.img}`);
-//   let [name, ext] = this.img.split('.');
-//   const prefijo = ext.includes('svg') ? `data:image/${ext}+xml;base64,` : `data:image/${ext};base64,`;
-//   let file = '';
-
-//   if (this.img && fs.existsSync(pathImg)) {
-//     file = prefijo + fs.readFileSync(pathImg, {encoding: 'base64'});
-//   }
-
-//   return file;
-// });
-
 /**
  * Hook to before to save user to encrypt password
  */
 UserSchema.pre('save', async function (next) {
   const user = this;
+
+  // validate is a new recorde and the profile is CLIENT_USER
+  if (user.isNew && user.role === roles.client) {
+    user.account_expiration = moment().add(2, 'months').hour(23).minute(59).second(59).toDate();
+  }
 
   if (user.isModified('password')) {
     user.password = await this.encryptPassword(user.password);

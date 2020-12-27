@@ -102,7 +102,7 @@ async function createUser(req, res, next) {
 
     let newUser = null;
 
-    if (body.role.toUpperCase() === 'CLIENT_ROLE') {
+    if (body.role.toUpperCase() === roles.client) {
       // verificacion y creacion del cliente
       let client = await ClientService.getClientByEmail(body.email);
 
@@ -180,15 +180,9 @@ async function updateUserPassword(req, res, next) {
 }
 
 function getConsultants(req, res, next) {
-  User.find({active: true, role: {$eq: 'USER_ROLE'}}, '_id first_name last_name email').exec((err, consultants) => {
+  User.find({active: true, role: {$eq: roles.user}}, '_id first_name last_name email').exec((err, consultants) => {
     if (err) {
-      return errorHandler(err);
-      // return res.status(500).json({
-      //   data: {
-      //     ok: false,
-      //     message: 'Problemas al cargar los consultores',
-      //   },
-      // });
+      return errorHandler(err, res);
     }
 
     return res.status(200).json({

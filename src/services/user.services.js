@@ -55,6 +55,7 @@ function getUserByEmail(_email) {
 function createUser(newUser) {
   return new Promise(async (resolve, reject) => {
     try {
+      newUser = _.pick(newUser, ['first_name', 'last_name', 'email', 'password', 'role', 'process']);
       const user = new User(newUser);
       await user.save();
 
@@ -71,7 +72,18 @@ function createUser(newUser) {
 
       resolve(user);
     } catch (error) {
-      reject(error);
+      // console.log('error de validacion del email', error);
+      // console.log('error de validacion del email', error.name);
+      if (error.message.includes('validation')) {
+        return reject({
+          status: 400,
+          ok: false,
+          message: error.message,
+          errors: error.errors,
+        });
+      }
+
+      return reject(error);
     }
   });
 }

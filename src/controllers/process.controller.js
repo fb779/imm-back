@@ -6,7 +6,7 @@ const ProcessServices = require('../services/process.services');
 const FormServices = require('../services/form.services');
 const ClientServices = require('../services/client.services');
 const VisaCategoryServices = require('../services/visa-category.services');
-const {valuesStatusStep} = require('../config/config');
+const {valuesStatusStep, roles} = require('../config/config');
 const campos = '_id first_name last_name email role active';
 
 async function getProcess(req, res, next) {
@@ -16,17 +16,17 @@ async function getProcess(req, res, next) {
     var ListProcess = [];
 
     switch (user.role) {
-      case 'ADMIN_ROLE':
+      case roles.admin:
         {
           ListProcess = await ProcessServices.getProcesses({status: {$in: ['FORM']}}, [{path: 'client'}, {path: 'visa_category'}]);
         }
         break;
-      case 'USER_ROLE':
+      case roles.user:
         {
           ListProcess = await ProcessServices.getProcesses({consultant: user._id, status: 'ASIGNED'}, [{path: 'client'}, {path: 'visa_category'}]);
         }
         break;
-      case 'CLIENT_ROLE':
+      case roles.client:
         {
           ListProcess = await ProcessServices.getProcesses({client: user.client}, [{path: 'client'}, {path: 'visa_category'}, {path: 'consultant'}]);
         }

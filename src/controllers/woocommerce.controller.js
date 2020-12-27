@@ -1,8 +1,9 @@
-const WoocommerceServices = require('../services/woocommerce.services');
 const ClientService = require('../services/client.services');
 const UserService = require('../services/user.services');
 const ProcessService = require('../services/process.services');
 const VisaCategoryServices = require('../services/visa-category.services');
+
+const {roles} = require('../config/config');
 
 async function postWoocommerceWebhook(req, res, next) {
   try {
@@ -23,6 +24,7 @@ async function postWoocommerceWebhook(req, res, next) {
     let user = await UserService.getUserByEmail(client.email);
     if (user === null) {
       billing['client'] = client;
+      billing['role'] = roles.client;
       billing['password'] = await UserService.generatePassword();
       user = await UserService.createUser(billing);
     }
