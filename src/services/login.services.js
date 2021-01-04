@@ -10,7 +10,7 @@ async function validLoginUserEmail(_email, _password) {
       }
       const user = await UserModel.findOne({email: _email, active: true});
 
-      if (!user.verifyPassword(_password)) {
+      if (!user || !user.verifyPassword(_password)) {
         return reject({
           status: 400,
           ok: false,

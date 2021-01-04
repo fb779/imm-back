@@ -6,17 +6,16 @@ const router = express.Router();
  *  Importaciones
  ************************************************/
 const visaCategoryCtrl = require('./../../controllers/visa-category.controller');
-const auth = require('./../../middlewares/auth.guard');
 
 /************************************************
  *  CRUD basico para el recurso
  ************************************************/
 
-router.get('/', [auth.isAuth], visaCategoryCtrl.getVisaCateories);
-router.get('/:id', [auth.isAuth], visaCategoryCtrl.getVisaCateoryId);
-router.get('/valid-name/:name', [auth.isAuth], visaCategoryCtrl.validName);
-router.post('/', [auth.isAuth], visaCategoryCtrl.createVisaCateory);
-router.put('/:id', [auth.isAuth], visaCategoryCtrl.editVisaCateory);
-router.delete('/:id', [auth.isAuth], visaCategoryCtrl.deleteVisaCateory);
+router.get('/', visaCategoryCtrl.getVisaCateories);
+router.get('/:id', visaCategoryCtrl.getVisaCateoryId);
+router.get('/valid-name/:name', visaCategoryCtrl.validName);
+router.post('/', visaCategoryCtrl.createVisaCateory);
+router.put('/:id', visaCategoryCtrl.editVisaCateory);
+router.delete('/:id', visaCategoryCtrl.deleteVisaCateory);
 
 module.exports = router;

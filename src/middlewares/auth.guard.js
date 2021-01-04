@@ -1,7 +1,7 @@
 const authSer = require('./../services/auth.services');
 
 // funcion de verificacion de token valido para autenticar la peticion
-function isAuth(req, res, next) {
+function isValidToken(req, res, next) {
   const token = extractToken(req);
 
   if (!token) {
@@ -83,6 +83,38 @@ function extractBodyToken(req) {
   return token;
 }
 
+/**
+ * Metodo encargado de validar si la cuenta de los usuarios con role client_role esta activa por fecha de expiracion
+ */
+function isAcountActive(req, res, next) {
+  const {
+    user: {_id: id},
+  } = req;
+
+  authSer
+    .isAcountActive(id)
+    .then((isActive) => {
+      if (!isActive) {
+        return res.status(404).send({
+          data: {
+            ok: false,
+            message: "You don't have authorization",
+          },
+        });
+      }
+
+      next();
+    })
+    .catch((err) => {
+      return res.status(404).send({
+        data: {
+          ok: false,
+          message: "You don't have authorization",
+        },
+      });
+    });
+}
+
 // funcion de verificacion de token valido para autenticar la peticion
 function isAdminRole(req, res, next) {
   next();
@@ -97,6 +129,7 @@ function isClientRole(req, res, next) {
 }
 
 module.exports = {
-  isAuth,
+  isValidToken,
+  isAcountActive,
   validResetToken,
 };

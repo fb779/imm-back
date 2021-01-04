@@ -2,6 +2,7 @@
  * Definicion
  ********************************************************/
 const express = require('express');
+const {isValidToken, isAcountActive} = require('../middlewares/auth.guard');
 // Inicialización
 const router = express.Router();
 
@@ -33,6 +34,9 @@ const static_files = require('./api/static-files');
 
 router.use('/prueba', principal);
 router.use('/auth', login);
+
+router.use([isValidToken, isAcountActive]);
+
 router.use('/users', users);
 router.use('/clients', client);
 router.use('/process', process);
@@ -51,8 +55,7 @@ router.use('/step', step);
  * - Carga de archivos (Upload)
  * - Archivos estaticos (Static Files)
  ********************************************************/
-// router.use('/api/v1/upload', uploads);
-// router.use('/api/v1/', static_files);
+
 router.use('/upload', uploads);
 router.use('/', static_files);
 

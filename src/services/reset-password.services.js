@@ -27,7 +27,7 @@ function createRequesPassword(user) {
       const newData = {
         email,
         token,
-        expire: moment().add(2, 'hours').unix(),
+        expire: moment().add(2, 'hours').valueOf(),
       };
 
       // const newReset = new UserReset(dataReset);

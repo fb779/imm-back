@@ -4,25 +4,20 @@ const express = require('express');
  *  Importaciones
  ************************************************/
 const processCtrl = require('../../controllers/process.controller');
-const auth = require('./../../middlewares/auth.guard');
 
 const router = express.Router();
 
 /************************************************
- *  CRUD's especiales
- ************************************************/
-
-/************************************************
  *  CRUD basico para el recurso
  ************************************************/
-router.get('/:id/form', [auth.isAuth], processCtrl.getProcessIdForm);
-router.get('/:id/client', [auth.isAuth], processCtrl.getProcessIdClient);
-router.get('/:id', [auth.isAuth], processCtrl.getProcessId);
-router.get('/', [auth.isAuth], processCtrl.getProcess);
-router.post('/:id/form', [auth.isAuth], processCtrl.createFormProcess);
-router.post('/', [auth.isAuth], processCtrl.createProcess);
-router.put('/:id/form', [auth.isAuth], processCtrl.editProcessIdForm);
-router.put('/:id/step', [auth.isAuth], processCtrl.editStepProcess);
-router.put('/:id', [auth.isAuth], processCtrl.editProcess);
+router.get('/:id/form', processCtrl.getProcessIdForm);
+router.get('/:id/client', processCtrl.getProcessIdClient);
+router.get('/:id', processCtrl.getProcessId);
+router.get('/', processCtrl.getProcess);
+router.post('/:id/form', processCtrl.createFormProcess);
+router.post('/', processCtrl.createProcess);
+router.put('/:id/form', processCtrl.editProcessIdForm);
+router.put('/:id/step', processCtrl.editStepProcess);
+router.put('/:id', processCtrl.editProcess);
 
 module.exports = router;

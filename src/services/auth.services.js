@@ -1,22 +1,23 @@
-const {seed, reset_seed} = require('../config/config');
+const {seed, reset_seed, roles} = require('../config/config');
 const jwt = require('jsonwebtoken');
 const moment = require('moment');
 const _ = require('underscore');
+const {getUserById} = require('./user.services');
 
 /**
  * metodo encargado de crear un token para las peticiones
  * Method to create a new access token
  **/
 function createToken(user) {
-  user = _.pick(user, ['role', 'client', '_id', 'first_name', 'last_name', 'email']);
+  user = _.pick(user, ['_id', 'role', 'client', 'first_name', 'last_name', 'email', 'isActive']);
 
   let dt = moment();
 
   const payload = {
     sub: user._id,
     user,
-    iat: dt.unix(),
-    exp: dt.add(2, 'days').unix(),
+    iat: dt.valueOf(),
+    exp: dt.add(2, 'days').valueOf(),
   };
 
   return jwt.sign(payload, seed);
@@ -32,7 +33,7 @@ function decodeToken(token) {
     try {
       const payload = jwt.verify(token, seed);
 
-      if (payload.exp <= moment().unix()) {
+      if (payload.exp <= moment().valueOf()) {
         reject({
           status: 401,
           message: 'Token expirado',
@@ -63,8 +64,8 @@ function createResetToken(user) {
   const payload = {
     sub: user.email,
     user,
-    iat: dt.unix(),
-    exp: dt.add(2, 'hours').unix(),
+    iat: dt.valueOf(),
+    exp: dt.add(2, 'hours').valueOf(),
   };
 
   return jwt.sign(payload, reset_seed);
@@ -80,7 +81,7 @@ function decodeResetToken(token) {
     try {
       const payload = jwt.verify(token, reset_seed);
 
-      if (payload.exp <= moment().unix()) {
+      if (payload.exp <= moment().valueOf()) {
         reject({
           status: 401,
           message: 'Token expirado',
@@ -98,9 +99,30 @@ function decodeResetToken(token) {
 
   return decode;
 }
+
+/**
+ * Metodo encargado de validar si la cuenta de los usuarios con role client_role esta activa por fecha de expiracion
+ */
+function isAcountActive(_id) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const user = await getUserById(_id);
+
+      resolve(user.isActive);
+    } catch (error) {
+      reject(error);
+      // reject({
+      //   status: 500,
+      //   message: 'problemas de verificacion de activacion de cuenta',
+      // });
+    }
+  });
+}
+
 module.exports = {
   createResetToken,
   decodeResetToken,
   createToken,
   decodeToken,
+  isAcountActive,
 };

@@ -33,7 +33,7 @@ const UserResetSchema = new Schema(
  */
 UserResetSchema.path('status').get(function (value) {
   const {expire: exp} = this;
-  const td = moment().unix();
+  const td = moment().valueOf();
   return exp > td && value;
 });
 
@@ -44,9 +44,9 @@ UserResetSchema.path('status').get(function (value) {
 //   // const data = JSON.parse(buff.toString('utf-8'));
 //   // const {exp} = data;
 
-//   // return !(exp <= moment().unix());
+//   // return !(exp <= moment().valueOf());
 //   const {expire: exp} = this;
-//   return !(exp <= moment().unix());
+//   return !(exp <= moment().valueOf());
 // });
 
 // async function decodeTokenAndValidDate(token) {

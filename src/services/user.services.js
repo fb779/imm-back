@@ -55,7 +55,7 @@ function getUserByEmail(_email) {
 function createUser(newUser) {
   return new Promise(async (resolve, reject) => {
     try {
-      newUser = _.pick(newUser, ['first_name', 'last_name', 'email', 'password', 'role', 'process']);
+      newUser = _.pick(newUser, ['first_name', 'last_name', 'email', 'password', 'role', 'client', 'process']);
       const user = new User(newUser);
       await user.save();
 
@@ -120,8 +120,6 @@ function updateUser(id, userUpdate) {
       if (userUpdate.bio) {
         user.bio = userUpdate.bio;
       }
-
-      // user.img = userUpdate.img || user.img;
 
       user.active = userUpdate.active || user.active;
 

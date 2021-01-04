@@ -8,10 +8,10 @@ const Schema = mongoose.Schema;
 
 const UserSchema = new Schema(
   {
-    email: {type: String, unique: true, required: [true, 'El correo es necesario'], lowercase: true},
-    first_name: {type: String, required: [true, 'El Nombre es necesario']},
-    last_name: {type: String, required: [true, 'El Apellido es necesario']},
-    password: {type: String, required: [true, 'La contraseña es necesario']},
+    email: {type: String, unique: true, required: [true, '{PATH} is required'], lowercase: true},
+    first_name: {type: String, required: [true, '{PATH} is required']},
+    last_name: {type: String, required: [true, '{PATH} is required']},
+    password: {type: String, required: [true, '{PATH} is required']},
     img: {type: String, required: false, default: ''},
     bio: {type: String, required: false, default: ''},
     active: {type: Boolean, default: true},
@@ -19,10 +19,30 @@ const UserSchema = new Schema(
     client: {type: Schema.Types.ObjectId, ref: 'Client', default: null, required: false},
     account_expiration: {type: Date, default: null},
   },
-  {timestamps: true, collection: 'users'}
+  {timestamps: true, collection: 'users', id: false, toObject: {virtuals: true}, toJSON: {virtuals: false}}
 );
 
 UserSchema.plugin(uniqueValidator, {message: '{PATH} is not unique'});
+
+/**
+ * Virtual field acount-expiration
+ */
+
+UserSchema.virtual('isActive').get(function () {
+  const {active, role, account_expiration} = this;
+
+  let vl = active;
+
+  if (role === roles.client && active) {
+    if (account_expiration) {
+      vl = moment(account_expiration).valueOf() >= moment().valueOf();
+    } else {
+      vl = false;
+    }
+  }
+
+  return vl;
+});
 
 /**
  * Hook to before to save user to encrypt password
