@@ -1,4 +1,5 @@
 const VisaCategory = require('../model/visa-category.model');
+const {visaCategories} = require('../config/config');
 
 // obtener un tipo de visa por su nombre
 function getVCList() {
@@ -8,11 +9,7 @@ function getVCList() {
 
       resolve(list);
     } catch (error) {
-      reject({
-        status: 500,
-        message: 'Error to load list VisaCategory',
-        errors: error,
-      });
+      reject({status: 500, message: 'Error to load list VisaCategory', errors: error});
     }
   });
 }
@@ -24,20 +21,44 @@ function getByName(name) {
       const visa = await VisaCategory.findOne({name: {$eq: name.toUpperCase()}}).select('-createdAt -updatedAt -__v');
 
       if (!visa) {
-        reject({
-          status: 400,
-          message: `The Visa Category "${name.toUpperCase()}" does't exist with this name`,
-          errors: "This Visa Category does't exist",
-        });
+        reject({status: 400, message: `The Visa Category "${name.toUpperCase()}" does't exist with this name`, errors: "This Visa Category does't exist"});
       }
 
       resolve(visa);
     } catch (error) {
-      reject({
-        status: 400,
-        message: 'Error to find VisaCategory',
-        errors: error,
-      });
+      reject({status: 400, message: 'Error to find VisaCategory', errors: error});
+    }
+  });
+}
+
+function getByTitle(title) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const visa = await VisaCategory.findByTitle(title).select('-createdAt -updatedAt -__v');
+
+      // if (!visa) {
+      //   reject({status: 400, message: `The Visa Category "${title.toUpperCase()}" does't exist with this name`, errors: "This Visa Category does't exist"});
+      // }
+
+      resolve(visa);
+    } catch (error) {
+      reject({status: 400, message: 'Error to find VisaCategory', errors: error});
+    }
+  });
+}
+
+function getById(id) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const visa = await VisaCategory.findById(id).select('-createdAt -updatedAt -__v');
+
+      // if (!visa) {
+      //   reject({status: 400, message: `The Visa Category "${title.toUpperCase()}" does't exist with this name`, errors: "This Visa Category does't exist"});
+      // }
+
+      resolve(visa);
+    } catch (error) {
+      reject({status: 400, message: 'Error to find VisaCategory', errors: error});
     }
   });
 }
@@ -52,46 +73,19 @@ function createVisaCategory(newVisaCategory) {
 
       resolve(visa);
     } catch (error) {
-      reject({
-        status: 400,
-        message: 'Error to create VisaCategory',
-        errors: error,
-      });
+      reject({status: 400, message: 'Error to create VisaCategory', errors: error});
     }
   });
 }
 
-function editVisaCategory(id, newVisa) {
+function editVisaCategory(id, dataVisa) {
   return new Promise(async (resolve, reject) => {
     try {
-      const visa = await VisaCategory.findById(id);
-
-      if (!visa) {
-        reject({
-          status: 400,
-          message: "Error, VisaCategory doesn't exist",
-          errors: '',
-        });
-      }
-
-      if (newVisa.name) {
-        visa.name = newVisa.name;
-      }
-      if (newVisa.description) {
-        visa.description = newVisa.description;
-      }
-
-      visa.active = newVisa.active;
-
-      await visa.save();
+      const visa = await VisaCategory.findByIdAndUpdate(id, dataVisa, {new: true, runValidators: false, context: 'query'});
 
       resolve(visa);
     } catch (error) {
-      reject({
-        status: 400,
-        message: 'Error to edit Visa-Category',
-        errors: error,
-      });
+      reject({status: 400, message: 'Error to edit Visa-Category', errors: error});
     }
   });
 }
@@ -102,20 +96,12 @@ function deleteVisaCategory(id) {
       const visa = await VisaCategory.findByIdAndRemove(id);
 
       if (!visa) {
-        reject({
-          status: 400,
-          message: "Error, the VisaCategory doesn't delete",
-          errors: error,
-        });
+        reject({status: 400, message: "Error, the VisaCategory doesn't delete", errors: error});
       }
 
       resolve(visa);
     } catch (error) {
-      reject({
-        status: 400,
-        message: "Error, the VisaCategory doesn't deletel",
-        errors: error,
-      });
+      reject({status: 400, message: "Error, the VisaCategory doesn't deletel", errors: error});
     }
   });
 }
@@ -124,6 +110,8 @@ module.exports = {
   createVisaCategory,
   editVisaCategory,
   deleteVisaCategory,
+  getById,
   getByName,
+  getByTitle,
   getVCList,
 };
