@@ -44,11 +44,6 @@ const relationships = {
   message: `{VALUE} doesn't a kind valid`,
 };
 
-const statusDocument = {
-  values: ['CREATE', 'UPLOADED', 'APPROVED', 'REJECTED'],
-  message: `{VALUE} isn't a valid status `,
-};
-
 const typeFiles = {
   values: ['forms', 'guides'],
   message: `{VALUE} isn't a valid status `,
@@ -94,6 +89,10 @@ const typesStatusDocument = {
   uploaded: 'UPLOADED',
   approved: 'APPROVED',
   rejected: 'REJECTED',
+};
+const statusDocument = {
+  values: Object.values(typesStatusDocument),
+  message: `{VALUE} isn't a valid status `,
 };
 
 const valuesActivateStep = {

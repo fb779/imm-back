@@ -6,8 +6,7 @@ const ProcessServices = require('../services/process.services');
 const FormServices = require('../services/form.services');
 const ClientServices = require('../services/client.services');
 const VisaCategoryServices = require('../services/visa-category.services');
-const {valuesStatusStep, roles} = require('../config/config');
-const campos = '_id first_name last_name email role active';
+const {roles} = require('../config/config');
 
 async function getProcess(req, res, next) {
   try {
@@ -192,7 +191,11 @@ async function createFormProcess(req, res, next) {
 
     const process = await Process.findOne({_id: id_process}).populate([{path: 'client'}, {path: 'visa_category'}]);
 
-    await ClientServices.editClient(process.client._id, body);
+    if (!process) {
+      throw {status: 404, message: `Error, Process doesn't exist`};
+    }
+
+    await ClientServices.editClient(process.client, body);
 
     const form = await FormServices.createForm(process, body);
 
@@ -209,30 +212,22 @@ async function createFormProcess(req, res, next) {
   }
 }
 
-async function getProcessIdForm(req, res, next) {
+async function getFormProcessId(req, res, next) {
   try {
     const id = req.params.id;
 
     const process = await Process.findOne({_id: id}).populate([{path: 'client'}, {path: 'visa_category'}]);
 
     if (!process) {
-      return res.status(404).json({
-        data: {
-          ok: false,
-          message: "Process references doesn't exist",
-        },
-      });
+      throw {status: 404, message: `Error, Process doesn't exist`};
+      // return res.status(404).json({ data: { ok: false, message: "Process references doesn't exist", }, });
     }
 
     const form = await FormServices.getFormByProcess(process);
 
     if (!form) {
-      return res.status(404).json({
-        data: {
-          ok: false,
-          message: "Form doesn't exist",
-        },
-      });
+      throw {status: 404, message: `Error, Form doesn't exist`};
+      // return res.status(404).json({ data: { ok: false, message: "Form doesn't exist", }, });
     }
 
     return res.status(200).json({
@@ -244,23 +239,49 @@ async function getProcessIdForm(req, res, next) {
   }
 }
 
-async function editProcessIdForm(req, res, next) {
+async function editFormProcessId(req, res, next) {
   try {
     const id_process = req.params.id;
-    const id_form = req.body._id;
     const body = req.body;
 
-    const process = await Process.findById(id_process).populate([{path: 'client'}]);
+    const client = {};
+    const {
+      first_name,
+      last_name,
+      title,
+      sex,
+      email,
+      telephone,
+      birthday,
+      age,
+      country_citizenship,
+      other_citizenship,
+      country_residence,
+      status_residence,
+      status_residence_other,
+      relationship,
+      active,
+      _id: form_id,
+      process: process_id,
+      ...dataForm
+    } = body;
 
+    const process = await Process.findById(id_process).populate([{path: 'client'}, {path: 'visa_category'}]);
+
+    if (!process) {
+      throw {status: 404, message: `Error, Process doesn't exist`};
+    }
+
+    // TODO: edicion de la informacion del cliente
     await ClientServices.editClient(process.client._id, body);
 
-    const form = await FormServices.editForm(process, body);
+    const form = await FormServices.editForm(form_id, process, dataForm);
 
     return res.status(200).json({
       data: {
         ok: true,
         // process,
-        // form,
+        form,
       },
     });
   } catch (error) {
@@ -314,7 +335,7 @@ module.exports = {
   // deleteProcess,
   getProcessIdClient,
   createFormProcess,
-  editProcessIdForm,
-  getProcessIdForm,
+  getFormProcessId,
+  editFormProcessId,
   editStepProcess,
 };

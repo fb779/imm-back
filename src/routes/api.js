@@ -35,7 +35,7 @@ const static_files = require('./api/static-files');
 router.use('/prueba', principal);
 router.use('/auth', login);
 
-router.use([isValidToken, isAcountActive]);
+router.use([isValidToken]);
 
 router.use('/users', users);
 router.use('/clients', client);

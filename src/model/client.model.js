@@ -43,7 +43,7 @@ const ClientSchema = new Schema(
     relationship: {type: String, enum: relationships, required: [false, 'The relationship is required'], uppercase: true},
     active: {type: Boolean, default: false},
   },
-  {timestamps: true, collection: 'clients'}
+  {timestamps: true, id: false, collection: 'clients'}
 );
 
 ClientSchema.plugin(uniqueValidator, {message: '{PATH} is not unique'});

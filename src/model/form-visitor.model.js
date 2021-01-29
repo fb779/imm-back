@@ -6,11 +6,8 @@ const {visaCategories, kindVisaCategories} = require('../config/config');
 const Schema = mongoose.Schema;
 
 const FormVisitorSchema = new Schema({
-  process: {type: Schema.Types.ObjectId, ref: 'Process', unique: true, required: [true, 'The process is required']},
-  client: {type: Schema.Types.ObjectId, ref: 'Client', required: [true, 'The user is required']},
   destiny: {type: String, required: true},
   marital_status: {type: String, required: true},
-  // number_accompanying: { type: Number, default: 0, required: false },
   purpose_visit: {type: String, required: true},
   letter_invitation: {type: String, required: true},
   stay_canada: {type: String, required: true},

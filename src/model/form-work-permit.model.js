@@ -6,8 +6,17 @@ const {visaCategories, kindVisaCategories} = require('../config/config');
 const Schema = mongoose.Schema;
 
 const FormWorkPermitSchema = new Schema({
-  other: {type: String, required: true},
-  more: {type: String, required: true},
+  destiny: {type: String, required: true},
+  marital_status: {type: String, required: true},
+  // number_accompanying: { type: Number, default: 0, required: false },
+  purpose_visit: {type: String, required: true},
+  letter_invitation: {type: String, required: true},
+  stay_canada: {type: String, required: true},
+  funds: {type: String, required: true},
+  disease: {type: String, required: true},
+  criminal_act: {type: String, required: true},
+  refuse_canada: {type: String, required: true},
+  comments: {type: String, required: false},
 });
 
 // FormWorkPermitSchema.plugin(uniqueValidator, {message: '{PATH} is not unique'});

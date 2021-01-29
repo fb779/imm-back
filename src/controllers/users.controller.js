@@ -130,7 +130,8 @@ async function createUser(req, res, next) {
 
       // creacion del proceso
       const name_process = body.process;
-      const visa_category = await VisaCategoryServices.getByName(name_process);
+      const visa_category = await VisaCategoryServices.getByTitle(name_process);
+      // const visa_category = await VisaCategoryServices.getByName(name_process);
 
       const process = await ProcessService.createProcess({client, visa_category});
     } else {
