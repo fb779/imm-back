@@ -29,8 +29,12 @@ const ProcessSchema = new Schema(
         status: {type: String, default: valuesStatusStep.inprogres, enum: statusStep, uppercase: true},
       },
     ],
+    createdAt: {
+      type: Date,
+      immutable: true, // Make `createdAt` immutable
+    },
   },
-  {timestamps: true, collection: 'process'}
+  {timestamps: true, collection: 'process', toObject: {virtuals: true}}
 );
 
 ProcessSchema.plugin(uniqueValidator, {message: '{PATH} is not unique'});
@@ -42,9 +46,18 @@ ProcessSchema.pre('save', async function (next) {
   const process = this;
 
   if (this.isNew) {
-    const list_process = await Process.find({visa_category: process.visa_category}).countDocuments();
-    process.code = `${process.visa_category.name}-${String(list_process + 1).padStart(10, '0')}`;
+    /**
+     * Generate the next code for process
+     */
+    const list_process = await Process.find({visa_category: process.visa_category}).sort({code: -1});
+    const nextValueCode = list_process.length > 0 && list_process[0] ? Number(list_process[0].code.slice(-1)) : 0;
+    const nextCode = `${process.visa_category.name}-${String(nextValueCode + 1).padStart(10, '0')}`;
 
+    process.code = nextCode;
+
+    /**
+     * Load steps to process
+     */
     const steps = (await StepModel.find({visa_categorie: process.visa_category})).map(({name}) => ({name}));
     if (steps.length > 1) process.steps = steps;
   }

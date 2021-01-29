@@ -65,7 +65,7 @@ function getProcessesByClient(id_client) {
   });
 }
 
-// crear nuevo VisaCategorye
+// crear nuevo Process
 function createProcess(newProcess) {
   return new Promise(async (resolve, reject) => {
     try {

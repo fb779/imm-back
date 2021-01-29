@@ -5,55 +5,27 @@ const User = require('../model/user.model');
 const authSer = require('../services/auth.services');
 const PasswordServices = require('../services/reset-password.services');
 const UserService = require('../services/user.services');
+const LoginService = require('../services/login.services');
 const {sendMail, templates} = require('../services/nodemailer');
 
 /**
  * Function to login user in app
  */
-function signin(req, res, next) {
-  const body = req.body;
+async function signin(req, res, next) {
+  try {
+    const {email, password} = req.body;
 
-  User.findOne({email: body.email, active: true}).exec((err, user) => {
-    if (err) {
-      return res.status(500).json({
-        data: {
-          ok: false,
-          message: 'Error al buscar usuario',
-          errors: [err],
-        },
-      });
-    }
+    const token = await LoginService.validLoginUserEmail(email, password);
 
-    if (!user) {
-      return res.status(400).json({
-        data: {
-          ok: false,
-          // messages: 'Credenciales incorrectas, usuario o password errados',
-          errors: ['The credentials are incorrect, email or password has error'],
-          // msa: 'email',
-        },
-      });
-    }
-
-    // validacion de verificacion del password para generar el token
-    if (!user.verifyPassword(body.password)) {
-      return res.status(400).json({
-        data: {
-          ok: false,
-          errors: ['The credentials are incorrect, email or password has error'],
-          // msa: 'password',
-        },
-      });
-    }
-
-    return res.status(200).json({
+    res.json({
       data: {
         ok: true,
-        token: authSer.createToken(user),
-        // message: 'signin',
+        token,
       },
     });
-  });
+  } catch (error) {
+    errorHandler(error, res);
+  }
 }
 
 /**
@@ -203,7 +175,7 @@ async function resetPass(req, res, next) {
 const errorHandler = (error, res) => {
   const {status, message, error: er} = error;
   if (error.hasOwnProperty('status')) {
-    return res.status(error.status).json({
+    return res.status(status).json({
       ok: false,
       errors: message,
       error: er,

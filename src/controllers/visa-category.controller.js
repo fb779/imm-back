@@ -3,11 +3,10 @@
  ************************************************/
 const VisaCategory = require('../model/visa-category.model');
 const VisaCategoryService = require('../services/visa-category.services');
-const moment = require('moment');
 
 async function getVisaCateories(req, res, next) {
   try {
-    const listVisaCategories = await VisaCategory.find({}).select('-createdAt -updatedAt -__v');
+    const listVisaCategories = await VisaCategoryService.getVCList();
 
     res.status(200).json({
       ok: true,
@@ -22,10 +21,10 @@ async function getVisaCateoryId(req, res, next) {
   try {
     const id = req.params.id;
 
-    const visa = await VisaCategory.findById(id).select('-createdAt -updatedAt -__v');
+    const visa = await VisaCategoryService.getById(id);
 
     if (!visa) {
-      return res.status(200).json({
+      return res.status(404).json({
         data: {
           ok: true,
           messages: "Visa doesn't exist",

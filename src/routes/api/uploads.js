@@ -9,7 +9,6 @@ const express = require('express');
 const fileUpload = require('express-fileupload');
 
 const UpController = require('../../controllers/upload.controller');
-const auth = require('./../../middlewares/auth.guard');
 
 /************************************************
  * Inicialización
@@ -33,8 +32,8 @@ router.use(
  * Definicion de rutas
  ************************************************/
 
-router.post('/forms-guides/:id_process', [auth.isAuth], UpController.uploadFormsGuides);
-router.post('/documents/:id_document', [auth.isAuth], UpController.uploadDocuments);
-router.post('/photo/:id', [auth.isAuth], UpController.uploadPhoto);
+router.post('/forms-guides/:id_process', UpController.uploadFormsGuides);
+router.post('/documents/:id_document', UpController.uploadDocuments);
+router.post('/photo/:id', UpController.uploadPhoto);
 
 module.exports = router;

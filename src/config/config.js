@@ -44,11 +44,6 @@ const relationships = {
   message: `{VALUE} doesn't a kind valid`,
 };
 
-const statusDocument = {
-  values: ['CREATE', 'UPLOADED', 'APPROVED', 'REJECTED'],
-  message: `{VALUE} isn't a valid status `,
-};
-
 const typeFiles = {
   values: ['forms', 'guides'],
   message: `{VALUE} isn't a valid status `,
@@ -95,6 +90,10 @@ const typesStatusDocument = {
   approved: 'APPROVED',
   rejected: 'REJECTED',
 };
+const statusDocument = {
+  values: Object.values(typesStatusDocument),
+  message: `{VALUE} isn't a valid status `,
+};
 
 const valuesActivateStep = {
   active: 'ACTIVE',
@@ -111,6 +110,17 @@ const formats = {
   output: 'YYYY-MM-DD',
 };
 
+const visaCategories = {
+  visitor: 'FormVisitor',
+  expressentry: 'FormExpressEntry',
+  workpermit: 'FormWorkPermit',
+};
+
+const kindVisaCategories = {
+  values: Object.values(visaCategories),
+  message: `{VALUE} isn't a valid visa-category `,
+};
+
 const passwordRegex = new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/);
 /*******************************************
  * Exports de los datos
@@ -121,7 +131,7 @@ module.exports = {
   seed: process.env.SEED,
   reset_seed: process.env.REST_SEED,
   url_frontend: process.env.URL_FRONTEND,
-  db_url: process.env.MONGODB_URI || `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`,
+  db_url: process.env.MONGODB_URI || process.env.MONGODB_URI_DEV,
   rootDir,
   uploadDir,
   uploadDirPhoto,
@@ -144,4 +154,6 @@ module.exports = {
   valuesStatusStep,
   formats,
   passwordRegex,
+  visaCategories,
+  kindVisaCategories,
 };

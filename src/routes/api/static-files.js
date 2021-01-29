@@ -4,17 +4,16 @@ const router = express.Router();
 
 const path = require('path');
 const fs = require('fs');
-const auth = require('./../../middlewares/auth.guard');
 const {uploadDirPhoto} = require('../../config/config');
 
 /********************************************************
  * Static Files
  ********************************************************/
 
-router.use('/files', [auth.isAuth], express.static(path.join(__dirname, '..', '..', 'public', 'processes')));
-// router.use('/photo', [auth.isAuth], express.static(path.join(__dirname, '..', '..', 'public', 'users')));
+router.use('/files', express.static(path.join(__dirname, '..', '..', 'public', 'processes')));
+// router.use('/photo', express.static(path.join(__dirname, '..', '..', 'public', 'users')));
 
-router.use('/photo/:name', [auth.isAuth], (req, res, next) => {
+router.use('/photo/:name', (req, res, next) => {
   const name = req.params.name;
 
   const [nameFile, ext] = name.split('.');

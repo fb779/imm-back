@@ -6,7 +6,6 @@ const express = require('express');
 /************************************************
  *  Imports
  ************************************************/
-const auth = require('./../../middlewares/auth.guard');
 const StepCtrl = require('../../controllers/step.controller');
 
 /************************************************
@@ -19,7 +18,6 @@ const router = express.Router();
  * Definicion de rutas
  ************************************************/
 
-router.use([auth.isAuth]);
 router.get('/', [], StepCtrl.getStepList);
 router.get('/valid', [], StepCtrl.validStepName);
 router.get('/:id', [], StepCtrl.getStepId);

@@ -1,4 +1,5 @@
 const Client = require('../model/client.model');
+const _ = require('underscore');
 
 function getById(id) {
   return new Promise(async (resolve, reject) => {
@@ -84,58 +85,28 @@ function createClient(newClient) {
 function editClient(id, editClient) {
   return new Promise(async (resolve, reject) => {
     try {
-      const client = await Client.findById(id);
+      const data = _.pick(editClient, [
+        'first_name',
+        'last_name',
+        'title',
+        'sex',
+        'email',
+        'telephone',
+        'birthday',
+        'age',
+        'country_citizenship',
+        'other_citizenship',
+        'country_residence',
+        'status_residence',
+        'status_residence_other',
+        'active',
+      ]);
+
+      const client = await Client.findByIdAndUpdate(id, data, {new: true, runValidators: true, context: 'query'});
 
       if (!client) {
-        reject({
-          status: 400,
-          message: "Error, client doesn't exist",
-          errors: '',
-        });
+        reject({status: 400, message: "Error, client doesn't exist", errors: ''});
       }
-
-      if (editClient.first_name) {
-        client.first_name = editClient.first_name;
-      }
-      if (editClient.last_name) {
-        client.last_name = editClient.last_name;
-      }
-      if (editClient.title) {
-        client.title = editClient.title;
-      }
-      if (editClient.sex) {
-        client.sex = editClient.sex;
-      }
-      if (editClient.email) {
-        client.email = editClient.email;
-      }
-      if (editClient.telephone) {
-        client.telephone = editClient.telephone;
-      }
-      if (editClient.birthday) {
-        client.birthday = editClient.birthday;
-      }
-      if (editClient.age) {
-        client.age = editClient.age;
-      }
-      if (editClient.country_citizenship) {
-        client.country_citizenship = editClient.country_citizenship;
-      }
-      if (editClient.other_citizenship) {
-        client.other_citizenship = editClient.other_citizenship;
-      }
-      if (editClient.country_residence) {
-        client.country_residence = editClient.country_residence;
-      }
-      if (editClient.status_residence) {
-        client.status_residence = editClient.status_residence;
-      }
-      if (editClient.status_residence_other) {
-        client.status_residence_other = editClient.status_residence_other;
-      }
-      // if (editClient.active) { client.active = editClient.active; }
-
-      await client.save();
 
       resolve(client);
     } catch (error) {

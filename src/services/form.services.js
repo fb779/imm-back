@@ -1,105 +1,112 @@
-const FormVisitor = require('../model/form-visitor.model');
+const _ = require('underscore');
+const {visaCategories} = require('../config/config');
 
-const ClientServices = require('../services/client.services');
+const FormBase = require('../model/form-base.model');
+const FormVisitorModel = require('../model/form-visitor.model');
+const FormExpressEntryModel = require('../model/form-express-entry.model');
+const FormWorkPermitModel = require('../model/form-work-permit.model');
 
+function defineForm(type) {
+  let form = null;
 
-function createForm(process, form) {
-  return new Promise(async(resolve, reject) => {
+  switch (type) {
+    case visaCategories.visitor:
+      form = FormVisitorModel;
+      break;
+
+    case visaCategories.expressentry:
+      form = FormExpressEntryModel;
+      break;
+
+    case visaCategories.workpermit:
+      form = FormWorkPermitModel;
+      break;
+  }
+
+  return form;
+}
+
+function createForm(process, dataForm) {
+  return new Promise(async (resolve, reject) => {
     try {
+      delete dataForm._id;
 
-      delete form._id;
-      form.client = process.client;
-      form.process = process._id;
+      const {
+        visa_category: {title: kindVisa},
+      } = process;
 
-      var newForm = await FormVisitor.findOne({ process: process });
+      const newData = {...dataForm, kind: kindVisa, client: process.client, process: process._id};
 
-      if (!newForm) {
-        newForm = new FormVisitor(form);
+      var form = await FormBase.findOne({process: process});
+      if (!form) {
+        // newForm = new FormVisa(form);
+        // await newForm.save();
+        form = await FormBase.create(newData);
+      } else {
+        form = await FormBase.findOneAndUpdate({process: process}, form, {new: true, runValidators: true});
       }
 
-      await newForm.save();
-
-      return resolve(newForm);
+      return resolve(form);
     } catch (error) {
       return reject({
         status: 400,
         message: 'Error to create form',
-        errors: error
+        errors: error,
       });
     }
   });
 }
 
-function editForm(process, oldForm) {
-  return new Promise(async(resolve, reject) => {
+function editForm(form_id, process, oldForm) {
+  return new Promise(async (resolve, reject) => {
     try {
-      const form = await FormVisitor.findOne({ _id: oldForm._id, process: process });
+      const {
+        visa_category: {title: kindVisa},
+      } = process;
 
-      if (!form) {
-        return reject({
-          status: 404,
-          message: 'Error to update form',
-          errors: []
-        });
-      }
+      const FormVisa = defineForm(kindVisa);
 
-      if (oldForm.destiny) { form.destiny = oldForm.destiny; }
-      if (oldForm.marital_status) { form.marital_status = oldForm.marital_status; }
-
-      // form.number_accompanying = oldForm.number_accompanying;
-      if (oldForm.purpose_visit) { form.purpose_visit = oldForm.purpose_visit; }
-      if (oldForm.letter_invitation) { form.letter_invitation = oldForm.letter_invitation; }
-      if (oldForm.stay_canada) { form.stay_canada = oldForm.stay_canada; }
-      if (oldForm.funds) { form.funds = oldForm.funds; }
-      if (oldForm.disease) { form.disease = oldForm.disease; }
-      if (oldForm.criminal_act) { form.criminal_act = oldForm.criminal_act; }
-      if (oldForm.refuse_canada) { form.refuse_canada = oldForm.refuse_canada; }
-
-      form.comments = oldForm.comments;
-
-      await form.save();
+      // const form = await FormVisa.findOneAndUpdate({process}, {$set: {...oldForm}}, {new: true, runValidators: true, context: 'query'});
+      const form = await FormVisa.findOneAndUpdate({process}, oldForm, {new: true, runValidators: true});
 
       return resolve(form);
     } catch (error) {
       return reject({
         status: 400,
         message: 'Error to edit form',
-        errors: error
+        errors: error,
       });
     }
   });
 }
 
 function getFormByProcess(process) {
-  return new Promise(async(resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     try {
+      // const form = await FormVisitor.findOne({process: process}).populate([{path: 'client', select: '-active -createdAt -updatedAt -__v'}]);
+      const form = await FormBase.findOne({process: process}).populate([{path: 'client', select: '-active -createdAt -updatedAt -__v'}]);
 
-      const form = await FormVisitor.findOne({ process: process }).populate([{ path: 'client', select: '-active -createdAt -updatedAt -__v' }]);
-
-      if (!form) {
-        return reject({
-          status: 403,
-          message: `Error, Form doesn't exist`,
-          errors: error
-        });
-      }
+      // if (!form) {
+      //   return reject({
+      //     status: 403,
+      //     message: `Error, Form doesn't exist`,
+      //     errors: error,
+      //   });
+      // }
 
       return resolve(form);
     } catch (error) {
       return reject({
         status: 400,
         message: 'Error to create form',
-        errors: error
+        errors: error,
       });
     }
   });
 }
 
-
-
-
 module.exports = {
   createForm,
   editForm,
   getFormByProcess,
-}
+};

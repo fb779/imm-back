@@ -1,45 +1,59 @@
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
+const moment = require('moment');
 const bcrypt = require('bcryptjs');
-const {rolesValidos} = require('./../config/config');
+const {rolesValidos, roles} = require('./../config/config');
 
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema(
   {
-    email: {type: String, unique: true, required: [true, 'El correo es necesario'], lowercase: true},
-    first_name: {type: String, required: [true, 'El Nombre es necesario']},
-    last_name: {type: String, required: [true, 'El Apellido es necesario']},
-    password: {type: String, required: [true, 'La contraseña es necesario']},
+    email: {type: String, unique: true, required: [true, '{PATH} is required'], lowercase: true},
+    first_name: {type: String, required: [true, '{PATH} is required']},
+    last_name: {type: String, required: [true, '{PATH} is required']},
+    password: {type: String, required: [true, '{PATH} is required']},
     img: {type: String, required: false, default: ''},
     bio: {type: String, required: false, default: ''},
     active: {type: Boolean, default: true},
-    role: {type: String, default: 'CLIENT_ROLE', enum: rolesValidos, uppercase: true},
+    role: {type: String, default: roles.client, enum: rolesValidos, uppercase: true},
     client: {type: Schema.Types.ObjectId, ref: 'Client', default: null, required: false},
+    account_expiration: {type: Date, default: null},
   },
-  {timestamps: true, collection: 'users'}
+  {timestamps: true, collection: 'users', id: false, toObject: {virtuals: true}, toJSON: {virtuals: false}}
 );
 
 UserSchema.plugin(uniqueValidator, {message: '{PATH} is not unique'});
 
-// UserSchema.virtual('img64').get(function () {
-//   let pathImg = path.resolve(uploadDirPhoto, `${this.img}`);
-//   let [name, ext] = this.img.split('.');
-//   const prefijo = ext.includes('svg') ? `data:image/${ext}+xml;base64,` : `data:image/${ext};base64,`;
-//   let file = '';
+/**
+ * Virtual field acount-expiration
+ */
 
-//   if (this.img && fs.existsSync(pathImg)) {
-//     file = prefijo + fs.readFileSync(pathImg, {encoding: 'base64'});
-//   }
+UserSchema.virtual('isActive').get(function () {
+  const {active, role, account_expiration} = this;
 
-//   return file;
-// });
+  let vl = active;
+
+  if (role === roles.client && active) {
+    if (account_expiration) {
+      vl = moment(account_expiration).valueOf() >= moment().valueOf();
+    } else {
+      vl = false;
+    }
+  }
+
+  return vl;
+});
 
 /**
  * Hook to before to save user to encrypt password
  */
 UserSchema.pre('save', async function (next) {
   const user = this;
+
+  // validate is a new recorde and the profile is CLIENT_USER
+  if (user.isNew && user.role === roles.client) {
+    user.account_expiration = moment().add(2, 'months').hour(23).minute(59).second(59).toDate();
+  }
 
   if (user.isModified('password')) {
     user.password = await this.encryptPassword(user.password);

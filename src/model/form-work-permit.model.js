@@ -5,9 +5,10 @@ const {visaCategories, kindVisaCategories} = require('../config/config');
 
 const Schema = mongoose.Schema;
 
-const FormVisitorSchema = new Schema({
+const FormWorkPermitSchema = new Schema({
   destiny: {type: String, required: true},
   marital_status: {type: String, required: true},
+  // number_accompanying: { type: Number, default: 0, required: false },
   purpose_visit: {type: String, required: true},
   letter_invitation: {type: String, required: true},
   stay_canada: {type: String, required: true},
@@ -18,19 +19,17 @@ const FormVisitorSchema = new Schema({
   comments: {type: String, required: false},
 });
 
-FormVisitorSchema.plugin(uniqueValidator, {message: '{PATH} is not unique'});
+// FormWorkPermitSchema.plugin(uniqueValidator, {message: '{PATH} is not unique'});
 
 /**
  * Hook to before to save user to encrypt password
  */
-// FormVisitorSchema.pre('save', async function(next) {
+// FormWorkPermitSchema.pre('save', async function(next) {
 //     const form = this;
-
 //     if (form.isModified('number_accompanying') || !form.number_accompanying) {
 //         form.number_accompanying = 0;
 //     }
-
 //     return next();
 // });
 
-module.exports = BaseForm.discriminator(visaCategories.visitor, FormVisitorSchema);
+module.exports = BaseForm.discriminator(visaCategories.workpermit, FormWorkPermitSchema);

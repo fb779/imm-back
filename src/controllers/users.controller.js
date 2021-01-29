@@ -8,7 +8,7 @@ const VisaCategoryServices = require('../services/visa-category.services');
 const ProcessService = require('../services/process.services');
 const {roles} = require('../config/config');
 
-const campos = '_id first_name last_name email role active client img bio';
+const campos = '_id first_name last_name email role active client img bio account_expiration';
 
 /************************************************
  *  Metodos
@@ -58,12 +58,13 @@ function getUser(req, res, next) {
  * es posible habilitar paginacion con las configuraciones respectivas
  */
 function getListUsers(req, res, next) {
+  const {user} = req;
   let offset = req.query.offset || 0;
   offset = Number(offset);
   let limit = req.query.limit || 20;
   let role = req.query.role || null;
 
-  let filters = {};
+  let filters = {_id: {$ne: user._id}};
   let populate = [{path: 'client', select: '-__v -createdAt -updatedAt'}]; // { path: '' };
 
   if (role) {
@@ -102,16 +103,25 @@ async function createUser(req, res, next) {
 
     let newUser = null;
 
-    if (body.role.toUpperCase() === 'CLIENT_ROLE') {
+    if (body.role.toUpperCase() === roles.client) {
+      // verificacion del usuario
+      // newUser = await UserService.getUserByEmail(client.email);
+      newUser = await UserService.getUserByEmail(body.email);
+
+      if (newUser && newUser.role !== roles.client) {
+        throw {
+          status: 400,
+          ok: false,
+          message: `This client can't have a process`,
+        };
+      }
+
       // verificacion y creacion del cliente
       let client = await ClientService.getClientByEmail(body.email);
 
       if (client === null) {
         client = await ClientService.createClient(body);
       }
-
-      // creacion y verificacion del usuario
-      newUser = await UserService.getUserByEmail(client.email);
 
       if (newUser === null) {
         body['client'] = client;
@@ -120,7 +130,8 @@ async function createUser(req, res, next) {
 
       // creacion del proceso
       const name_process = body.process;
-      const visa_category = await VisaCategoryServices.getByName(name_process);
+      const visa_category = await VisaCategoryServices.getByTitle(name_process);
+      // const visa_category = await VisaCategoryServices.getByName(name_process);
 
       const process = await ProcessService.createProcess({client, visa_category});
     } else {
@@ -180,15 +191,9 @@ async function updateUserPassword(req, res, next) {
 }
 
 function getConsultants(req, res, next) {
-  User.find({active: true, role: {$eq: 'USER_ROLE'}}, '_id first_name last_name email').exec((err, consultants) => {
+  User.find({active: true, role: {$eq: roles.user}}, '_id first_name last_name email').exec((err, consultants) => {
     if (err) {
-      return errorHandler(err);
-      // return res.status(500).json({
-      //   data: {
-      //     ok: false,
-      //     message: 'Problemas al cargar los consultores',
-      //   },
-      // });
+      return errorHandler(err, res);
     }
 
     return res.status(200).json({
