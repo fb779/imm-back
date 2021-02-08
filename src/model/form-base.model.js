@@ -16,8 +16,8 @@ const baseOptions = {
 
 BaseSchema = new Schema(
   {
-    process: {type: Schema.Types.ObjectId, ref: 'Process', unique: true, required: [true, 'The process is required']},
-    client: {type: Schema.Types.ObjectId, ref: 'Client', required: [true, 'The user is required']},
+    process: {type: Schema.Types.ObjectId, ref: 'Process', required: [true, 'The process is required'], unique: true},
+    client: {type: Schema.Types.ObjectId, ref: 'Client', required: [true, 'The client is required']},
   },
   baseOptions
 );

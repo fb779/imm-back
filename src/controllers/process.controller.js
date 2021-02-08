@@ -189,6 +189,27 @@ async function createFormProcess(req, res, next) {
     const id_process = req.params.id;
     const body = req.body;
 
+    const {
+      first_name,
+      last_name,
+      title,
+      sex,
+      email,
+      telephone,
+      birthday,
+      age,
+      country_citizenship,
+      other_citizenship,
+      country_residence,
+      status_residence,
+      status_residence_other,
+      relationship,
+      active,
+      _id: form_id,
+      process: process_id,
+      ...dataForm
+    } = body;
+
     const process = await Process.findOne({_id: id_process}).populate([{path: 'client'}, {path: 'visa_category'}]);
 
     if (!process) {
@@ -197,7 +218,7 @@ async function createFormProcess(req, res, next) {
 
     await ClientServices.editClient(process.client, body);
 
-    const form = await FormServices.createForm(process, body);
+    const form = await FormServices.createForm(process, dataForm);
 
     process.status = 'FORM';
 
@@ -244,7 +265,6 @@ async function editFormProcessId(req, res, next) {
     const id_process = req.params.id;
     const body = req.body;
 
-    const client = {};
     const {
       first_name,
       last_name,

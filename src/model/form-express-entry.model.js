@@ -2,26 +2,9 @@ const mongoose = require('mongoose');
 const BaseForm = require('./form-base.model');
 const uniqueValidator = require('mongoose-unique-validator');
 const {visaCategories} = require('../config/config');
+const {EducationSchema, WorkDetailSchema} = require('./form-public-schema.model');
 
 const Schema = mongoose.Schema;
-
-const EducationSchema = new Schema({
-  level: {type: String, required: true},
-  study: {type: String, required: true},
-  institution: {type: String, required: true},
-  duration: {type: String, required: true},
-  country: {type: String, required: true},
-});
-
-const WorkDetailSchema = new Schema({
-  kind: {type: String},
-  title: {type: String},
-  duties: {type: String},
-  company: {type: String},
-  duration: {type: String},
-  hoursPerWeek: {type: String},
-  country: {type: String},
-});
 
 const FormExpressEntrySchema = new Schema({
   // marital status
@@ -43,7 +26,7 @@ const FormExpressEntrySchema = new Schema({
   // education
   p_education_001: {type: String, default: null, required: true},
   p_education_list: [EducationSchema],
-  p_education_spouse_001: {type: String, default: null, required: true},
+  p_education_spouse_001: {type: String, default: null},
   p_education_spouse_list: [EducationSchema],
 
   // language
@@ -67,7 +50,7 @@ const FormExpressEntrySchema = new Schema({
   p_language_fr_006: {type: String, default: null},
 
   // language englis
-  p_language_spouse_001: {type: String, default: null, required: true},
+  p_language_spouse_001: {type: String, default: null},
   p_language_spouse_en_001: {type: String, default: null},
   p_language_spouse_en_002: {type: String, default: null},
   p_language_spouse_en_003: {type: String, default: null},
@@ -94,7 +77,7 @@ const FormExpressEntrySchema = new Schema({
 
   // family
   p_family_001: {type: String, default: null, required: true},
-  p_family_002: {type: String, default: null, required: true},
+  p_family_002: {type: String, default: null},
   p_family_003: {type: String, default: null},
   p_family_004: {type: String, default: null},
 
@@ -109,6 +92,7 @@ const FormExpressEntrySchema = new Schema({
  */
 FormExpressEntrySchema.pre('save', async function (next) {
   const form = this;
+  const fields = this.schema.obj;
 
   if (form.p_marital_001 != 2) {
     Object.keys(fields)

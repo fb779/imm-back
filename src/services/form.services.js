@@ -35,16 +35,18 @@ function createForm(process, dataForm) {
         visa_category: {title: kindVisa},
       } = process;
 
-      const newData = {...dataForm, kind: kindVisa, client: process.client, process: process._id};
+      const newData = {...dataForm, kind: kindVisa, client: process.client, process: process};
 
-      var form = await FormBase.findOne({process: process});
-      if (!form) {
-        // newForm = new FormVisa(form);
-        // await newForm.save();
-        form = await FormBase.create(newData);
-      } else {
-        form = await FormBase.findOneAndUpdate({process: process}, form, {new: true, runValidators: true});
-      }
+      form = await FormBase.create(newData);
+
+      // var form = await FormBase.findOne({process: process});
+      // if (!form) {
+      //   // newForm = new FormVisa(form);
+      //   // await newForm.save();
+      //   form = await FormBase.create(newData);
+      // } else {
+      //   form = await FormBase.findOneAndUpdate({process: process}, form, {new: true, runValidators: true});
+      // }
 
       return resolve(form);
     } catch (error) {
