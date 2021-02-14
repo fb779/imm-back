@@ -8,32 +8,38 @@ const {roles} = require('../config/config');
 async function postWoocommerceWebhook(req, res, next) {
   try {
     // Validación de información inicial
-    let {billing, line_items} = validationsData(req.body);
+    let {
+      billing,
+      billing: {email},
+      line_items,
+    } = validationsData(req.body);
 
     // respuesta de confirmacion
     // res.status(200).json({ ok: true });
 
-    // verificacion y creacion del cliente
-    let client = await ClientService.getClientByEmail(billing.email);
-
-    if (client === null) {
-      client = await ClientService.createClient(billing);
-    }
-
     // creacion y verificacion del usuario
-    let user = await UserService.getUserByEmail(client.email);
+    let user = await UserService.getUserByEmail(email);
     if (user === null) {
-      billing['client'] = client;
       billing['role'] = roles.client;
       billing['password'] = await UserService.generatePassword();
       user = await UserService.createUser(billing);
     }
 
+    // verificacion y creacion del cliente
+    let client = await ClientService.getClientByEmail(billing.email);
+
+    if (client === null) {
+      billing['user'] = user;
+      client = await ClientService.createClient(billing);
+    }
+
+    user = await UserService.updateUserClient(user._id, client);
+
     // creacion del proceso
     const name_process = line_items[0].name;
-    const visa_category = await VisaCategoryServices.getByName(name_process);
+    const visa_category = await VisaCategoryServices.getByTitle(name_process);
 
-    const process = await ProcessService.createProcess({client, visa_category});
+    const process = await ProcessService.createProcess({user, client, visa_category});
 
     if (process) {
       console.log('fin de la ejecucion', billing);

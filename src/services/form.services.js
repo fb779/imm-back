@@ -85,16 +85,7 @@ function editForm(form_id, process, oldForm) {
 function getFormByProcess(process) {
   return new Promise(async (resolve, reject) => {
     try {
-      // const form = await FormVisitor.findOne({process: process}).populate([{path: 'client', select: '-active -createdAt -updatedAt -__v'}]);
       const form = await FormBase.findOne({process: process}).populate([{path: 'client', select: '-active -createdAt -updatedAt -__v'}]);
-
-      // if (!form) {
-      //   return reject({
-      //     status: 403,
-      //     message: `Error, Form doesn't exist`,
-      //     errors: error,
-      //   });
-      // }
 
       return resolve(form);
     } catch (error) {

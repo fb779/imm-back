@@ -116,24 +116,26 @@ async function createUser(req, res, next) {
         };
       }
 
+      if (newUser === null) {
+        // body['client'] = client;
+        newUser = await UserService.createUser(body);
+      }
+
       // verificacion y creacion del cliente
       let client = await ClientService.getClientByEmail(body.email);
 
       if (client === null) {
+        body['user'] = newUser;
         client = await ClientService.createClient(body);
       }
 
-      if (newUser === null) {
-        body['client'] = client;
-        newUser = await UserService.createUser(body);
-      }
+      newUser = await UserService.updateUserClient(newUser._id, client);
 
       // creacion del proceso
       const name_process = body.process;
       const visa_category = await VisaCategoryServices.getByTitle(name_process);
-      // const visa_category = await VisaCategoryServices.getByName(name_process);
 
-      const process = await ProcessService.createProcess({client, visa_category});
+      const process = await ProcessService.createProcess({user: newUser, client, visa_category});
     } else {
       newUser = await UserService.createUser(body);
     }

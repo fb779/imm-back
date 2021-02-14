@@ -88,6 +88,26 @@ function createUser(newUser) {
   });
 }
 
+function updateUserClient(id, client) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const user = await User.findByIdAndUpdate(id, {client}, {new: true, runValidators: true});
+      resolve(user);
+    } catch (error) {
+      if (error.message.includes('validation')) {
+        return reject({
+          status: 400,
+          ok: false,
+          message: error.message,
+          errors: error.errors,
+        });
+      }
+
+      return reject(error);
+    }
+  });
+}
+
 function updateUser(id, userUpdate) {
   return new Promise(async (resolve, reject) => {
     try {
@@ -269,6 +289,7 @@ module.exports = {
   createUser,
   updateUser,
   updatePhoto,
+  updateUserClient,
   updatePassword,
   resetPassword,
   generatePassword,

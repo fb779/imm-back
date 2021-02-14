@@ -27,6 +27,7 @@ const DocumentSchema = new Schema(
 
 DocumentSchema.plugin(uniqueValidator, {message: '{PATH} is not unique'});
 
-DocumentSchema.index({process: 1, client: 1, checklist: 1}, {unique: true});
+// DocumentSchema.index({process: 1, client: 1, checklist: 1}, {unique: true});
+DocumentSchema.index({client: 1, checklist: 1}, {unique: true});
 
 module.exports = mongoose.model('Document', DocumentSchema);

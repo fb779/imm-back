@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const UserModel = require('./user.model');
 const uniqueValidator = require('mongoose-unique-validator');
 const moment = require('moment');
 const {titles, sexs, relationships} = require('../config/config');
@@ -27,6 +28,7 @@ const min = moment().subtract(80, 'years').format('YYYY-MM-DD').toString();
  */
 const ClientSchema = new Schema(
   {
+    user: {type: Schema.Types.ObjectId, ref: 'User', required: true},
     first_name: {type: String, required: [true, 'First name is required']},
     last_name: {type: String, required: [true, 'Last  name is required']},
     title: {type: String, enum: titles, required: false},
@@ -47,6 +49,14 @@ const ClientSchema = new Schema(
 );
 
 ClientSchema.plugin(uniqueValidator, {message: '{PATH} is not unique'});
+
+/**
+ * method to validate if visa_categorie ref exist in the your collection
+ */
+ClientSchema.path('user').validate(async function (value) {
+  const val = await UserModel.findById(value);
+  return !val ? false : true;
+}, `{PATH} is invalid`);
 
 /**
  * Hook to before to save user to encrypt password

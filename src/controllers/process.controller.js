@@ -237,18 +237,10 @@ async function getFormProcessId(req, res, next) {
   try {
     const id = req.params.id;
 
-    const process = await Process.findOne({_id: id}).populate([{path: 'client'}, {path: 'visa_category'}]);
-
-    if (!process) {
-      throw {status: 404, message: `Error, Process doesn't exist`};
-      // return res.status(404).json({ data: { ok: false, message: "Process references doesn't exist", }, });
-    }
-
-    const form = await FormServices.getFormByProcess(process);
+    const form = await FormServices.getFormByProcess(id);
 
     if (!form) {
       throw {status: 404, message: `Error, Form doesn't exist`};
-      // return res.status(404).json({ data: { ok: false, message: "Form doesn't exist", }, });
     }
 
     return res.status(200).json({

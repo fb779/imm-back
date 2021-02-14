@@ -1,6 +1,22 @@
 const Client = require('../model/client.model');
 const _ = require('underscore');
 
+function getClientList() {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const list = await Client.find();
+
+      return resolve(list);
+    } catch (error) {
+      return reject({
+        status: 500,
+        message: "Error, the client doesn't find",
+        errors: error,
+      });
+    }
+  });
+}
+
 function getById(id) {
   return new Promise(async (resolve, reject) => {
     try {
@@ -17,45 +33,6 @@ function getById(id) {
       return resolve(client);
     } catch (error) {
       return reject({
-        status: 500,
-        message: "Error, the client doesn't find",
-        errors: error,
-      });
-    }
-  });
-}
-
-function getByEmail(email) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      var client = await Client.findOne({email: email});
-
-      if (!client) {
-        reject({
-          status: 404,
-          message: `The client doesn't find with the Email: ${email}`,
-          errors: `Client doesn't find with the Email`,
-        });
-      }
-
-      resolve(client);
-    } catch (error) {
-      reject({
-        status: 500,
-        message: "Error, the client doesn't find",
-        errors: error,
-      });
-    }
-  });
-}
-/** verificacion de existencia del usuario por el email */
-function getClientByEmail(email) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      var client = await Client.findOne({email: email});
-      resolve(client);
-    } catch (error) {
-      reject({
         status: 500,
         message: "Error, the client doesn't find",
         errors: error,
@@ -124,13 +101,13 @@ function deleteClient(id) {
     try {
       const client = await Client.findByIdAndRemove(id);
 
-      if (!client) {
-        return reject({
-          status: 400,
-          message: "Error, the client doesn't deletel",
-          errors: error,
-        });
-      }
+      // if (!client) {
+      //   return reject({
+      //     status: 400,
+      //     message: "Error, the client doesn't deletel",
+      //     errors: error,
+      //   });
+      // }
 
       return resolve(client);
     } catch (error) {
@@ -143,24 +120,56 @@ function deleteClient(id) {
   });
 }
 
-function editEmailClient(id, newEmail) {
+function getByEmail(email) {
   return new Promise(async (resolve, reject) => {
     try {
-      const client = await Client.findByIdAndRemove(id);
+      var client = await Client.findOne({email: email});
 
       if (!client) {
-        return reject({
-          status: 400,
-          message: "Error, the client doesn't deletel",
-          errors: error,
+        reject({
+          status: 404,
+          message: `The client doesn't find with the Email: ${email}`,
+          errors: `Client doesn't find with the Email`,
         });
       }
 
-      return resolve(client);
+      resolve(client);
     } catch (error) {
-      return reject({
-        status: 400,
-        message: "Error, the client doesn't deletel",
+      reject({
+        status: 500,
+        message: "Error, the client doesn't find",
+        errors: error,
+      });
+    }
+  });
+}
+
+/** verificacion de existencia del usuario por el email */
+function getClientByEmail(email) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      var client = await Client.findOne({email: email});
+      resolve(client);
+    } catch (error) {
+      reject({
+        status: 500,
+        message: "Error, the client doesn't find",
+        errors: error,
+      });
+    }
+  });
+}
+
+/** Consulta de clientes del mismo usuario */
+function getClinetListByUser(user_id) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      var client = await Client.find({user: user_id});
+      resolve(client);
+    } catch (error) {
+      reject({
+        status: 500,
+        message: "Error, the client doesn't find",
         errors: error,
       });
     }
@@ -168,10 +177,12 @@ function editEmailClient(id, newEmail) {
 }
 
 module.exports = {
+  getClientList,
+  getById,
   createClient,
   editClient,
   deleteClient,
-  getById,
   getByEmail,
   getClientByEmail,
+  getClinetListByUser,
 };

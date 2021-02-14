@@ -3,22 +3,21 @@
  ************************************************/
 const Client = require('../model/client.model');
 const ClientService = require('../services/client.services');
+const {roles} = require('../config/config');
 const moment = require('moment');
 
 // metodo cargar todos los procesos del usuario
 async function getClientes(req, res, next) {
-  Client.find().exec((err, listClients) => {
-    if (err) {
-      errorHandler(err, res);
-    }
+  try {
+    const list = await ClientService.getClientList();
 
-    return res.status(200).json({
-      data: {
-        ok: true,
-        list: listClients,
-      },
+    res.status(200).json({
+      ok: true,
+      data: list,
     });
-  });
+  } catch (error) {
+    errorHandler(error, res);
+  }
 }
 
 async function getClienteId(req, res, next) {

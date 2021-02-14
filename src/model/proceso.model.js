@@ -15,6 +15,7 @@ const Schema = mongoose.Schema;
 
 const ProcessSchema = new Schema(
   {
+    user: {type: Schema.Types.ObjectId, ref: 'User', required: [true, 'The {PATH} is required']},
     client: {type: Schema.Types.ObjectId, ref: 'Client', required: [true, 'The user is required']},
     consultant: {type: Schema.Types.ObjectId, ref: 'User', required: [false, 'The consultan is required']},
     visa_category: {type: Schema.Types.ObjectId, ref: 'VisaCategory', required: [true, 'The type visa is required']},
@@ -22,7 +23,6 @@ const ProcessSchema = new Schema(
     status: {type: String, default: 'ACTIVE', enum: statusVisa, uppercase: true},
     active: {type: Boolean, default: true},
     companion: {type: Number, default: 1},
-    // steps: [StepProcessSchema],
     steps: [
       {
         name: {type: String, required: true},
@@ -66,6 +66,14 @@ ProcessSchema.pre('save', async function (next) {
 
 /**
  * method to validate if visa_categorie ref exist in the your collection
+ */
+ProcessSchema.path('user').validate(async function (value) {
+  const val = await UserModel.findById(value);
+  return !val ? false : true;
+}, `{PATH} is invalid`);
+
+/**
+ * method to validate if the client ref exist in the your collection
  */
 ProcessSchema.path('client').validate(async function (value) {
   const val = await ClientModel.findById(value);

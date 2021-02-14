@@ -6,16 +6,17 @@ const {visaCategories, kindVisaCategories} = require('../config/config');
 const Schema = mongoose.Schema;
 
 const FormVisitorSchema = new Schema({
-  destiny: {type: String, required: true},
-  marital_status: {type: String, required: true},
-  purpose_visit: {type: String, required: true},
-  letter_invitation: {type: String, required: true},
-  stay_canada: {type: String, required: true},
-  funds: {type: String, required: true},
-  disease: {type: String, required: true},
-  criminal_act: {type: String, required: true},
-  refuse_canada: {type: String, required: true},
-  comments: {type: String, required: false},
+  p_information_001: {type: String, required: true},
+  p_information_002: {type: String, required: true},
+  p_information_003: {type: String, required: true},
+  p_information_004: {type: String, required: true},
+  p_information_005: {type: String, required: true},
+
+  p_familyinfo_001: {type: String, required: true},
+  p_familyinfo_002: {type: String, required: true},
+  p_familyinfo_003: {type: String, required: true},
+  p_familyinfo_004: {type: String, required: true},
+  p_familyinfo_005: {type: String, required: false},
 });
 
 FormVisitorSchema.plugin(uniqueValidator, {message: '{PATH} is not unique'});

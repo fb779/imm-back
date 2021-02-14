@@ -36,10 +36,10 @@ BaseSchema.plugin(uniqueValidator, {message: '{PATH} is not unique'});
 /**
  * method to validate if visa_categorie ref exist in the your collection
  */
-BaseSchema.path('client').validate(async function (value) {
-  const val = await ClientModel.findById(value);
-  return !val ? false : true;
-}, `{PATH} is invalid`);
+// BaseSchema.path('client').validate(async function (value) {
+//   const val = await ClientModel.findById(value);
+//   return !val ? false : true;
+// }, `{PATH} is invalid`);
 
 BaseSchema.path('process').validate(async function (value) {
   const val = await ProcessModel.findById(value);

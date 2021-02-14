@@ -32,7 +32,7 @@ async function getFamilyByProcess(req, res, next) {
 
     const list = await FamilyService.getFamilyByProcess(process._id);
 
-    list.splice(0, 0, {client: process.client});
+    // list.splice(0, 0, {client: process.client});
 
     return res.status(200).json({
       ok: true,
@@ -43,10 +43,26 @@ async function getFamilyByProcess(req, res, next) {
   }
 }
 
+async function getFamilyByUser(req, res, next) {
+  try {
+    const id_process = req.params.id_process;
+
+    const data = await FamilyService.getFamilyByUser(id_process);
+
+    return res.status(200).json({
+      ok: true,
+      data,
+    });
+  } catch (error) {
+    errorHandler(error, res);
+  }
+}
+
 async function createFamilyMember(req, res, next) {
   try {
     const id_process = req.params.id_process;
     const body = req.body;
+
     const familiMember = await FamilyService.createFamilyMember(id_process, body);
 
     res.status(200).json({
@@ -76,18 +92,42 @@ async function editFamilyMember(req, res, next) {
 }
 
 async function deleteFamilyMember(req, res, next) {
-  const id_process = req.params.id_process;
-  const id_client = req.params.id_client;
-
   try {
-    const familyMember = await FamilyService.deleteFamilyMember(id_process, id_client);
+    const id_client = req.params.id_client;
+
+    const familyMember = await FamilyService.deleteFamilyMember(id_client);
 
     res.status(200).json({
       ok: true,
-      message: 'se elimino el familiar',
-      id_process,
-      id_client,
       familyMember,
+    });
+  } catch (error) {
+    errorHandler(error, res);
+  }
+}
+
+async function setMemberProcess(req, res, next) {
+  try {
+    const {client, process, action = null} = req.body;
+
+    switch (action) {
+      case 'add':
+        await FamilyService.addFamilyMemberProcess(client, process);
+        break;
+      case 'remove':
+        await FamilyService.removeFamilyMemberProcess(client, process);
+        break;
+
+      default:
+        throw {
+          status: 400,
+          message: 'Error information, you need to complete the information',
+        };
+        break;
+    }
+
+    res.status(200).json({
+      ok: true,
     });
   } catch (error) {
     errorHandler(error, res);
@@ -118,7 +158,9 @@ const errorHandler = (error, res) => {
 module.exports = {
   getFamilyByClient,
   getFamilyByProcess,
+  getFamilyByUser,
   createFamilyMember,
   editFamilyMember,
   deleteFamilyMember,
+  setMemberProcess,
 };
