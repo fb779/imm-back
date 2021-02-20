@@ -11,7 +11,7 @@ const DocumentSchema = new Schema(
     client: {type: Schema.Types.ObjectId, ref: 'Client', required: true},
     checklist: {type: Schema.Types.ObjectId, ref: 'CheckList', required: true},
     name: {type: String, required: [true, 'the name is required'], uppercase: true},
-    status: {type: String, default: typesStatusDocument.CREATE, enum: statusDocument, uppercase: true},
+    status: {type: String, default: typesStatusDocument.create, enum: statusDocument, uppercase: true},
     extension: {type: String, required: [false, 'the name is required'], lowercase: true},
     file_name: {type: String, required: [false, 'the name is required']},
     directory: {type: String, required: [false, 'the directory is required']},
@@ -27,7 +27,7 @@ const DocumentSchema = new Schema(
 
 DocumentSchema.plugin(uniqueValidator, {message: '{PATH} is not unique'});
 
-// DocumentSchema.index({process: 1, client: 1, checklist: 1}, {unique: true});
-DocumentSchema.index({client: 1, checklist: 1}, {unique: true});
+DocumentSchema.index({process: 1, client: 1, checklist: 1}, {unique: true});
+// DocumentSchema.index({client: 1, checklist: 1}, {unique: true});
 
 module.exports = mongoose.model('Document', DocumentSchema);

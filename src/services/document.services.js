@@ -2,7 +2,7 @@
  *  Importaciones
  ************************************************/
 const Document = require('../model/document.model');
-const {typesDocument} = require('../config/config');
+const {typesDocument, typesStatusDocument} = require('../config/config');
 
 /************************************************
  *  Deficnicion de metodos
@@ -165,6 +165,30 @@ function deleteDocumentsByClient(id_client) {
   });
 }
 
+function updateDocumentState(id_document, status, comment) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const document = await getDocumentById(id_document);
+
+      document.status = status;
+
+      if (status === typesStatusDocument.rejected) {
+        document.comments.push({comment});
+      }
+
+      await document.save();
+
+      return resolve(document);
+    } catch (error) {
+      return reject({
+        status: 500,
+        message: 'Error to update document state',
+        errors: error,
+      });
+    }
+  });
+}
+
 /************************************************
  *  Export de metodos
  ************************************************/
@@ -178,4 +202,5 @@ module.exports = {
   uploadDocument,
   deleteDocuments,
   deleteDocumentsByClient,
+  updateDocumentState,
 };

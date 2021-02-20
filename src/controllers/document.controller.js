@@ -11,6 +11,24 @@ const {typesStatusDocument} = require('../config/config');
  *  Deficnicion de metodos
  ************************************************/
 
+async function getDocumentsByProcess(req, res, next) {
+  try {
+    const query = req.query;
+    const body = req.body;
+
+    // const documents = await DocumentServices.getDocuments(type, id);
+    const documents = [];
+
+    res.status(200).json({
+      ok: true,
+      list: documents,
+      body,
+    });
+  } catch (error) {
+    errorHandler(error, res);
+  }
+}
+
 async function getDocuments(req, res, next) {
   try {
     const type = req.query.type || null;
@@ -125,15 +143,7 @@ async function updateStatusDocument(req, res, next) {
       };
     }
 
-    const document = await DocumentServices.getDocumentById(id_document);
-
-    document.status = status;
-
-    if (status === typesStatusDocument.rejected) {
-      document.comments.push({comment});
-    }
-
-    await document.save();
+    const document = await DocumentServices.updateDocumentState(id_document, status, comment);
 
     res.status(200).json({
       ok: true,
@@ -189,6 +199,7 @@ const errorHandler = (error, res) => {
  ************************************************/
 
 module.exports = {
+  getDocumentsByProcess,
   getDocuments,
   getDocumentsByCliente,
   getDocumentsByProcessClient,

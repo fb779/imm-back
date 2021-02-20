@@ -32,7 +32,7 @@ async function getFamilyByProcess(req, res, next) {
 
     const list = await FamilyService.getFamilyByProcess(process._id);
 
-    // list.splice(0, 0, {client: process.client});
+    list.splice(0, 0, {client: process.client});
 
     return res.status(200).json({
       ok: true,
