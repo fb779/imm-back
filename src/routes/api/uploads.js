@@ -25,6 +25,8 @@ router.use(
     safeFileNames: true, // elimina caracteres especiales de los nombres
     preserveExtension: 4, // define la cantidad de caracteres de la extension
     parseNested: false, // deshabilitacion por verificacion de seguridad (atacqued DoS e inyeccion de codigo)
+    limits: {fileSize: 2 * 1024 * 1024},
+    abortOnLimit: true,
   })
 );
 

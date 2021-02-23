@@ -17,7 +17,7 @@ async function getProcess(req, res, next) {
     switch (user.role) {
       case roles.admin:
         {
-          ListProcess = await ProcessServices.getProcesses({status: {$in: ['FORM']}}, [{path: 'client'}, {path: 'visa_category'}]);
+          ListProcess = await ProcessServices.getProcesses({status: {$nin: ['ACTIVE']}}, [{path: 'client'}, {path: 'visa_category'}]);
         }
         break;
       case roles.user:

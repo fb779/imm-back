@@ -11,7 +11,7 @@ function getFamilyByUser(id_user) {
 
       const {user, client} = process;
 
-      let familyList = await ClientService.getClinetListByUser(user._id);
+      let familyList = await ClientService.getClientListByUser(user._id);
 
       familyList = familyList.filter((el) => {
         return el._id.toString() !== client._id.toString();

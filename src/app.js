@@ -2,11 +2,9 @@
  *  imports
  ********************************************************/
 const express = require('express');
-const path = require('path');
-// const session = require('express-session');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const config = require('./config/config')
+const config = require('./config/config');
 
 /********************************************************
  *  initilizations
@@ -21,14 +19,6 @@ app.set('port', config.port);
 /********************************************************
  *  Middlewares
  ********************************************************/
-// app.use(express.urlencoded({ extended: false }));
-
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true }));
-
-// parse application/json
-app.use(bodyParser.json());
-
 // configuracion y permitir las rutas de tipos get, post, put y delete
 // app.use(function(req, res, next) {
 //     res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
@@ -41,15 +31,12 @@ app.use(bodyParser.json());
 
 app.use(cors());
 
+// parse application/x-www-form-urlencoded
+// app.use(express.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({extended: true}));
 
-// middleware to session
-// manejo de sessiones
-// app.use(session({
-//     secret: process.env.SECRET,
-//     resave: false,
-//     saveUninitialized: true,
-//     cookie: { secure: true }
-// }));
+// parse application/json
+app.use(bodyParser.json());
 
 /********************************************************
  *  Globals variables
@@ -59,10 +46,5 @@ app.use(cors());
  *  routes
  ********************************************************/
 app.use(require('./routes/routes'));
-
-/********************************************************
- * Static Files
- ********************************************************/
-// app.use('/api/v1/documents', express.static(path.join(__dirname, 'public', 'processes')));
 
 module.exports = app;

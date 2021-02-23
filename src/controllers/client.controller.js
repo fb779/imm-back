@@ -20,6 +20,22 @@ async function getClientes(req, res, next) {
   }
 }
 
+// metodo cargar todos los procesos del usuario
+async function getClientListByUser(req, res, next) {
+  try {
+    const {id: userId} = req.params;
+
+    const list = await ClientService.getClientListByUser(userId);
+
+    res.status(200).json({
+      ok: true,
+      data: list,
+    });
+  } catch (error) {
+    errorHandler(error, res);
+  }
+}
+
 async function getClienteId(req, res, next) {
   try {
     const id = req.params.id;
@@ -123,6 +139,7 @@ const errorHandler = (error, res) => {
 module.exports = {
   getClientes,
   getClienteId,
+  getClientListByUser,
   createCliente,
   editCliente,
   deleteCliente,

@@ -123,7 +123,7 @@ function deleteClient(id) {
 function getByEmail(email) {
   return new Promise(async (resolve, reject) => {
     try {
-      var client = await Client.findOne({email: email});
+      const client = await Client.findOne({email: email});
 
       if (!client) {
         reject({
@@ -148,7 +148,7 @@ function getByEmail(email) {
 function getClientByEmail(email) {
   return new Promise(async (resolve, reject) => {
     try {
-      var client = await Client.findOne({email: email});
+      const client = await Client.findOne({email: email});
       resolve(client);
     } catch (error) {
       reject({
@@ -161,10 +161,10 @@ function getClientByEmail(email) {
 }
 
 /** Consulta de clientes del mismo usuario */
-function getClinetListByUser(user_id) {
+function getClientListByUser(userId) {
   return new Promise(async (resolve, reject) => {
     try {
-      var client = await Client.find({user: user_id});
+      const client = await Client.find({user: userId});
       resolve(client);
     } catch (error) {
       reject({
@@ -184,5 +184,5 @@ module.exports = {
   deleteClient,
   getByEmail,
   getClientByEmail,
-  getClinetListByUser,
+  getClientListByUser,
 };

@@ -13,6 +13,7 @@ const clientCtrl = require('./../../controllers/client.controller');
 
 router.get('/', clientCtrl.getClientes);
 router.get('/:id', clientCtrl.getClienteId);
+router.get('/user/:id', clientCtrl.getClientListByUser);
 router.post('/', clientCtrl.createCliente);
 router.put('/:id', clientCtrl.editCliente);
 router.delete('/:id', clientCtrl.deleteCliente);
