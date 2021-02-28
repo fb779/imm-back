@@ -26,6 +26,13 @@ async function uploadFormsGuides(req, res, next) {
 
     const process = await ProcessService.getProcessId(id_process);
 
+    if (!req.files || req.files.length > 0) {
+      return res.status(404).json({
+        ok: false,
+        message: 'Error, You need select a document',
+      });
+    }
+
     const files_upload = req.files[Object.keys(req.files)[0]];
 
     const rt = loadSingleFilesServer(files_upload, nameFile(files_upload, type_document, process._id, null, null));
@@ -52,10 +59,10 @@ async function uploadDocuments(req, res, next) {
   try {
     const id_document = req.params.id_document;
 
-    if (req.files.length > 0) {
+    if (!req.files || req.files.length > 0) {
       return res.status(404).json({
         ok: false,
-        message: 'Error, No selecciono ningun documento',
+        message: 'Error, You need select a document',
       });
     }
 
@@ -66,7 +73,8 @@ async function uploadDocuments(req, res, next) {
 
     const files_upload = req.files[Object.keys(req.files)[0]];
 
-    const rt = loadSingleFilesServer(files_upload, nameFile(files_upload, typeFilesUpload.documents, process._id, client._id, document.name));
+    // const rt = loadSingleFilesServer(files_upload, nameFile(files_upload, typeFilesUpload.documents, process._id, client._id, document.name));
+    const rt = loadSingleFilesServer(files_upload, nameFile(files_upload, typeFilesUpload.documents, null, client._id, document.name));
 
     document.status = typesStatusDocument.uploaded;
     document.file_name = rt.name;
@@ -92,7 +100,7 @@ async function uploadPhoto(req, res, next) {
       throw {
         status: 404,
         ok: false,
-        message: 'Error, No selecciono ningun documento',
+        message: 'Error, You need select a document',
       };
     }
 
@@ -126,6 +134,7 @@ async function uploadPhoto(req, res, next) {
  *  Metodo de trabajo para la carga de archivos
  ************************************************/
 
+// const nameFile = (file, type_document, id_client, keyFile) => {
 const nameFile = (file, type_document, id_process, id_client, keyFile) => {
   var nombreCortado = file.name.split('.');
   var extension = nombreCortado[nombreCortado.length - 1];
@@ -203,7 +212,7 @@ const errorHandler = (error, res) => {
   }
   return res.status(500).json({
     ok: false,
-    message: 'error en el servicio de upload files',
+    message: 'Error, upload files',
     error,
   });
 };
