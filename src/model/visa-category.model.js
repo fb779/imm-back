@@ -4,17 +4,11 @@ const {kindVisaCategories} = require('../config/config');
 
 const Schema = mongoose.Schema;
 
-/**
- * - _id: ObjectId()
- * - name: string
- * - description: string
- * - active: boolean
- */
-
 const VisaCategorySchema = new Schema(
   {
     name: {type: String, required: [true, 'the {PATH} is required'], unique: true, uppercase: true},
     title: {type: String, enum: kindVisaCategories, required: [true, 'the {PATH} is required'], unique: true},
+    product: {type: String, default: null, lowercase: true},
     description: {type: String, required: false},
     active: {type: Boolean, default: true},
   },
@@ -23,13 +17,12 @@ const VisaCategorySchema = new Schema(
 
 VisaCategorySchema.plugin(uniqueValidator, {message: '{PATH} is not unique'});
 
-// VisaCategorySchema.virtual('title').get(function () {
-//   const {name} = this;
-//   return name.toLowerCase().replace(/\s/, '-');
-// });
-
 VisaCategorySchema.static('findByTitle', function (title) {
   return this.findOne({title});
+});
+
+VisaCategorySchema.static('findByProduct', function (product) {
+  return this.findOne({product: product.toLowerCase()});
 });
 
 module.exports = mongoose.model('VisaCategory', VisaCategorySchema);

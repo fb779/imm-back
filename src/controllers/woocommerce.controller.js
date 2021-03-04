@@ -36,8 +36,8 @@ async function postWoocommerceWebhook(req, res, next) {
     user = await UserService.updateUserClient(user._id, client);
 
     // creacion del proceso
-    const name_process = line_items[0].name;
-    const visa_category = await VisaCategoryServices.getByTitle(name_process);
+    const product = line_items[0].name;
+    const visa_category = await VisaCategoryServices.getByProduct(product);
 
     const process = await ProcessService.createProcess({user, client, visa_category});
 

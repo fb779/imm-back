@@ -47,6 +47,26 @@ function getByTitle(title) {
   });
 }
 
+function getByProduct(product) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const visa = await VisaCategory.findByProduct(product).select('-createdAt -updatedAt -__v');
+
+      if (!visa) {
+        reject({
+          status: 400,
+          message: `The Visa Category "${product}" does't exist`,
+          errors: "This Visa Category does't exist",
+        });
+      }
+
+      resolve(visa);
+    } catch (error) {
+      reject({status: 400, message: 'Error to find VisaCategory', errors: error});
+    }
+  });
+}
+
 function getById(id) {
   return new Promise(async (resolve, reject) => {
     try {
@@ -113,5 +133,6 @@ module.exports = {
   getById,
   getByName,
   getByTitle,
+  getByProduct,
   getVCList,
 };
