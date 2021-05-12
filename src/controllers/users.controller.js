@@ -153,13 +153,14 @@ async function updateUser(req, res, next) {
   try {
     const user = req.user;
     const id = req.params.id;
-    const body = req.body;
+    // const body = req.body;
+    let {password, ...body} = req.body;
+
+    if (password !== '' && (id === user._id || user.role === roles.admin)) {
+      body = {...body, password};
+    }
 
     const userEdit = await UserService.updateUser(id, body);
-
-    // if (user.role === roles.client) {
-    //   userEdit.client = await ClientService.editClient(user.client, body);
-    // }
 
     return res.status(200).json({
       ok: true,

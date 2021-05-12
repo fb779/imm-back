@@ -50,7 +50,7 @@ function getByTitle(title) {
 function getByProduct(product) {
   return new Promise(async (resolve, reject) => {
     try {
-      const visa = await VisaCategory.findByProduct(product).select('-createdAt -updatedAt -__v');
+      const visa = await VisaCategory.findByProduct(product);
 
       if (!visa) {
         reject({

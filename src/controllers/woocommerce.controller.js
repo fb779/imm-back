@@ -41,9 +41,9 @@ async function postWoocommerceWebhook(req, res, next) {
 
     const process = await ProcessService.createProcess({user, client, visa_category});
 
-    if (process) {
-      console.log('fin de la ejecucion', billing);
-    }
+    // if (process) {
+    //   console.log('fin de la ejecucion', billing);
+    // }
 
     // res.status(200).json({ok: true, client, user, process});
     res.status(200).json({ok: true});

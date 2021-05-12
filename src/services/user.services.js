@@ -111,39 +111,7 @@ function updateUserClient(id, client) {
 function updateUser(id, userUpdate) {
   return new Promise(async (resolve, reject) => {
     try {
-      const user = await User.findById(id).select(fields_out).populate('client');
-
-      if (!user) {
-        throw {
-          status: 400,
-          message: "Error, user doesn't exist",
-          errors: '',
-        };
-      }
-
-      if (userUpdate.email && userUpdate.email !== user.email) {
-        user.email = userUpdate.email;
-      }
-
-      if (userUpdate.first_name) {
-        user.first_name = userUpdate.first_name;
-      }
-
-      if (userUpdate.last_name) {
-        user.last_name = userUpdate.last_name;
-      }
-
-      if (userUpdate.role) {
-        user.role = userUpdate.role;
-      }
-
-      if (userUpdate.bio) {
-        user.bio = userUpdate.bio;
-      }
-
-      user.active = userUpdate.active || user.active;
-
-      await user.save();
+      const user = await User.findByIdAndUpdate(id, userUpdate, {new: true, runValidators: true, context: 'query'});
 
       return resolve(user);
     } catch (error) {
