@@ -48,7 +48,7 @@ async function postWoocommerceWebhook(req, res, next) {
     // res.status(200).json({ok: true, client, user, process});
     res.status(200).json({ok: true});
   } catch (error) {
-    // console.log('manejo del error', error);
+    //  console.log('manejo del error', error);
     errorHandler(error, res);
   }
 }

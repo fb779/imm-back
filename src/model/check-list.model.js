@@ -11,17 +11,17 @@ const Schema = mongoose.Schema;
  */
 const CheckListSchema = new Schema(
   {
-    name: { type: String, required: [true, 'the name is required'], unique: true, uppercase: true },
-    description: { type: String, required: false },
-    group: { type: String, default: 'Others', required: true, uppercase: true },
-    visa_categories: [{ type: Schema.Types.ObjectId, ref: 'VisaCategory', required: false }],
-    required: { type: Boolean, default: false },
-    state: { type: Boolean, default: true },
+    name: {type: String, required: [true, 'the name is required'], unique: true, uppercase: true},
+    description: {type: String, required: false},
+    group: {type: String, default: null, uppercase: true},
+    visa_categories: [{type: Schema.Types.ObjectId, ref: 'VisaCategory', required: false}],
+    required: {type: Boolean, default: false},
+    state: {type: Boolean, default: true},
   },
-  { timestamps: true, collection: 'checklist' }
+  {timestamps: true, collection: 'checklist'}
 );
 
-CheckListSchema.plugin(uniqueValidator, { message: '{PATH} is not unique' });
+CheckListSchema.plugin(uniqueValidator, {message: '{PATH} is not unique'});
 
 CheckListSchema.methods.toJSON = function () {
   const checkListObject = this.toObject();

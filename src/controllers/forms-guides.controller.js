@@ -1,10 +1,7 @@
 /************************************************
  *  Importaciones
  ************************************************/
-const moment = require('moment');
-const path = require('path');
 const fs = require('fs');
-const {uploadDir, typeFilesUpload} = require('./../config/config');
 
 const ProcessService = require('../services/process.services');
 const ClientService = require('../services/client.services');
@@ -76,7 +73,7 @@ async function deleteFormGuideById(req, res, next) {
       fs.unlink(formguide.directory, (err) => {
         if (err) {
           throw {
-            message: 'el archivo no se elimina',
+            message: `the file couldn't delete`,
           };
         }
       });

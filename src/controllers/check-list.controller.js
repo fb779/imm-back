@@ -1,34 +1,32 @@
 /************************************************
  *  Importaciones
  ************************************************/
-const CheckList = require('../model/check-list.model');
+// const CheckList = require('../model/check-list.model');
 const CheckListService = require('../services/check-list.services');
 const VisaCategoriesServices = require('../services/visa-category.services');
 
 async function getCheckList(req, res, next) {
   try {
     const type = req.query.type;
-    let visa;
 
-    // const filter = { visa_categories: { $eq: visa } };
     const filter = {};
 
-    if (!type) {
+    const visa = await VisaCategoriesServices.getByTitle(type);
+
+    if (type != 'all' && (!type || !visa)) {
       return res.status(404).json({
         ok: true,
-        messages: 'Type visa is required',
+        messages: 'Required a valid type of visa',
         error: {},
       });
     }
 
     if (type != 'all') {
-      visa = await VisaCategoriesServices.getByName(type);
       filter['state'] = true;
-      filter['visa_categories'] = {$in: [visa]};
+      filter['visa_categories'] = {$in: [visa._id]};
     }
 
-    const listCheckList = await CheckList.find(filter).select('-createdAt -updatedAt -__v');
-    // .populate({ path: 'visa_categories', select: '-active -createdAt -updatedAt -__v', match: { name: { $eq: 'VISITOR' } } });
+    const listCheckList = await CheckListService.getListCheckList(filter);
 
     res.status(200).json({
       ok: true,
@@ -44,7 +42,7 @@ async function getCheckListId(req, res, next) {
   try {
     const id = req.params.id;
 
-    const checkList = await CheckList.findById(id).select('-required -createdAt -updatedAt -__v');
+    const checkList = await CheckListService.getCheckListById(id);
 
     if (!checkList) {
       return res.status(404).json({

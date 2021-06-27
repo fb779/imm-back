@@ -51,7 +51,7 @@ ProcessSchema.pre('save', async function (next) {
      */
     const list_process = await Process.find({visa_category: process.visa_category}).sort({code: -1});
     const nextValueCode = list_process.length > 0 && list_process[0] ? Number(list_process[0].code.slice(-1)) : 0;
-    const nextCode = `${String(process.visa_category.name).replace(/\s/, '-')}-${String(nextValueCode + 1).padStart(10, '0')}`;
+    const nextCode = `${String(process.visa_category.title).replace(/\s+/, '-')}-${String(nextValueCode + 1).padStart(10, '0')}`;
 
     process.code = nextCode;
 

@@ -8,7 +8,7 @@ const VisaCategorySchema = new Schema(
   {
     name: {type: String, required: [true, 'the {PATH} is required'], unique: true, uppercase: true},
     title: {type: String, enum: kindVisaCategories, required: [true, 'the {PATH} is required'], unique: true},
-    product: {type: String, default: null, lowercase: true},
+    product: {type: String, default: null},
     description: {type: String, required: false},
     active: {type: Boolean, default: true},
   },
@@ -31,8 +31,8 @@ VisaCategorySchema.static('findByTitle', function (title) {
   return this.findOne({title});
 });
 
-VisaCategorySchema.static('findByProduct', function (_product) {
-  return this.findOne({product: _product.toLowerCase(), active: true}).select('-createdAt -updatedAt -__v');
+VisaCategorySchema.static('findByProduct', function (product) {
+  return this.findOne({product, active: true}).select('-createdAt -updatedAt -__v');
   // return this.findOne({product: _product, active: true}).select('-createdAt -updatedAt -__v');
 });
 

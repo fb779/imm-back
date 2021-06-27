@@ -1,8 +1,7 @@
 const CouponService = require('../services/coupon.services');
-const {roles, formats} = require('../config/config');
+const {roles} = require('../config/config');
 const moment = require('moment');
 const _ = require('underscore');
-const {use} = require('../routes/api/coupons');
 
 async function getCouponList(req, res, next) {
   try {

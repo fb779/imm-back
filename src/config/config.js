@@ -110,10 +110,23 @@ const formats = {
   output: 'YYYY-MM-DD',
 };
 
+const formOtherServices = 'FormOtherServices';
+
 const visaCategories = {
   visitor: 'FormVisitor',
-  expressentry: 'FormExpressEntry',
+  studypermit: 'FormStudyPermit',
   workpermit: 'FormWorkPermit',
+  expressentry: 'FormExpressEntry',
+  citizenship: 'FormCitizenship',
+  prstream: 'FormPrStream',
+  eta: 'FormEta',
+  gcms_notes: 'FormGcmsNotes',
+  status_verification: 'FormStatusVerification',
+  document_replacement: 'FormDocumentReplacement',
+  document_replacement_citizenship: 'FormDocumentReplacementCitizenship',
+  amendment_documents: 'FormAmendmentDocuments',
+  temporary_resident_extension: 'FormTemporaryResidentExtension',
+  pgwp: 'FormPgwp',
 };
 
 const kindVisaCategories = {
@@ -154,6 +167,7 @@ module.exports = {
   valuesStatusStep,
   formats,
   passwordRegex,
+  formOtherServices,
   visaCategories,
   kindVisaCategories,
 };

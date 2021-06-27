@@ -17,10 +17,10 @@ function getCheckListByName(_name) {
   });
 }
 
-function getListCheckList() {
+function getListCheckList(filter = {}) {
   return new Promise(async (resolve, reject) => {
     try {
-      const list = await CheckList.find().populate({path: 'visa_categories'});
+      const list = await CheckList.find(filter);
 
       return resolve(list);
     } catch (error) {
@@ -46,7 +46,7 @@ function getCheckListById(id_checklist) {
         });
       }
 
-      return resolve(list_items);
+      return resolve(checklist);
     } catch (error) {
       return reject({
         status: 500,
@@ -119,38 +119,7 @@ function createCheckList(newCheckList) {
 function editCheckList(id, editCheckList) {
   return new Promise(async (resolve, reject) => {
     try {
-      const check = await CheckList.findById(id);
-
-      if (!check) {
-        reject({
-          status: 400,
-          message: "Error, CheckList doesn't exist",
-          errors: '',
-        });
-      }
-
-      if (editCheckList.visa_categories) {
-        editCheckList.visa_categories = await [...new Set(editCheckList.visa_categories.filter((el) => (el.trim() ? true : false)).map((el) => el.trim()))];
-
-        check.visa_categories = editCheckList.visa_categories;
-      }
-
-      if (editCheckList.name) {
-        check.name = editCheckList.name;
-      }
-      if (editCheckList.description) {
-        check.description = editCheckList.description;
-      }
-      if (editCheckList.group) {
-        check.group = editCheckList.group;
-      }
-      if (editCheckList.required) {
-        check.required = editCheckList.required;
-      }
-
-      check.state = editCheckList.state;
-
-      await check.save();
+      const check = await CheckList.findByIdAndUpdate(id, editCheckList, {new: true, runValidators: true, context: 'query'});
 
       resolve(check);
     } catch (error) {
@@ -256,4 +225,5 @@ module.exports = {
   getCheckListById,
   getCheckListByIds,
   getCheckListByName,
+  getListCheckList,
 };
